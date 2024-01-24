@@ -6,6 +6,7 @@ from .managers import UserManager
 from django.core.validators import RegexValidator
 import re
 from core.utils import user_image_path
+from orders.models import DiscountCode
 
 # Create your models here.
 class User(AbstractBaseUser):
@@ -25,12 +26,14 @@ class User(AbstractBaseUser):
     updated_at = models.DateTimeField(auto_now=True)
     is_deleted = models.BooleanField(default=False)
     deleted_at = models.DateTimeField(auto_now=True, editable=False)
-    is_active = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=False) # when get otp code with SMS or email, then set this to True.
+    is_admin = models.BooleanField(default=False)
+    discount_code = models.ForeignKey(DiscountCode, on_delete=models.PROTECT) # this relation is between customer and discount_code not staff.
     
     objects = UserManager()
     
-    USERNAME_FIELD = "phone_number"
-    REQUIRED_FIELDS = ["email", "first_name", "last_name"]
+    USERNAME_FIELD = "phone_number" # this field 'phone_number here!' must always be unique!!!
+    REQUIRED_FIELDS = ["email", "first_name", "last_name"] # password is going to be asked by django automatiacaly & phone_number will too because its in USERNAME_FIELD.
          
     def convert_to_english_numbers(self, input_str):
         persian_to_english = {
@@ -90,4 +93,4 @@ class Address(BaseModel):
     postal_code = models.IntegerField()
     
     #Foreign Keys
-    user = models.ForeignKey(User, on_delete=models.PROTECT)
+    user = models.ForeignKey(User, on_delete=models.PROTECT) # this relation is between both customers and staff with Address.
