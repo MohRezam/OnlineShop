@@ -10,7 +10,7 @@ class Order(BaseModel):
     is_paid = models.BooleanField(default=False)
     
     # Foreign keys
-    user = models.ForeignKey("User", on_delete=models.PROTECT)
+    user = models.ForeignKey(User, on_delete=models.PROTECT)
     discount_code = models.ForeignKey("DiscountCode", on_delete=models.PROTECT)
     
     
@@ -19,7 +19,7 @@ class OrderItem(BaseModel):
     
     # Foreign keys
     order = models.ForeignKey("Order", on_delete=models.PROTECT)
-    product = models.ForeignKey("Product", on_delete=models.PROTECT)
+    product = models.ForeignKey(Product, on_delete=models.PROTECT)
     
 
 class DiscountCode(BaseModel):
@@ -38,7 +38,7 @@ class Transaction(BaseModel):
     ("receipts", "receipts"),
 )
     final_price = models.DecimalField(max_digits=10, decimal_places=2)
-    transaction_type = models.CharField(max_length=20, choices=TRANSACTION_TYPES)
+    transaction_type = models.CharField(max_length=255, choices=TRANSACTION_TYPES)
     
     # Foreign Keys
     user = models.ForeignKey(User, on_delete=models.PROTECT)
