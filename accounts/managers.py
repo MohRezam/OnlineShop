@@ -15,8 +15,9 @@ class UserManager(BaseUserManager):
         
         if not last_name:
             raise ValueError("User must have a last name")
-
-        user = self.model(
+        
+        # self.model is the model User!
+        user = self.model( 
             phone_number=phone_number,
             email=self.normalize_email(email),
             first_name=first_name,
