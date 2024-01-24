@@ -23,7 +23,7 @@ class Product(BaseModel):
     image = models.ImageField(upload_to=product_image_path)
     
     # Foreign Keys
-    user = models.ForeignKey(User, on_delete=models.PROTECT)
+    user = models.ForeignKey(User, on_delete=models.PROTECT) # this relation is between staff and Product not customer.
     category = models.ForeignKey(Category, on_delete=models.PROTECT)
     discount = models.ForeignKey("Discount", on_delete=models.PROTECT, null=True, blank=True)
 
@@ -35,7 +35,7 @@ class Discount(BaseModel):
     is_active = models.BooleanField(default=False)
     
     # Foreign Keys
-    user = models.ManyToManyField(User)
+    user = models.ManyToManyField(User) # this relation is between staff and Discount not customer.
     
     
     
