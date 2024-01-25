@@ -6,16 +6,19 @@ from .managers import UserManager
 from django.core.validators import RegexValidator
 import re
 from core.utils import user_image_path
-from orders.models import DiscountCode
 
 # Create your models here.
 class User(AbstractBaseUser):
     ROLE_CHOICES = (
-        ("Product Manager", "Product Manager"),
-        ("Supervisor", "Supervisor"),
-        ("Operator", "Operator"),
-        ("Customer", "Customer"),
+        ("product manager", "Product Manager"),
+        ("supervisor", "Supervisor"),
+        ("operator", "Operator"),
+        ("customer", "Customer"),
     )    
+    ADMIN_CHOICES = (
+        (True, "Admin"),
+        (False, "Not Admin")
+    )
     first_name = models.CharField(max_length=255)
     last_name = models.CharField(max_length=255)
     phone_number = models.CharField(max_length=11, unique=True, validators=[RegexValidator(r'^\d{11}$', message='Enter a valid 11-digit phone number.')])
@@ -27,8 +30,7 @@ class User(AbstractBaseUser):
     is_deleted = models.BooleanField(default=False)
     deleted_at = models.DateTimeField(auto_now=True, editable=False)
     is_active = models.BooleanField(default=False) # when get otp code with SMS or email, then set this to True.
-    is_admin = models.BooleanField(default=False)
-    discount_code = models.ForeignKey(DiscountCode, on_delete=models.PROTECT) # this relation is between customer and discount_code not staff.
+    is_admin = models.CharField(max_length=25, choices=ADMIN_CHOICES, default=False)
     
     objects = UserManager()
     
@@ -90,7 +92,11 @@ class Address(BaseModel):
     province = models.CharField(max_length=255)
     city = models.CharField(max_length=255)
     detailed_address = models.TextField()
-    postal_code = models.IntegerField()
+    postal_code = models.PositiveIntegerField()
+    is_actual_person = models.BooleanField(default=True)
+    receiver_name = models.CharField(max_length=255, blank=True, null=True)
+    receiver_last_name = models.CharField(max_length=255, blank=True, null=True)
+    receiver_phone_number = models.CharField(max_length=11, blank=True, null=True)
     
     #Foreign Keys
-    user = models.ForeignKey(User, on_delete=models.PROTECT) # this relation is between both customers and staff with Address.
+    user = models.ForeignKey(User, on_delete=models.PROTECT, related_name="address") # this relation is between both customers and staff with Address.
