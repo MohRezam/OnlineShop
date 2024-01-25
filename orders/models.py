@@ -6,30 +6,36 @@ from products.models import Product
 # Create your models here.
 
 class Order(BaseModel):
+    PAYMENT_CHOICES = (
+        (True, "Paid"),
+        (False, "Not Paid")
+    )
     total_price = models.DecimalField(max_digits=10, decimal_places=2)
-    is_paid = models.BooleanField(default=False)
+    is_paid = models.CharField(max_length=25, choices=PAYMENT_CHOICES)
     
     # Foreign keys
-    user = models.ForeignKey(User, on_delete=models.PROTECT)
-    discount_code = models.ForeignKey("DiscountCode", on_delete=models.PROTECT)
+    user = models.ForeignKey(User, on_delete=models.PROTECT, related_name="orders")
+    coupon = models.ForeignKey("Coupon", on_delete=models.PROTECT, blank=True, null=True, related_name="orders")
     
     
 class OrderItem(BaseModel):
     quantity = models.IntegerField()
     
     # Foreign keys
-    order = models.ForeignKey("Order", on_delete=models.PROTECT)
-    product = models.ForeignKey(Product, on_delete=models.PROTECT)
+    order = models.ForeignKey("Order", on_delete=models.PROTECT, related_name="order_items")
+    product = models.ForeignKey(Product, on_delete=models.PROTECT, related_name="order_items")
     
 
-class DiscountCode(BaseModel):
-    code = models.CharField(max_length=255)
-    percentage = models.IntegerField()
+class Coupon(BaseModel):
+    code = models.CharField(max_length=255, unique=True)
+    percentage = models.PositiveIntegerField(default=1)
     expiration_date = models.DateTimeField()
+    available_quantity = models.PositiveIntegerField()
+    usage_limit_per_user = models.PositiveIntegerField()
     is_active = models.BooleanField(default=True)
     
-    # Foreign keys
-    # user = models.ForeignKey("User", on_delete=models.PROTECT)
+    # Foreign Keys
+    user = models.ForeignKey(User, on_delete=models.PROTECT, related_name="coupons")
     
     
 class Transaction(BaseModel):
@@ -38,11 +44,10 @@ class Transaction(BaseModel):
     ("receipts", "receipts"),
 )
     final_price = models.DecimalField(max_digits=10, decimal_places=2)
-    transaction_type = models.CharField(max_length=255, choices=TRANSACTION_TYPES)
+    transaction_type = models.CharField(max_length=255, choices=TRANSACTION_TYPES) # deleted in ERD!
     
     # Foreign Keys
-    user = models.ForeignKey(User, on_delete=models.PROTECT)
-    order = models.OneToOneField(Order, on_delete=models.PROTECT,  primary_key=True)
-    # discount_code = models.ForeignKey("DiscountCode", on_delete=models.PROTECT)
+    user = models.ForeignKey(User, on_delete=models.PROTECT, related_name="transactions")
+    order = models.ForeignKey(Order, on_delete=models.PROTECT, related_name="transactions")
     
-    
+
