@@ -6,6 +6,7 @@ from .managers import UserManager
 from django.core.validators import RegexValidator
 import re
 from core.utils import user_image_path
+from django.utils import timezone
 
 # Create your models here.
 class User(AbstractBaseUser):
@@ -13,7 +14,7 @@ class User(AbstractBaseUser):
         ("product manager", "Product Manager"),
         ("supervisor", "Supervisor"),
         ("operator", "Operator"),
-        ("customer", "Customer"),
+        # ("customer", "Customer"),
     )    
     ADMIN_CHOICES = (
         (True, "Admin"),
@@ -24,18 +25,19 @@ class User(AbstractBaseUser):
     phone_number = models.CharField(max_length=11, unique=True, validators=[RegexValidator(r'^\d{11}$', message='Enter a valid 11-digit phone number.')])
     email = models.EmailField(max_length=255, unique=True, validators=[EmailValidator(message='Enter a valid email address.')])
     image = models.ImageField(upload_to=user_image_path)
-    role = models.CharField(max_length=255, choices=ROLE_CHOICES)
+    role = models.CharField(max_length=255, choices=ROLE_CHOICES, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     is_deleted = models.BooleanField(default=False)
-    deleted_at = models.DateTimeField(auto_now=True, editable=False)
-    is_active = models.BooleanField(default=False) # when get otp code with SMS or email, then set this to True.
+    deleted_at = models.DateTimeField(null=True, default=None, editable=False)
+    is_active = models.BooleanField(default=True) # when get otp code with SMS or email, then set this to True.
     is_admin = models.CharField(max_length=25, choices=ADMIN_CHOICES, default=False)
     
     objects = UserManager()
     
     USERNAME_FIELD = "phone_number" # this field 'phone_number here!' must always be unique!!!
     REQUIRED_FIELDS = ["email", "first_name", "last_name"] # password is going to be asked by django automatiacaly & phone_number will too because its in USERNAME_FIELD.
+  
          
     def convert_to_english_numbers(self, input_str):
         persian_to_english = {
@@ -73,10 +75,11 @@ class User(AbstractBaseUser):
     
     def delete(self):
         self.is_deleted = True
+        self.deleted_at = timezone.now()
         self.save()
             
-    def __str__(self):
-        return self.email
+    def __str__(self) -> str:
+        return f"{self.first_name} {self.last_name}"
     
     def has_perm(self, perm, obj=None):
         return True
@@ -87,6 +90,9 @@ class User(AbstractBaseUser):
     @property
     def is_staff(self):
         return self.is_admin
+    
+    class Meta:
+        verbose_name_plural = 'Users'
     
 class Address(BaseModel):
     province = models.CharField(max_length=255)
@@ -99,4 +105,9 @@ class Address(BaseModel):
     receiver_phone_number = models.CharField(max_length=11, blank=True, null=True)
     
     #Foreign Keys
-    user = models.ForeignKey(User, on_delete=models.PROTECT, related_name="address") # this relation is between both customers and staff with Address.
+    user = models.ForeignKey(User, on_delete=models.PROTECT) # this relation is between both customers and staff with Address.
+    
+    def __str__(self) -> str:
+        return f"{self.city} {self.province} {self.detailed_address[:10]}..."
+    class Meta:
+        verbose_name_plural = 'Addresses'
