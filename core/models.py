@@ -1,5 +1,6 @@
 from django.db import models
 from django.db.models import Manager, QuerySet
+from django.utils import timezone
 
 class AppQuerySet(QuerySet):
     def delete(self):
@@ -12,16 +13,17 @@ class AppManager(Manager):
 
 
 class BaseModel(models.Model):
-    class Meta:
-        abstract = True
-        
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     is_deleted = models.BooleanField(default=False)
-    deleted_at = models.DateTimeField(auto_now=True, editable=False)
+    deleted_at = models.DateTimeField(null=True, default=None, editable=False)
     
     def delete(self):
         self.is_deleted = True
+        self.deleted_at = timezone.now()
         self.save()
+    
+    class Meta:
+        abstract = True
                 
     objects = AppManager()
