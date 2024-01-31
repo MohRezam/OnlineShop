@@ -24,7 +24,7 @@ class User(AbstractBaseUser):
     last_name = models.CharField(max_length=255)
     phone_number = models.CharField(max_length=11, unique=True, validators=[RegexValidator(r'^\d{11}$', message='Enter a valid 11-digit phone number.')])
     email = models.EmailField(max_length=255, unique=True, validators=[EmailValidator(message='Enter a valid email address.')])
-    image = models.ImageField(upload_to=user_image_path)
+    image = models.ImageField(upload_to=user_image_path, blank=True, null=True)
     role = models.CharField(max_length=255, choices=ROLE_CHOICES, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -62,8 +62,6 @@ class User(AbstractBaseUser):
 
     def clean_phone_number(self, phone_number):
         cleaned_phone_number = self.convert_to_english_numbers(phone_number)
-        # Additional validation (e.g., ensuring the length or format of the phone number)
-        # For example:
         if len(cleaned_phone_number) != 11:
             raise ValueError('Phone number should be 11 digits long.')
 
