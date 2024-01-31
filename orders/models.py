@@ -4,20 +4,20 @@ from accounts.models import User
 from products.models import Product
 
 # Create your models here.
-def create_order_from_cart(self, cart): # this cart is an object of Cart model
-    order = self.create(user=cart.user, total_price=cart.calculate_total_price())
+# def create_order_from_cart(self, cart): # this cart is an object of Cart model
+#     order = self.create(user=cart.user, total_price=cart.calculate_total_price())
 
-    for cart_item in cart.cart_items.all():
-        OrderItem.objects.create(order=order, product=cart_item.product, quantity=cart_item.quantity)
+#     for cart_item in cart.cart_items.all():
+#         OrderItem.objects.create(order=order, product=cart_item.product, quantity=cart_item.quantity)
 
-    cart.delete()
+#     cart.delete()
 
-    return order
+#     return order
 
 class Order(BaseModel):
     PAYMENT_CHOICES = (
-        (True, "Paid"),
-        (False, "Not Paid")
+        ("paid", "Paid"),
+        ("not paid", "Not Paid"),
     )
     total_price = models.DecimalField(max_digits=10, decimal_places=2)
     is_paid = models.CharField(max_length=25, choices=PAYMENT_CHOICES, default=False) # when we create order from cart we have to set is_paid to True
@@ -60,7 +60,7 @@ class Cart(models.Model):
     
     
     def __str__(self) -> str:
-        return f"total cart: {self.calculate_total_price}"
+        return f"total cart: {self.calculate_total_price()}"
     
     def calculate_total_price(self):
         return sum(item.total_price() for item in self.cart_items.all())
@@ -74,12 +74,12 @@ class CartItem(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     
     # Foreign Keys
-    cart = models.ForeignKey(Cart, on_delete=models.CASCADE)
+    cart = models.ForeignKey(Cart, on_delete=models.CASCADE, related_name="cart_items")
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     
     
     def __str__(self) -> str:
-        return f"total price of {self.quantity} {self.product.name}: {self.total_price}"
+        return f"total price of {self.quantity} {self.product.name}: {self.total_price()}"
     
     def total_price(self):
         return self.quantity * self.product.price
@@ -96,7 +96,7 @@ class Coupon(BaseModel):
     is_active = models.BooleanField(default=True)
     
     # Foreign Keys
-    user = models.ManyToManyField(User, blank=True, null=True) # fekr shavad
+    user = models.ManyToManyField(User, blank=True) # fekr shavad
     
     def __str__(self) -> str:
         return f"{self.code} with {self.percentage} percentage is active until {self.expiration_date} for {self.available_quantity} people"
