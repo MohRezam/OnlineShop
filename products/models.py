@@ -30,7 +30,7 @@ class Product(BaseModel):
     description = models.TextField()
     slug = models.SlugField()
     inventory_quantity = models.PositiveIntegerField()
-    is_availabe = models.CharField(max_length=25, choices=PRODUCT_AVAILABLE_CHOICES, default=True)
+    is_available = models.CharField(max_length=25, choices=PRODUCT_AVAILABLE_CHOICES, default=True)
     image = models.ImageField(upload_to=product_image_path, blank=True, null=True)
     
     
