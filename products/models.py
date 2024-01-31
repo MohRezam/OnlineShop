@@ -56,6 +56,7 @@ class ProductFeature(BaseModel):
     
     class Meta:
         verbose_name_plural = 'features'
+        
 class ProductFeatureValue(BaseModel):
     value = models.CharField(max_length=255)
     
@@ -86,7 +87,7 @@ class Discount(BaseModel):
         ("percentage", "Percentage"),
         ("decimal", "Decimal"),
     )
-    type = models.CharField(max_length=255)
+    type = models.CharField(max_length=255, choices=DISCOUNT_TYPE)
     value = models.DecimalField(max_digits=10, decimal_places=2)
     max_value = models.DecimalField(max_digits=10, decimal_places=2)
     is_active = models.BooleanField(default=False)
@@ -95,9 +96,10 @@ class Discount(BaseModel):
     user = models.ManyToManyField(User) # this relation is between staff and Discount not customer.
     
     def __str__(self) -> str:
-        return f"{self.type}| {self.value}"
+        return f"{self.type}: {self.value}"
     
     class Meta:
         verbose_name_plural = 'discounts'
     
     
+  
