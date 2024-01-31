@@ -7,10 +7,10 @@ from core.utils import category_image_path, product_image_path
 class Category(BaseModel):
     name = models.CharField(max_length=255, unique=True)
     is_sub = models.BooleanField(default=False)
-    image = models.ImageField(upload_to=category_image_path)
+    image = models.ImageField(upload_to=category_image_path, blank=True, null=True)
     
     # Foreign Keys
-    parent_category = models.ForeignKey("self", on_delete=models.PROTECT)
+    parent_category = models.ForeignKey("self", on_delete=models.PROTECT, blank=True, null=True)
     discount = models.ForeignKey("Discount", on_delete=models.PROTECT, null=True, blank=True)
     
     def __str__(self) -> str:
@@ -20,22 +20,22 @@ class Category(BaseModel):
         verbose_name_plural = 'categories'
             
 class Product(BaseModel):
-    PRODUCT_ACTIVE_CHOICES = (
-        (True, "Active"),
-        (False, "Not Active"),
+    PRODUCT_AVAILABLE_CHOICES = (
+        ("available", "Available"),
+        ("not available", "Not Available"),
     )
     name = models.CharField(max_length=255)
     brand = models.CharField(max_length=255)
     price = models.DecimalField(max_digits=10, decimal_places=2)
     description = models.TextField()
     slug = models.SlugField()
-    features = models.ManyToManyField("ProductFeature", through='ProductFeatureValue')
     inventory_quantity = models.PositiveIntegerField()
-    is_active = models.CharField(max_length=25, choices=PRODUCT_ACTIVE_CHOICES, default=True)
-    image = models.ImageField(upload_to=product_image_path)
+    is_availabe = models.CharField(max_length=25, choices=PRODUCT_AVAILABLE_CHOICES, default=True)
+    image = models.ImageField(upload_to=product_image_path, blank=True, null=True)
     
     
     # Foreign Keys
+    features = models.ManyToManyField("ProductFeature", through='ProductFeatureValue', blank=True)
     user = models.ForeignKey(User, on_delete=models.PROTECT) # this relation is between staff and Product not customer.
     category = models.ForeignKey(Category, on_delete=models.PROTECT)
     discount = models.ForeignKey("Discount", on_delete=models.PROTECT, null=True, blank=True) # had blank and null True
@@ -89,7 +89,8 @@ class Discount(BaseModel):
     )
     type = models.CharField(max_length=255, choices=DISCOUNT_TYPE)
     value = models.DecimalField(max_digits=10, decimal_places=2)
-    max_value = models.DecimalField(max_digits=10, decimal_places=2)
+    max_value = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
+    expiration_date = models.DateTimeField()
     is_active = models.BooleanField(default=False)
     
     # Foreign Keys
