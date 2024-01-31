@@ -61,7 +61,7 @@ class ProductModelTest(CommonTestSetup):
             description='TestDescription',
             slug='test-product',
             inventory_quantity=50,
-            is_active=True,
+            is_available=True,
             user=self.user,
             category=self.category,
             discount=self.discount,
