@@ -96,7 +96,7 @@ class Coupon(BaseModel):
     is_active = models.BooleanField(default=True)
     
     # Foreign Keys
-    user = models.ForeignKey(User, on_delete=models.PROTECT, blank=True, null=True)
+    user = models.ManyToManyField(User, blank=True, null=True) # fekr shavad
     
     def __str__(self) -> str:
         return f"{self.code} with {self.percentage} percentage is active until {self.expiration_date} for {self.available_quantity} people"
