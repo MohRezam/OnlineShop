@@ -23,6 +23,8 @@ class CommonTestSetup(TestCase):
 
         cls.category = Category.objects.create(
             name='TestCategory',
+            slug="test-product",
+            image="test/test/test",
             discount=cls.discount,
         )
 
@@ -38,6 +40,8 @@ class CategoryModelTest(CommonTestSetup):
         sub_category = Category.objects.create(
             name='TestSubCategory',
             is_sub=True,
+            slug="test-product",
+            image="test/test/test",
             parent_category=self.category,
         )
 
@@ -62,6 +66,7 @@ class ProductModelTest(CommonTestSetup):
             slug='test-product',
             inventory_quantity=50,
             is_available=True,
+            image="test/test/test",
             user=self.user,
             category=self.category,
             discount=self.discount,
@@ -121,6 +126,8 @@ class ProductFeatureValueModelTest(CommonTestSetup):
             description='Test Description',
             slug='test-product',
             inventory_quantity=10,
+            is_available=True,
+            image="test/test/test",
             user=self.user,  
             category=self.category  
         )
