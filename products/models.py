@@ -6,6 +6,7 @@ from core.utils import category_image_path, product_image_path
 
 class Category(BaseModel):
     name = models.CharField(max_length=255, unique=True)
+    slug = models.SlugField()
     is_sub = models.BooleanField(default=False)
     image = models.ImageField(upload_to=category_image_path, blank=True, null=True)
     
