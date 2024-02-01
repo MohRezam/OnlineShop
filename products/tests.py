@@ -7,13 +7,16 @@ from django.utils import timezone
 class CommonTestSetup(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.user = get_user_model().objects.create_user(
-            phone_number='09123456789',
-            email='john.doe@example.com',
+        cls.user = get_user_model().objects.create(
             first_name='John',
             last_name='Doe',
-            password="123"
+            phone_number='09123456789',  
+            email='john.doe@example.com',
+            image="test/test/test",
+            role='product manager',
+            is_admin=False,
         )
+
 
         cls.discount = Discount.objects.create(
             type="percentage",

@@ -13,6 +13,7 @@ class UserModelTest(TestCase):
             last_name='Doe',
             phone_number='09123456789',  
             email='john.doe@example.com',
+            image="test/test/test",
             role='product manager',
             is_admin=False,
         )
@@ -46,11 +47,16 @@ class UserModelTest(TestCase):
 class AddressModelTest(TestCase):
 
     def setUp(self):
-        self.user = get_user_model().objects.create_user(phone_number='09123456789',
-            email='john.doe@example.com',
+        self.user = get_user_model().objects.create(
             first_name='John',
             last_name='Doe',
-            password="123")
+            phone_number='09123456789',  
+            email='john.doe@example.com',
+            image="test/test/test",
+            role='product manager',
+            is_admin=False,
+        )
+
         
 
         self.address = Address.objects.create(
@@ -58,7 +64,7 @@ class AddressModelTest(TestCase):
             city='Test City',
             detailed_address='Test Detailed Address',
             postal_code=12345,
-            is_actual_person=True,
+            is_actual_person=False,
             receiver_name='Test Receiver Name',
             receiver_last_name='Test Receiver Last Name',
             receiver_phone_number='1234567890',

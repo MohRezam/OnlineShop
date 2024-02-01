@@ -9,11 +9,16 @@ from django.utils import timezone
 class OrderModelTest(TestCase):
 
     def setUp(self):
-        self.user = get_user_model().objects.create_user(phone_number='09123456789',
-            email='john.doe@example.com',
+        self.user = get_user_model().objects.create(
             first_name='John',
             last_name='Doe',
-            password="123")
+            phone_number='09123456789',  
+            email='john.doe@example.com',
+            image="test/test/test",
+            role='product manager',
+            is_admin=False,
+        )
+
 
         self.coupon = Coupon.objects.create(code='TESTCODE', percentage=1, expiration_date=timezone.now() + timezone.timedelta(days=7), available_quantity=100, usage_limit_per_user=3)
 
@@ -89,11 +94,16 @@ class OrderItemModelTest(TestCase):
 
 class CartModelTest(TestCase):
     def setUp(self):
-        self.user = get_user_model().objects.create_user(phone_number='09123456789',
-            email='john.doe@example.com',
+        self.user = get_user_model().objects.create(
             first_name='John',
             last_name='Doe',
-            password="123")
+            phone_number='09123456789',  
+            email='john.doe@example.com',
+            image="test/test/test",
+            role='product manager',
+            is_admin=False,
+        )
+
 
         self.cart = Cart.objects.create(
             user=self.user,
@@ -133,11 +143,16 @@ class CartModelTest(TestCase):
 
 class CartItemModelTest(TestCase):
     def setUp(self):
-        self.user = get_user_model().objects.create_user(phone_number='09123456789',
-            email='john.doe@example.com',
+        self.user = get_user_model().objects.create(
             first_name='John',
             last_name='Doe',
-            password="123")
+            phone_number='09123456789',  
+            email='john.doe@example.com',
+            image="test/test/test",
+            role='product manager',
+            is_admin=False,
+        )
+
 
         self.category = Category.objects.create(name="Test Category")
 
@@ -180,11 +195,16 @@ class CartItemModelTest(TestCase):
 
 class CouponModelTest(TestCase):
     def setUp(self):
-        self.user = get_user_model().objects.create_user(phone_number='09123456789',
-            email='john.doe@example.com',
+        self.user = get_user_model().objects.create(
             first_name='John',
             last_name='Doe',
-            password="123")
+            phone_number='09123456789',  
+            email='john.doe@example.com',
+            image="test/test/test",
+            role='product manager',
+            is_admin=False,
+        )
+
 
         self.coupon = Coupon.objects.create(
             code='TESTCODE',
@@ -211,11 +231,16 @@ class CouponModelTest(TestCase):
 
 class TransactionModelTest(TestCase):
     def setUp(self):
-        self.user = get_user_model().objects.create_user(phone_number='09123456789',
-            email='john.doe@example.com',
+        self.user = get_user_model().objects.create(
             first_name='John',
             last_name='Doe',
-            password="123")
+            phone_number='09123456789',  
+            email='john.doe@example.com',
+            image="test/test/test",
+            role='product manager',
+            is_admin=False,
+        )
+
 
         self.order = Order.objects.create(
             total_price=100.00,
