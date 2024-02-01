@@ -14,6 +14,11 @@ class Category(BaseModel):
     parent_category = models.ForeignKey("self", on_delete=models.PROTECT, blank=True, null=True)
     discount = models.ForeignKey("Discount", on_delete=models.PROTECT, null=True, blank=True)
     
+    def save(self, *args, **kwargs):
+        if not self.image:
+            self.image = 'path/to/default/image.jpg'
+        super().save(*args, **kwargs)
+    
     def __str__(self) -> str:
         return f"{self.name}"
     
@@ -41,6 +46,12 @@ class Product(BaseModel):
     category = models.ForeignKey(Category, on_delete=models.PROTECT)
     discount = models.ForeignKey("Discount", on_delete=models.PROTECT, null=True, blank=True) # had blank and null True
 
+    
+    def save(self, *args, **kwargs):
+        if not self.image:
+            self.image = 'path/to/default/image.jpg'
+        super().save(*args, **kwargs)
+    
     def __str__(self) -> str:
         return f"{self.name}"
     

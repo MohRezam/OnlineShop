@@ -67,6 +67,8 @@ class User(AbstractBaseUser):
 
         return cleaned_phone_number  
     def save(self, *args, **kwargs):
+        if not self.image:
+            self.image = 'path/to/default/image.jpg'
         self.phone_number = self.clean_phone_number(self.phone_number)
         self.email = self.email
         super().save(*args, **kwargs)
