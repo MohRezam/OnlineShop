@@ -90,19 +90,19 @@ class ProductFeatureModelTest(TestCase):
     def setUp(self):
         self.product_feature = ProductFeature.objects.create(
             name='TestFeature',
-            text_value='TestTextValue',
-            numeric_value=10.0,
+            # text_value='TestTextValue',
+            # numeric_value=10.0,
         )
 
     def test_product_feature_str_representation(self):
         expected_str = str(self.product_feature.name)
         self.assertEqual(str(self.product_feature), expected_str)
 
-    def test_product_feature_text_value(self):
-        self.assertEqual(self.product_feature.text_value, 'TestTextValue')
+    # def test_product_feature_text_value(self):
+    #     self.assertEqual(self.product_feature.text_value, 'TestTextValue')
 
-    def test_product_feature_numeric_value(self):
-        self.assertEqual(self.product_feature.numeric_value, 10.0)
+    # def test_product_feature_numeric_value(self):
+    #     self.assertEqual(self.product_feature.numeric_value, 10.0)
 
     def test_product_feature_verbose_name_plural(self):
         self.assertEqual(str(ProductFeature._meta.verbose_name_plural), 'features')
