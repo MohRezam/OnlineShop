@@ -95,10 +95,10 @@ class User(AbstractBaseUser):
         verbose_name_plural = 'Users'
     
 class Address(BaseModel):
-    province = models.CharField(max_length=255)
-    city = models.CharField(max_length=255)
+    province = models.CharField(max_length=255, help_text="like Alborz")
+    city = models.CharField(max_length=255, help_text="like karaj")
     detailed_address = models.TextField()
-    postal_code = models.PositiveIntegerField()
+    postal_code = models.PositiveIntegerField(help_text="like 3149757953")
     is_actual_person = models.BooleanField(default=True)
     receiver_name = models.CharField(max_length=255, blank=True, null=True)
     receiver_last_name = models.CharField(max_length=255, blank=True, null=True)

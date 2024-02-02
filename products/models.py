@@ -59,7 +59,7 @@ class Product(BaseModel):
         verbose_name_plural = 'products'
 
 class ProductFeature(BaseModel):
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=255, help_text="like color")
     # text_value = models.TextField(blank=True, null=True)
     # numeric_value = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
     

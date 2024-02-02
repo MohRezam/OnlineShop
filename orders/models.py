@@ -21,10 +21,10 @@ class Order(BaseModel):
     )
     total_price = models.DecimalField(max_digits=10, decimal_places=2)
     is_paid = models.CharField(max_length=25, choices=PAYMENT_CHOICES, default=False) # when we create order from cart we have to set is_paid to True
-    province = models.CharField(max_length=255, blank=True, null=True) # if user dont fill this it is going to fill by user address model informations
-    city = models.CharField(max_length=255, blank=True, null=True)
+    province = models.CharField(max_length=255, blank=True, null=True, help_text="like Alborz") # if user dont fill this it is going to fill by user address model informations
+    city = models.CharField(max_length=255, blank=True, null=True, help_text="like karaj")
     detailed_address = models.TextField(blank=True, null=True)
-    postal_code = models.PositiveIntegerField(blank=True, null=True)
+    postal_code = models.PositiveIntegerField(blank=True, null=True, help_text="like 3149757953")
     
     # Foreign Keys
     user = models.ForeignKey(User, on_delete=models.PROTECT)
@@ -48,10 +48,10 @@ class OrderItem(BaseModel):
         verbose_name_plural = 'order items'
 
 class Cart(models.Model):
-    province = models.CharField(max_length=255, blank=True, null=True)
-    city = models.CharField(max_length=255, blank=True, null=True)
+    province = models.CharField(max_length=255, blank=True, null=True, help_text="like Alborz")
+    city = models.CharField(max_length=255, blank=True, null=True, help_text="like karaj")
     detailed_address = models.TextField(blank=True, null=True)
-    postal_code = models.PositiveIntegerField(blank=True, null=True)
+    postal_code = models.PositiveIntegerField(blank=True, null=True, help_text="like 3149757953")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
@@ -88,7 +88,7 @@ class CartItem(models.Model):
         verbose_name_plural = 'cart items'
         
 class Coupon(BaseModel):
-    code = models.CharField(max_length=255, unique=True)
+    code = models.CharField(max_length=100, unique=True, help_text="like DJke21x")
     percentage = models.PositiveIntegerField(default=1)
     expiration_date = models.DateTimeField()
     available_quantity = models.PositiveIntegerField()
