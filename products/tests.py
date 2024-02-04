@@ -1,6 +1,6 @@
 from django.test import TestCase
 from django.contrib.auth import get_user_model
-from .models import Category, Discount, Product, ProductFeature, ProductFeatureValue
+from .models import Category, Discount, Product, ProductFeature, ProductFeatureValue, News
 from django.utils import timezone
 
 
@@ -169,3 +169,27 @@ class DiscountModelTest(CommonTestSetup):
         self.assertIn(self.user, saved_discount.user.all())
         
    
+class NewsModelTest(TestCase):
+    def setUp(self):
+        self.user = get_user_model().objects.create(
+            first_name='John',
+            last_name='Doe',
+            phone_number='09123456789',  
+            email='john.doe@example.com',
+            image="test/test/test",
+            role='product manager',
+            is_admin=False,
+        )
+        self.news = News.objects.create(
+            title="Test Title",
+            body="Test Body",
+            image="test/test/test",
+            user=self.user
+        )
+        
+    def test_news_str_representation(self):
+        expected_str = str(self.news.title) + "-" + str(self.news.created_at)
+        self.assertEqual(str(self.news), expected_str)
+        
+    def test_news_verbose_name_plural(self):
+        self.assertEqual(str(News._meta.verbose_name_plural), 'News')

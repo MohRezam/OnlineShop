@@ -123,7 +123,7 @@ class News(BaseModel):
     user = models.ForeignKey(User, on_delete=models.PROTECT, related_name="news")
     
     def __str__(self) -> str:
-        return f"{self.title}- {self.created_at}"
+        return f"{self.title}-{self.created_at}"
     
     class Meta:
         verbose_name_plural = 'News'
