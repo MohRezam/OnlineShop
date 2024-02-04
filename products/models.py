@@ -11,8 +11,8 @@ class Category(BaseModel):
     image = models.ImageField(upload_to=category_image_path, blank=True, null=True)
     
     # Foreign Keys
-    parent_category = models.ForeignKey("self", on_delete=models.PROTECT, blank=True, null=True)
-    discount = models.ForeignKey("Discount", on_delete=models.PROTECT, null=True, blank=True)
+    parent_category = models.ForeignKey("self", on_delete=models.PROTECT, blank=True, null=True, related_name="categories")
+    discount = models.ForeignKey("Discount", on_delete=models.PROTECT, null=True, blank=True, related_name="categories")
     
     def save(self, *args, **kwargs):
         if not self.image:
@@ -42,9 +42,9 @@ class Product(BaseModel):
     
     # Foreign Keys
     features = models.ManyToManyField("ProductFeature", through='ProductFeatureValue', blank=True)
-    user = models.ForeignKey(User, on_delete=models.PROTECT) # this relation is between staff and Product not customer.
-    category = models.ForeignKey(Category, on_delete=models.PROTECT)
-    discount = models.ForeignKey("Discount", on_delete=models.PROTECT, null=True, blank=True) # had blank and null True
+    user = models.ForeignKey(User, on_delete=models.PROTECT, related_name="products") # this relation is between staff and Product not customer.
+    category = models.ForeignKey(Category, on_delete=models.PROTECT, related_name="products")
+    discount = models.ForeignKey("Discount", on_delete=models.PROTECT, null=True, blank=True, related_name="products") # had blank and null True
 
     
     def save(self, *args, **kwargs):
@@ -73,8 +73,8 @@ class ProductFeatureValue(BaseModel):
     value = models.CharField(max_length=255)
     
     # Foreign Keys
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    feature = models.ForeignKey(ProductFeature, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="products_feature_value")
+    feature = models.ForeignKey(ProductFeature, on_delete=models.CASCADE, related_name="products_feature_value")
     
     def __str__(self) -> str:
         return f"{self.value} for {self.feature.name}"
@@ -85,8 +85,8 @@ class Comment(BaseModel):
     text = models.TextField()
     
     # Foreign Keys
-    user = models.ForeignKey(User, on_delete=models.PROTECT)
-    products = models.ForeignKey("Product", on_delete=models.PROTECT)
+    user = models.ForeignKey(User, on_delete=models.PROTECT, related_name="comments")
+    products = models.ForeignKey("Product", on_delete=models.PROTECT, related_name="comments")
     
     def __str__(self) -> str:
         return f"{self.text} by {self.user.first_name} {self.user.last_name}"
@@ -105,7 +105,6 @@ class Discount(BaseModel):
     expiration_date = models.DateTimeField()
     is_active = models.BooleanField(default=False)
     
-    # Foreign Keys
     user = models.ManyToManyField(User) # this relation is between staff and Discount not customer.
     
     def __str__(self) -> str:
