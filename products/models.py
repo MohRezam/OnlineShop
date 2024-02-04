@@ -1,7 +1,7 @@
 from django.db import models
 from core.models import BaseModel
 from accounts.models import User
-from core.utils import category_image_path, product_image_path
+from core.utils import category_image_path, product_image_path, news_image_path
 # Create your models here.
 
 class Category(BaseModel):
@@ -114,4 +114,16 @@ class Discount(BaseModel):
         verbose_name_plural = 'discounts'
     
     
-  
+class News(BaseModel):
+    title = models.CharField(max_length=255)
+    body = models.TextField()
+    image = models.ImageField(upload_to=news_image_path)
+    
+    # Foreign Keys
+    user = models.ForeignKey(User, on_delete=models.PROTECT, related_name="news")
+    
+    def __str__(self) -> str:
+        return f"{self.title}- {self.created_at}"
+    
+    class Meta:
+        verbose_name_plural = 'News'
