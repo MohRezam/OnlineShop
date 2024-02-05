@@ -15,7 +15,7 @@ class UserModelTest(TestCase):
             email='john.doe@example.com',
             image="test/test/test",
             role='product manager',
-            is_admin=False,
+            is_staff=False,
         )
 
     def test_user_str_representation(self):
@@ -54,7 +54,7 @@ class AddressModelTest(TestCase):
             email='john.doe@example.com',
             image="test/test/test",
             role='product manager',
-            is_admin=False,
+            is_staff=False,
         )
 
         
