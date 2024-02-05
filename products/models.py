@@ -83,6 +83,7 @@ class ProductFeatureValue(BaseModel):
         verbose_name_plural = 'feature values'
 class Comment(BaseModel):
     text = models.TextField()
+    likes = models.PositiveIntegerField(default=0)
     
     # Foreign Keys
     user = models.ForeignKey(User, on_delete=models.PROTECT, related_name="comments")
