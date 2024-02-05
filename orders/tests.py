@@ -16,7 +16,7 @@ class OrderModelTest(TestCase):
             email='john.doe@example.com',
             image="test/test/test",
             role='product manager',
-            is_admin=False,
+            is_staff=False,
         )
 
 
@@ -101,7 +101,7 @@ class CartModelTest(TestCase):
             email='john.doe@example.com',
             image="test/test/test",
             role='product manager',
-            is_admin=False,
+            is_staff=False,
         )
 
 
@@ -150,7 +150,7 @@ class CartItemModelTest(TestCase):
             email='john.doe@example.com',
             image="test/test/test",
             role='product manager',
-            is_admin=False,
+            is_staff=False,
         )
 
 
@@ -202,7 +202,7 @@ class CouponModelTest(TestCase):
             email='john.doe@example.com',
             image="test/test/test",
             role='product manager',
-            is_admin=False,
+            is_staff=False,
         )
 
 
@@ -238,7 +238,7 @@ class TransactionModelTest(TestCase):
             email='john.doe@example.com',
             image="test/test/test",
             role='product manager',
-            is_admin=False,
+            is_staff=False,
         )
 
 

@@ -1,6 +1,6 @@
 from django.test import TestCase
 from django.contrib.auth import get_user_model
-from .models import Category, Discount, Product, ProductFeature, ProductFeatureValue, News
+from .models import Category, Discount, Product, ProductFeature, ProductFeatureValue, News, Comment
 from django.utils import timezone
 
 
@@ -14,7 +14,7 @@ class CommonTestSetup(TestCase):
             email='john.doe@example.com',
             image="test/test/test",
             role='product manager',
-            is_admin=False,
+            is_staff=False,
         )
 
 
@@ -178,7 +178,7 @@ class NewsModelTest(TestCase):
             email='john.doe@example.com',
             image="test/test/test",
             role='product manager',
-            is_admin=False,
+            is_staff=False,
         )
         self.news = News.objects.create(
             title="Test Title",
@@ -193,3 +193,31 @@ class NewsModelTest(TestCase):
         
     def test_news_verbose_name_plural(self):
         self.assertEqual(str(News._meta.verbose_name_plural), 'News')
+        
+        
+
+
+class CommentModelTest(CommonTestSetup):
+    def setUp(self):
+        self.product = Product.objects.create(
+            name='Test Product',
+            brand='Test Brand',
+            price=100,
+            description='Test Description',
+            slug='test-product',
+            inventory_quantity=10,
+            is_available=True,
+            image="test/test/test",
+            user=self.user,  
+            category=self.category  
+        )
+        self.comment = Comment.objects.create(
+            text='Test Comment',
+            user=self.user,
+            product=self.product
+        )
+        
+    def test_comment_verbose_name_plural(self):
+        verbose_name_plural = self.comment._meta.verbose_name_plural
+
+        self.assertEqual(verbose_name_plural, 'comments')
