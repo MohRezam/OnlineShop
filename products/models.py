@@ -87,7 +87,7 @@ class Comment(BaseModel):
     
     # Foreign Keys
     user = models.ForeignKey(User, on_delete=models.PROTECT, related_name="comments")
-    products = models.ForeignKey("Product", on_delete=models.PROTECT, related_name="comments")
+    product = models.ForeignKey("Product", on_delete=models.PROTECT, related_name="comments")
     
     def __str__(self) -> str:
         return f"{self.text} by {self.user.first_name} {self.user.last_name}"
