@@ -7,9 +7,10 @@ from django.core.validators import RegexValidator
 import re
 from core.utils import user_image_path
 from django.utils import timezone
+from django.contrib.auth.models import PermissionsMixin
 
 # Create your models here.
-class User(AbstractBaseUser):
+class User(AbstractBaseUser, PermissionsMixin):
     ROLE_CHOICES = (
         ("product manager", "Product Manager"),
         ("supervisor", "Supervisor"),
@@ -17,8 +18,8 @@ class User(AbstractBaseUser):
         # ("customer", "Customer"),
     )    
     ADMIN_CHOICES = (
-        (True, "Admin"),
-        (False, "Not Admin")
+        ("Admin", "Admin"),
+        ("Not Admin", "Not Admin")
     )
     first_name = models.CharField(max_length=255)
     last_name = models.CharField(max_length=255)
@@ -31,13 +32,14 @@ class User(AbstractBaseUser):
     is_deleted = models.BooleanField(default=False)
     deleted_at = models.DateTimeField(null=True, default=None, editable=False)
     is_active = models.BooleanField(default=True) # when get otp code with SMS or email, then set this to True.
-    is_admin = models.CharField(max_length=25, choices=ADMIN_CHOICES, default=False)
+    # is_admin = models.CharField(max_length=25, choices=ADMIN_CHOICES, default=False)
+    is_staff = models.BooleanField(default=False)
     
     objects = UserManager()
     
     USERNAME_FIELD = "phone_number" # this field 'phone_number here!' must always be unique!!!
     REQUIRED_FIELDS = ["email", "first_name", "last_name"] # password is going to be asked by django automatiacaly & phone_number will too because its in USERNAME_FIELD.
-  
+    
          
     def convert_to_english_numbers(self, input_str):
         persian_to_english = {
@@ -87,9 +89,9 @@ class User(AbstractBaseUser):
     def has_module_perms(self, app_label):
         return True
     
-    @property
-    def is_staff(self):
-        return self.is_admin
+    # @property
+    # def is_staff(self):
+    #     return self.is_admin
     
     class Meta:
         verbose_name_plural = 'Users'
