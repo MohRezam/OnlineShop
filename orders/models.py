@@ -27,8 +27,8 @@ class Order(BaseModel):
     postal_code = models.PositiveIntegerField(blank=True, null=True, help_text="like 3149757953")
     
     # Foreign Keys
-    user = models.ForeignKey(User, on_delete=models.PROTECT, related_name="orders")
-    coupon = models.ForeignKey("Coupon", on_delete=models.PROTECT, blank=True, null=True, related_name="orders")
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="orders")
+    coupon = models.ForeignKey("Coupon", on_delete=models.CASCADE, blank=True, null=True, related_name="orders")
     
     def __str__(self) -> str:
         return f"Total: {self.total_price}, Payment: {self.is_paid}"
@@ -39,8 +39,8 @@ class OrderItem(BaseModel):
     quantity = models.IntegerField()
     
     # Foreign Keys
-    order = models.ForeignKey("Order", on_delete=models.PROTECT, related_name="order_items")
-    product = models.ForeignKey(Product, on_delete=models.PROTECT, related_name="order_items")
+    order = models.ForeignKey("Order", on_delete=models.CASCADE, related_name="order_items")
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="order_items")
     
     def __str__(self) -> str:
         return f"number of {self.product.name}: {self.quantity}"
@@ -111,8 +111,8 @@ class Transaction(BaseModel):
     transaction_type = models.CharField(max_length=255, choices=TRANSACTION_TYPES) # deleted in ERD!
     
     # Foreign Keys
-    user = models.ForeignKey(User, on_delete=models.PROTECT, related_name="transacions")
-    order = models.ForeignKey(Order, on_delete=models.PROTECT, related_name="transacions")
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="transacions")
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name="transacions")
     
     def __str__(self) -> str:
         return f"transaction: {self.final_price}"
