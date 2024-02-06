@@ -107,7 +107,7 @@ class Address(BaseModel):
     receiver_phone_number = models.CharField(max_length=11, blank=True, null=True)
     
     #Foreign Keys
-    user = models.ForeignKey(User, on_delete=models.PROTECT) # this relation is between customers with Address.
+    user = models.ForeignKey(User, on_delete=models.CASCADE) # this relation is between customers with Address.
     
     def __str__(self) -> str:
         return f"{self.city} {self.province} {self.detailed_address[:10]}..."
