@@ -2,22 +2,51 @@ from django.db import models
 from core.models import BaseModel
 from accounts.models import User
 from core.utils import category_image_path, product_image_path, news_image_path
+from django.utils.text import slugify
+from django.urls import reverse
+from django.core.exceptions import ValidationError
 # Create your models here.
 
 class Category(BaseModel):
-    name = models.CharField(max_length=255, unique=True)
-    slug = models.SlugField()
+    name = models.CharField(max_length=255)
+    slug = models.SlugField(unique=True, blank=True)
     is_sub = models.BooleanField(default=False)
     image = models.ImageField(upload_to=category_image_path, blank=True, null=True)
     
     # Foreign Keys
-    parent_category = models.ForeignKey("self", on_delete=models.PROTECT, blank=True, null=True, related_name="categories")
-    discount = models.ForeignKey("Discount", on_delete=models.PROTECT, null=True, blank=True, related_name="categories")
+    parent_category = models.ForeignKey("self", on_delete=models.CASCADE, blank=True, null=True, related_name="categories")
+    discount = models.ForeignKey("Discount", on_delete=models.CASCADE, null=True, blank=True, related_name="categories")
+    
+    
+    def clean(self):
+        if self.is_sub and not self.parent_category:
+            raise ValidationError("Subcategories must have a parent category.")
+        
+        if not self.is_sub and self.parent_category:
+            raise ValidationError("Main categories cannot have a parent category.You should set is_sub to True for that.")
+    
+    def validate_unique(self, exclude=None):
+        super().validate_unique(exclude)
+        if not self.is_sub:
+            if self.__class__.objects.filter(name=self.name, is_sub=False).exclude(pk=self.pk).exists():
+                raise ValidationError({'name': ['Category with this name already exists.']})
     
     def save(self, *args, **kwargs):
         if not self.image:
             self.image = 'path/to/default/image.jpg'
+        if not self.slug:
+            if self.is_sub:
+                self.slug = slugify(self.parent_category.name + "-" + self.name)
+            else:
+                self.slug = slugify(self.name)
         super().save(*args, **kwargs)
+        
+    def get_absolute_url(self):
+        if self.is_sub:
+            return reverse("products", kwargs={"category_slug": self.parent_category.slug, "subcategory_slug": self.slug})
+        else:
+            return reverse("category", kwargs={"slug": self.slug})
+    
     
     def __str__(self) -> str:
         return f"{self.name}"
@@ -34,7 +63,7 @@ class Product(BaseModel):
     brand = models.CharField(max_length=255)
     price = models.DecimalField(max_digits=10, decimal_places=2)
     description = models.TextField()
-    slug = models.SlugField()
+    slug = models.SlugField(unique=True, blank=True)
     inventory_quantity = models.PositiveIntegerField()
     is_available = models.CharField(max_length=25, choices=PRODUCT_AVAILABLE_CHOICES, default=True)
     image = models.ImageField(upload_to=product_image_path, blank=True, null=True)
@@ -42,15 +71,21 @@ class Product(BaseModel):
     
     # Foreign Keys
     features = models.ManyToManyField("ProductFeature", through='ProductFeatureValue', blank=True)
-    user = models.ForeignKey(User, on_delete=models.PROTECT, related_name="products") # this relation is between staff and Product not customer.
-    category = models.ForeignKey(Category, on_delete=models.PROTECT, related_name="products")
-    discount = models.ForeignKey("Discount", on_delete=models.PROTECT, null=True, blank=True, related_name="products") # had blank and null True
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="products") # this relation is between staff and Product not customer.
+    category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name="products")
+    discount = models.ForeignKey("Discount", on_delete=models.CASCADE, null=True, blank=True, related_name="products") # had blank and null True
 
     
     def save(self, *args, **kwargs):
         if not self.image:
             self.image = 'path/to/default/image.jpg'
+        if not self.slug:
+            self.slug = slugify(self.brand + "-" + self.name)
         super().save(*args, **kwargs)
+    
+    def get_absolute_url(self):
+        return reverse("product_detail", kwargs={"pk": self.slug})
+    
     
     def __str__(self) -> str:
         return f"{self.name}"
@@ -86,8 +121,8 @@ class Comment(BaseModel):
     likes = models.PositiveIntegerField(default=0)
     
     # Foreign Keys
-    user = models.ForeignKey(User, on_delete=models.PROTECT, related_name="comments")
-    product = models.ForeignKey("Product", on_delete=models.PROTECT, related_name="comments")
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="comments")
+    product = models.ForeignKey("Product", on_delete=models.CASCADE, related_name="comments")
     
     def __str__(self) -> str:
         return f"{self.text} by {self.user.first_name} {self.user.last_name}"
@@ -121,7 +156,7 @@ class News(BaseModel):
     image = models.ImageField(upload_to=news_image_path)
     
     # Foreign Keys
-    user = models.ForeignKey(User, on_delete=models.PROTECT, related_name="news")
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="news")
     
     def __str__(self) -> str:
         return f"{self.title}-{self.created_at}"
