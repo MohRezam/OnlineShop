@@ -1,9 +1,11 @@
 from django.shortcuts import render
 from rest_framework.views import APIView
-from .models import Category, Comment, News
+from .models import Category, Comment, News, Product
 from rest_framework.response import Response
-from .serializers import CategorySerializer, CommentSerializer, NewsSerializer
+from .serializers import CategorySerializer, CommentSerializer, NewsSerializer, ProductSerializer
 from rest_framework import status
+from django.shortcuts import get_object_or_404
+from rest_framework.exceptions import NotFound
 # Create your views here.
 
 
@@ -24,3 +26,30 @@ class HomeView(APIView):
         }
 
         return Response(data=response_data, status=status.HTTP_200_OK)
+    
+    
+class CategoryView(APIView):
+    def get(self, request, category_slug):
+        category = get_object_or_404(Category, slug=category_slug)
+        subcategories = Category.objects.filter(parent_category=category)
+        serializer = CategorySerializer(instance=subcategories, many=True)
+        
+        return Response(data=serializer.data, status=status.HTTP_200_OK)
+    
+    
+class ProductView(APIView):
+    def get(self, request, category_slug, subcategory_slug):
+        category = get_object_or_404(Category, slug=category_slug)
+        subcategory = get_object_or_404(Category, slug=subcategory_slug, parent_category=category)
+        products = Product.objects.filter(category=subcategory)
+        serializer = ProductSerializer(instance=products, many=True)
+        
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class ProductDetailView(APIView):
+    def get(self, request, slug):
+        product = get_object_or_404(Product, slug=slug)
+        serializer = ProductSerializer(instance=product)
+        
+        return Response(serializer.data, status=status.HTTP_200_OK)
