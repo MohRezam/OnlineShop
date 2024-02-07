@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block body_class %}main-layout inner_posituong{% endblock %}
+{% load static %}
+{% block title %}Contact Us{% endblock title %}
+{% block content %}
+      <!--  contact -->
+      <div class="contact">
+         <div class="container">
+            <div class="row">
+               <div class="col-md-12">
+                  <div class="titlepage">
+                     <h2>Contact Now</h2>
+                  </div>
+               </div>
+            </div>
+            <div class="row">
+               <div class="col-md-10 offset-md-1">
+                  <form id="request" class="main_form">
+                     <div class="row">
+                        <div class="col-md-12 ">
+                           <input class="contactus" placeholder="Name" type="type" name="Name"> 
+                        </div>
+                        <div class="col-md-12">
+                           <input class="contactus" placeholder="Email" type="type" name="Email"> 
+                        </div>
+                        <div class="col-md-12">
+                           <input class="contactus" placeholder="Phone Number" type="type" name="Phone Number">                          
+                        </div>
+                        <div class="col-md-12">
+                           <textarea class="textarea" placeholder="Message" type="type" Message="Name">Message </textarea>
+                        </div>
+                        <div class="col-md-12">
+                           <button class="send_btn">Send</button>
+                        </div>
+                     </div>
+                  </form>
+               </div>
+            </div>
+         </div>
+      </div>
+      <!-- end contact -->
+       <!-- Javascript files-->
+  <script src="{% static 'js/jquery.min.js' %}"></script>
+  <script src="{% static 'js/popper.min.js' %}"></script>
+  <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+  <script src="{% static 'js/jquery-3.0.0.min.js' %}"></script>
+  <!-- sidebar -->
+  <script src="{% static 'js/jquery.mCustomScrollbar.concat.min.js' %}"></script>
+  <script src="{% static 'js/custom.js' %}"></script>
+   {% endblock content %}

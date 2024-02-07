@@ -1,0 +1,137 @@
+{% extends "base.html" %}
+{% block body_class %}main-layout inner_posituong computer_page{% endblock %}
+{% load static %}
+{% block title %} product detail page {% endblock title %}
+{% block content %}
+<!-- laptop1 -->
+<div class="laptop1">
+    <div class="container">
+        <div class="row" id="productDetailContainer">
+            <!-- Product details will be inserted here dynamically -->
+        </div>
+    </div>
+</div>
+<!-- end laptop1 -->
+<footer>
+    <!-- Footer content -->
+</footer>
+<style>
+   #productDetailContainer {
+      display: flex;
+      flex-direction: row-reverse; 
+  }
+
+  /* Add styles for product image column */
+  #productDetailContainer .col-md-7 {
+      flex: 1; 
+  }
+  
+  /* Add styles for product info column */
+  #productDetailContainer .col-md-5 {
+      flex: 1; 
+  }
+  /* Add styles for product info */
+   .product-info > div {
+      margin-bottom: 5px; /* Adjust bottom margin */
+      .laptop1_img img {
+         width: 40%; /* Adjust the width of the image */
+         height: auto; /* Maintain the aspect ratio */
+      }
+      .laptop1_img img:hover {
+         transform: scale(1.1); /* Increase the scale on hover */
+      }
+</style>
+
+<script src="{% static 'js/jquery.min.js' %}"></script>
+<script src="{% static 'js/popper.min.js' %}"></script>
+<script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+<script src="{% static 'js/jquery-3.0.0.min.js' %}"></script>
+<!-- sidebar -->
+<script src="{% static 'js/jquery.mCustomScrollbar.concat.min.js' %}"></script>
+<script src="{% static 'js/custom.js' %}"></script>
+<script>
+   function fetchProductDetail() {
+       fetch('/api' + window.location.pathname)
+       .then(response => response.json())
+           .then(product => {
+               const productDetailContainer = document.getElementById('productDetailContainer');
+
+               const colDiv = document.createElement('div');
+               colDiv.classList.add('col-md-7');
+
+               const laptopImg = document.createElement('div');
+               laptopImg.classList.add('laptop1_img');
+               laptopImg.innerHTML = `<figure><img src="${product.image}" alt="${product.name}"/></figure>`;
+               colDiv.appendChild(laptopImg);
+
+               const colDiv2 = document.createElement('div');
+               colDiv2.classList.add('col-md-5');
+
+               const titlePage = document.createElement('div');
+               titlePage.classList.add('titlepage');
+               titlePage.innerHTML = `
+                   <h2>${product.name}</h2>
+                   <h1>${product.brand}</h1>
+                   <div class="product-info">
+                       <div><strong>Description:</strong> ${product.description}</div>
+                       <div><strong>Price:</strong> ${product.price}</div>
+                       <div><strong>Inventory quantity:</strong> ${product.inventory_quantity}</div>
+                       <div><strong>Discount:</strong> ${product.discount ? product.discount : '-'}</div>
+                   </div>
+                   <a class="read_more" href="#">Add to Cart</a>
+               `;
+               colDiv2.appendChild(titlePage);
+
+               productDetailContainer.appendChild(colDiv);
+               productDetailContainer.appendChild(colDiv2);
+           })
+           .catch(error => console.error('Error fetching product detail:', error));
+   }
+
+   window.addEventListener('DOMContentLoaded', fetchProductDetail);
+</script>
+
+
+{% endblock content %}
+
+{% comment %} <script>
+   // Function to fetch product detail from API and populate HTML
+   function fetchProductDetail() {
+       // Replace '/api/products/' with your API endpoint
+       fetch('/api' + window.location.pathname)
+       .then(response => response.json())
+           .then(product => {
+               // Get the container to insert product detail
+               const productDetailContainer = document.getElementById('productDetailContainer');
+
+               // Create HTML elements for product detail
+               const colDiv = document.createElement('div');
+               colDiv.classList.add('col-md-7');
+
+               const laptopImg = document.createElement('div');
+               laptopImg.classList.add('laptop1_img');
+               laptopImg.innerHTML = `<figure><img src="${product.image}" alt="${product.name}"/></figure>`;
+               colDiv.appendChild(laptopImg);
+
+               const colDiv2 = document.createElement('div');
+               colDiv2.classList.add('col-md-5');
+
+               const titlePage = document.createElement('div');
+               titlePage.classList.add('titlepage');
+               titlePage.innerHTML = `
+                   <h2>${product.name}</h2>
+                   <p>${product.description}</p>
+                   <a class="read_more" href="#">Read More</a>
+               `;
+               colDiv2.appendChild(titlePage);
+
+               // Append the product detail to the container
+               productDetailContainer.appendChild(colDiv);
+               productDetailContainer.appendChild(colDiv2);
+           })
+           .catch(error => console.error('Error fetching product detail:', error));
+   }
+
+   // Call the fetchProductDetail function when the page loads
+   window.addEventListener('DOMContentLoaded', fetchProductDetail);
+</script> {% endcomment %}

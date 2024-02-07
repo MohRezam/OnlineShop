@@ -1,0 +1,155 @@
+{% extends "base.html" %}
+{% block body_class %}main-layout inner_posituong{% endblock %}
+{% load static %}
+{% block title %}brands{% endblock title %}
+{% block content %}
+
+<!-- products -->
+<div class="products">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="titlepage">
+                    <h2>Brands</h2>
+                </div>
+            </div>
+        </div>
+        <div class="row" id="productsRowContainer">
+            <div class="col-md-12">
+                <div class="product-container">
+                    <div class="row" id="productsRow">
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+   .product_box {
+       position: relative; /* Positioning context for absolute positioning */
+       background-color: #fff; /* Set background color */
+       border: 1px solid #ddd; /* Add border */
+       border-radius: 5px; /* Add border radius */
+       padding: 20px; /* Add padding */
+       height: 300px; /* Set a fixed height for the product box */
+       display: flex; /* Use flexbox for product box */
+       flex-direction: column; /* Stack elements vertically */
+       justify-content: center; /* Center content vertically */
+       text-align: center; /* Center text horizontally */
+   }
+
+   .product_box img {
+       max-height: 200px; /* Set a maximum height for the images */
+       width: auto; /* Set width to auto to maintain aspect ratio */
+       margin: 0 auto 10px; /* Add margin below the image */
+   }
+
+   .product_name {
+       font-size: 16px; /* Set font size */
+       font-weight: bold; /* Set font weight */
+       margin-top: auto; /* Align the product name to the bottom */
+   }
+
+   .product_name a {
+       display: inline-block; /* Make the anchor element inline-block */
+       width: 100%; /* Ensure the anchor takes up full width */
+       padding: 10px; /* Add padding */
+       border-radius: 10px; /* Add border radius */
+       background-color: #f0f0f0; /* Set background color */
+   }
+</style>
+
+<!-- Javascript files-->
+<script src="{% static 'js/jquery.min.js' %}"></script>
+<script src="{% static 'js/popper.min.js' %}"></script>
+<script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+<script src="{% static 'js/jquery-3.0.0.min.js' %}"></script>
+<!-- sidebar -->
+<script src="{% static 'js/jquery.mCustomScrollbar.concat.min.js' %}"></script>
+<script src="{% static 'js/custom.js' %}"></script>
+<!-- end products -->
+
+<script>
+   fetch('/api' + window.location.pathname)
+       .then(response => response.json())
+       .then(data => {
+           const productsRow = document.getElementById('productsRow');
+
+           data.forEach(product => {
+               const colDiv = document.createElement('div');
+               colDiv.classList.add('col-md-4', 'margin_bottom1');
+
+               const productBox = document.createElement('div');
+               productBox.classList.add('product_box');
+
+               const figure = document.createElement('figure');
+               const img = document.createElement('img');
+               img.src = product.image;
+               img.alt = product.name;
+               figure.appendChild(img);
+
+               const productNameLink = document.createElement('a');
+               productNameLink.textContent = product.name;
+               productNameLink.href = `/product/${product.id}`;
+               productNameLink.href = window.location.pathname + product.slug + '/products/'
+
+               productNameLink.style.display = 'block'; // Ensure the product name link takes up the full width of the box
+               productNameLink.style.fontWeight = 'bold';
+               productNameLink.style.width = '60%';
+               productNameLink.style.borderRadius = '10px';
+               productNameLink.style.margin = '0 auto';
+               productNameLink.style.backgroundColor = '#f0f0f0';
+               productNameLink.style.textAlign = 'center'; // Center-align the text
+
+               // Append the product name anchor to the product box
+               productBox.appendChild(figure);
+               productBox.appendChild(productNameLink);
+
+               colDiv.appendChild(productBox);
+               productsRow.appendChild(colDiv);
+           });
+       })
+       .catch(err => {
+           console.error('Error fetching products data:', err);
+       });
+</script>
+
+{% endblock content %}
+
+{% comment %} <script>
+   // Fetch data from the API endpoint
+   fetch('{% url "products:category_api" category_slug="your_category_slug" %}')
+     .then(response => response.json())
+     .then(data => {
+       const productsRow = document.getElementById('productsRow');
+ 
+       // Loop through each product and create HTML elements dynamically
+       data.forEach(product => {
+         const colDiv = document.createElement('div');
+         colDiv.classList.add('col-md-4', 'margin_bottom1');
+ 
+         const productBox = document.createElement('div');
+         productBox.classList.add('product_box');
+ 
+         const figure = document.createElement('figure');
+         const img = document.createElement('img');
+         img.src = product.image;
+         img.alt = product.name;
+         figure.appendChild(img);
+ 
+         const productName = document.createElement('h3');
+         productName.textContent = product.name;
+ 
+         productBox.appendChild(figure);
+         productBox.appendChild(productName);
+ 
+         colDiv.appendChild(productBox);
+         productsRow.appendChild(colDiv);
+       });
+     })
+     .catch(err => {
+       console.error('Error fetching products data:', err);
+     });
+ </script> {% endcomment %}

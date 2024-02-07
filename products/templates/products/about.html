@@ -1,0 +1,36 @@
+
+{% extends "base.html" %}
+{% block body_class %}main-layout inner_posituong{% endblock %}
+{% load static %}
+{% block title %}About Page{% endblock title %}
+{% block content %}
+      <!-- about section -->
+      <div class="about">
+         <div class="container">
+            <div class="row d_flex">
+               <div class="col-md-5">
+                  <div class="titlepage">
+                     <h2>About Us</h2>
+                     <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat.</p>
+                     <a class="read_more" href="#">Read More</a>
+                  </div>
+               </div>
+               <div class="col-md-7">
+                  <div class="about_img">
+                     <figure><img src="{% static 'images/about.jpg' %}" alt="#"/></figure>
+                  </div>
+               </div>
+            </div>
+         </div>
+      </div>
+      </div>
+      <!-- end about section -->
+        <!-- Javascript files-->
+  <script src="{% static 'js/jquery.min.js' %}"></script>
+  <script src="{% static 'js/popper.min.js' %}"></script>
+  <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+  <script src="{% static 'js/jquery-3.0.0.min.js' %}"></script>
+  <!-- sidebar -->
+  <script src="{% static 'js/jquery.mCustomScrollbar.concat.min.js' %}"></script>
+  <script src="{% static 'js/custom.js' %}"></script>
+{% endblock content %}
