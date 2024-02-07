@@ -6,10 +6,11 @@ from .serializers import CategorySerializer, CommentSerializer, NewsSerializer, 
 from rest_framework import status
 from django.shortcuts import get_object_or_404
 from rest_framework.exceptions import NotFound
+from django .views import View
 # Create your views here.
 
 
-class HomeView(APIView):
+class HomeAPIView(APIView):
     def get(self, request):
         categories = Category.objects.filter(is_sub=False)
         comments = Comment.objects.all().order_by('-likes')[:10]
@@ -18,6 +19,7 @@ class HomeView(APIView):
         ser_cat_data = CategorySerializer(instance=categories, many=True)
         ser_comm_data = CommentSerializer(instance=comments, many=True)
         ser_news_data = NewsSerializer(instance=news, many=True)
+        
         
         response_data = {
             'categories': ser_cat_data.data,
@@ -28,7 +30,7 @@ class HomeView(APIView):
         return Response(data=response_data, status=status.HTTP_200_OK)
     
     
-class CategoryView(APIView):
+class CategoryAPIView(APIView):
     def get(self, request, category_slug):
         category = get_object_or_404(Category, slug=category_slug)
         subcategories = Category.objects.filter(parent_category=category)
@@ -37,19 +39,50 @@ class CategoryView(APIView):
         return Response(data=serializer.data, status=status.HTTP_200_OK)
     
     
-class ProductView(APIView):
+class ProductAPIView(APIView):
     def get(self, request, category_slug, subcategory_slug):
         category = get_object_or_404(Category, slug=category_slug)
         subcategory = get_object_or_404(Category, slug=subcategory_slug, parent_category=category)
         products = Product.objects.filter(category=subcategory)
         serializer = ProductSerializer(instance=products, many=True)
         
+        
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-class ProductDetailView(APIView):
+class ProductDetailAPIView(APIView):
     def get(self, request, slug):
         product = get_object_or_404(Product, slug=slug)
         serializer = ProductSerializer(instance=product)
-        
+ 
+            
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class HomeView(View):
+    def get(self, request):
+        return render(request, "products/index.html", {})
+    
+
+
+class CategoryView(View):
+    def get(self, request, category_slug):
+        return render(request, "products/subcategories.html", {})
+
+class ProductView(View):
+    def get(self, request, category_slug, subcategory_slug):
+        return render(request, 'products/products.html', {})    
+
+class ProductDetailView(View):
+    def get(self, request, product_slug):
+        return render(request, 'products/product_detail.html', {})
+
+
+class AboutUsView(View):
+    def get(self, request):
+        return render(request, "products/about.html", {})
+    
+class ContactView(View):
+    def get(self, request):
+        return render(request, "products/contact.html", {})
+    
