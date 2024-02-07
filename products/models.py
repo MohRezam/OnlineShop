@@ -41,6 +41,10 @@ class Category(BaseModel):
                 self.slug = slugify(self.name)
         super().save(*args, **kwargs)
         
+    @property
+    def url(self):
+        return self.get_absolute_url()
+    
     def get_absolute_url(self):
         if self.is_sub:
             return reverse("products", kwargs={"category_slug": self.parent_category.slug, "subcategory_slug": self.slug})
@@ -49,7 +53,10 @@ class Category(BaseModel):
     
     
     def __str__(self) -> str:
-        return f"{self.name}"
+        if self.parent_category:
+            return f"{self.name}-{self.parent_category}" # to prevent showing None in admin panel.
+        else:
+            return self.name
     
     class Meta:
         verbose_name_plural = 'categories'
@@ -62,7 +69,7 @@ class Product(BaseModel):
     name = models.CharField(max_length=255)
     brand = models.CharField(max_length=255)
     price = models.DecimalField(max_digits=10, decimal_places=2)
-    description = models.TextField()
+    description = models.TextField(blank=True, null=True)
     slug = models.SlugField(unique=True, blank=True)
     inventory_quantity = models.PositiveIntegerField()
     is_available = models.CharField(max_length=25, choices=PRODUCT_AVAILABLE_CHOICES, default=True)
@@ -80,7 +87,7 @@ class Product(BaseModel):
         if not self.image:
             self.image = 'path/to/default/image.jpg'
         if not self.slug:
-            self.slug = slugify(self.brand + "-" + self.name)
+            self.slug = slugify(self.category.parent_category.name + "-" + self.name)
         super().save(*args, **kwargs)
     
     def get_absolute_url(self):
