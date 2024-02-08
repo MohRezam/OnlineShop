@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block body_class %}main-layout inner_posituong computer_page{% endblock %}
 {% load static %}
-{% block title %} product detail page {% endblock title %}
+{% block title %} product detail page{% endblock title %}
 {% block content %}
 <!-- laptop1 -->
 <div class="laptop1">
@@ -61,7 +61,7 @@
 
                const laptopImg = document.createElement('div');
                laptopImg.classList.add('laptop1_img');
-               laptopImg.innerHTML = `<figure><img src="${product.image}" alt="${product.name}"/></figure>`;
+               laptopImg.innerHTML = `<figure><img src="${product.product.image}" alt="${product.product.name}"/></figure>`;
                colDiv.appendChild(laptopImg);
 
                const colDiv2 = document.createElement('div');
@@ -70,15 +70,24 @@
                const titlePage = document.createElement('div');
                titlePage.classList.add('titlepage');
                titlePage.innerHTML = `
-                   <h2>${product.name}</h2>
-                   <h1>${product.brand}</h1>
+                   <h2>${product.product.name}</h2>
+                   <h1>${product.product.brand}</h1>
                    <div class="product-info">
-                       <div><strong>Description:</strong> ${product.description}</div>
-                       <div><strong>Price:</strong> ${product.price}</div>
-                       <div><strong>Inventory quantity:</strong> ${product.inventory_quantity}</div>
-                       <div><strong>Discount:</strong> ${product.discount ? product.discount : '-'}</div>
+                       <div><strong>Description:</strong> ${product.product.description}</div>
+                       <div><strong>Price:</strong> ${product.product.price}</div>
+                       <div><strong>Is Available: </strong>${product.product.is_available}</div>
+                       <div><strong>Inventory quantity:</strong> ${product.product.inventory_quantity}</div>
+                       <div><strong>Discount:</strong> ${product.product.discount ? product.product.discount : '-'}</div>
+                       <div>${product.comments.text}</div>
                    </div>
                    <a class="read_more" href="#">Add to Cart</a>
+                   <div>
+                    <strong>Comments:</strong>
+                    <ul>
+                        ${product.comments.map(comment => `<li><strong></stong> ${comment.user}:   ${comment.text}</li>`).join('')}
+                        
+                    </ul>
+                </div>
                `;
                colDiv2.appendChild(titlePage);
 

@@ -78,7 +78,6 @@
        .then(data => {
            const productsRow = document.getElementById('productsRow');
 
-           // Loop through each product and create HTML elements dynamically
            data.forEach(product => {
                const colDiv = document.createElement('div');
                colDiv.classList.add('col-md-4', 'margin_bottom1');
@@ -92,21 +91,19 @@
                img.alt = product.name;
                figure.appendChild(img);
 
-               // Create an anchor element for the product name
                const productNameLink = document.createElement('a');
                productNameLink.textContent = product.name;
                productNameLink.href = `/product/${product.id}`;
                productNameLink.href = '/products/' + product.slug 
 
-               productNameLink.style.display = 'block'; // Ensure the product name link takes up the full width of the box
+               productNameLink.style.display = 'block'; 
                productNameLink.style.fontWeight = 'bold';
                productNameLink.style.width = '60%';
                productNameLink.style.borderRadius = '10px';
                productNameLink.style.margin = '0 auto';
                productNameLink.style.backgroundColor = '#f0f0f0';
-               productNameLink.style.textAlign = 'center'; // Center-align the text
+               productNameLink.style.textAlign = 'center';
 
-               // Append the product name anchor to the product box
                productBox.appendChild(figure);
                productBox.appendChild(productNameLink);
 

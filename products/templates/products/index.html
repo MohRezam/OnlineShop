@@ -309,53 +309,45 @@
   <script src="{% static 'js/custom.js' %}"></script>
   
   <script>
-   fetch('http://127.0.0.1:8000/api/')
+   fetch(window.location.pathname + 'api/')
    .then(response => response.json())
    .then(data => {
-       const categories = data.categories; // Extract categories data from the response
-       const productsRow = document.getElementById('productsRow'); // Get the container element
+       const categories = data.categories; 
+       const productsRow = document.getElementById('productsRow'); 
 
-       // Loop through each category and create HTML elements dynamically
        categories.forEach(category => {
-           // Create a div element for each category
            const colDiv = document.createElement('div');
            colDiv.classList.add('col-md-4', 'margin_bottom1');
 
            const productBox = document.createElement('div');
            productBox.classList.add('product_box');
 
-           // Create a figure element for the category image
            const figure = document.createElement('figure');
            const img = document.createElement('img');
-           img.src = category.image; // Assuming the API provides the image URL for each category
-           img.alt = category.name; // Use category name as alt text
+           img.src = category.image; 
+           img.alt = category.name;
            figure.appendChild(img);
 
-           // Create an anchor element for the product name
            const productNameLink = document.createElement('a');
            productNameLink.classList.add('product_name');
            productNameLink.textContent = category.name;
            
-           // Generate the URL based on the category slug
            const categorySlug = category.slug;
-           const categoryUrl = `/category/${categorySlug}/`; // Adjust the URL structure based on your project
-           productNameLink.href = categoryUrl; // Set the URL for the product
-           productNameLink.style.display = 'block'; // Ensure the product name link takes up the full width of the box
-           productNameLink.style.textAlign = 'center'; // Center-align the text
+           const categoryUrl = `/category/${categorySlug}/`; 
+           productNameLink.href = categoryUrl; 
+           productNameLink.style.display = 'block';
+           productNameLink.style.textAlign = 'center'; 
            productNameLink.style.fontWeight = 'bold';
            productNameLink.style.width = '60%';
            productNameLink.style.borderRadius = '10px';
            productNameLink.style.margin = '0 auto';
            productNameLink.style.backgroundColor = '#f0f0f0';
 
-           // Append the anchor element to the product box
            productBox.appendChild(figure);
            productBox.appendChild(productNameLink);
 
-           // Append the product box to the column div
            colDiv.appendChild(productBox);
 
-           // Append the column div to the products row
            productsRow.appendChild(colDiv);
        });
    })

@@ -95,15 +95,14 @@
                productNameLink.href = `/product/${product.id}`;
                productNameLink.href = window.location.pathname + product.slug + '/products/'
 
-               productNameLink.style.display = 'block'; // Ensure the product name link takes up the full width of the box
+               productNameLink.style.display = 'block'; 
                productNameLink.style.fontWeight = 'bold';
                productNameLink.style.width = '60%';
                productNameLink.style.borderRadius = '10px';
                productNameLink.style.margin = '0 auto';
                productNameLink.style.backgroundColor = '#f0f0f0';
-               productNameLink.style.textAlign = 'center'; // Center-align the text
+               productNameLink.style.textAlign = 'center'; 
 
-               // Append the product name anchor to the product box
                productBox.appendChild(figure);
                productBox.appendChild(productNameLink);
 
