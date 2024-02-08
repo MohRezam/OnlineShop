@@ -80,12 +80,12 @@ class ProductDetailAPIView(APIView):
         
         return Response(data=response_data, status=status.HTTP_200_OK)
 
-# class ProductSearchAPIView(APIView):
-#     def get(self, request):
-#         query = request.query_params.get('q', '')
-#         products = Product.objects.filter(name__icontains=query)
-#         serializer = ProductSerializer(products, many=True)
-#         return Response(serializer.data, status=status.HTTP_200_OK)
+class ProductSearchAPIView(APIView):
+    def get(self, request):
+        query = request.query_params.get('q', '')
+        products = Product.objects.filter(name__icontains=query)
+        serializer = ProductSerializer(products, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
     
     
 class HomeView(View):
