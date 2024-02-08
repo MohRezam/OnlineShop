@@ -77,7 +77,6 @@ class Product(BaseModel):
     
     
     # Foreign Keys
-    features = models.ManyToManyField("ProductFeature", through='ProductFeatureValue', blank=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="products") # this relation is between staff and Product not customer.
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name="products")
     discount = models.ForeignKey("Discount", on_delete=models.CASCADE, null=True, blank=True, related_name="products") # had blank and null True
@@ -102,8 +101,13 @@ class Product(BaseModel):
 
 class ProductFeature(BaseModel):
     name = models.CharField(max_length=255, help_text="like color")
+    
     # text_value = models.TextField(blank=True, null=True)
     # numeric_value = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
+    
+    #Foreign Keys
+    products = models.ManyToManyField("Product", through='ProductFeatureValue', blank=True)
+
     
     def __str__(self) -> str:
         return f"{self.name}"
@@ -123,6 +127,7 @@ class ProductFeatureValue(BaseModel):
     
     class Meta:
         verbose_name_plural = 'feature values'
+        
 class Comment(BaseModel):
     text = models.TextField()
     likes = models.PositiveIntegerField(default=0)
