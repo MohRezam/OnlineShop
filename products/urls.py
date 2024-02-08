@@ -17,7 +17,7 @@ urlpatterns = [
     path("api/category/<slug:category_slug>/", views.CategoryAPIView.as_view(), name="category_api"),
     path("api/category/<slug:category_slug>/<slug:subcategory_slug>/products/", views.ProductAPIView.as_view(), name="products_api"),
     path("api/products/<slug:slug>/", views.ProductDetailAPIView.as_view(), name="product_detail_api"),
-    # path("api/products/search/", views.ProductSearchAPIView.as_view(), name='product_search'),
+    path("api/searching/search/", views.ProductSearchAPIView.as_view(), name='product_search'),
 ]
 
 
