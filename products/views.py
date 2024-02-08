@@ -1,12 +1,15 @@
 from django.shortcuts import render
 from rest_framework.views import APIView
-from .models import Category, Comment, News, Product
+from .models import Category, Comment, News, Product, ProductFeature, ProductFeatureValue
 from rest_framework.response import Response
-from .serializers import CategorySerializer, CommentSerializer, NewsSerializer, ProductSerializer
+from .serializers import (CategorySerializer,
+CommentSerializer, NewsSerializer, ProductSerializer,
+ProductFeatureSerializer, ProductFeatureValueSerializer, DiscountSerializer)
 from rest_framework import status
 from django.shortcuts import get_object_or_404
 from rest_framework.exceptions import NotFound
 from django .views import View
+from rest_framework import filters 
 # Create your views here.
 
 
@@ -47,18 +50,44 @@ class ProductAPIView(APIView):
         serializer = ProductSerializer(instance=products, many=True)
         
         
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(data=serializer.data, status=status.HTTP_200_OK)
 
 
 class ProductDetailAPIView(APIView):
     def get(self, request, slug):
         product = get_object_or_404(Product, slug=slug)
         serializer = ProductSerializer(instance=product)
- 
-            
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        
+        features = ProductFeature.objects.filter(products=product)
+        features_serializer = ProductFeatureSerializer(instance=features, many=True)
+        
+        feature_values = ProductFeatureValue.objects.filter(product=product)
+        feature_value_serializer = ProductFeatureValueSerializer(instance=feature_values, many=True)
+        
+        comments = Comment.objects.filter(product=product)
+        comment_serializer = CommentSerializer(instance=comments, many=True)
+        
+        discount_serializer = DiscountSerializer(instance=product.discount)
+        
+        
+        response_data = {
+            "features":features_serializer.data,
+            "feature_values":feature_value_serializer.data,
+            "product":serializer.data,
+            "discounts":discount_serializer.data,
+            "comments":comment_serializer.data,
+        }
+        
+        return Response(data=response_data, status=status.HTTP_200_OK)
 
-
+# class ProductSearchAPIView(APIView):
+#     def get(self, request):
+#         query = request.query_params.get('q', '')
+#         products = Product.objects.filter(name__icontains=query)
+#         serializer = ProductSerializer(products, many=True)
+#         return Response(serializer.data, status=status.HTTP_200_OK)
+    
+    
 class HomeView(View):
     def get(self, request):
         return render(request, "products/index.html", {})
