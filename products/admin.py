@@ -5,8 +5,8 @@ from .models import Category, Product, Comment, Discount, ProductFeature, Produc
 
 # admin.site.register(Category)
 # admin.site.register(Product)
-admin.site.register(Comment)
-admin.site.register(Discount)
+# admin.site.register(Comment)
+# admin.site.register(Discount)
 admin.site.register(ProductFeature)
 admin.site.register(ProductFeatureValue)
 admin.site.register(News)
@@ -27,3 +27,18 @@ class CategoryAdmin(admin.ModelAdmin):
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
 admin.site.register(Category, CategoryAdmin)
+
+@admin.register(Comment)
+class CommentAdmin(admin.ModelAdmin):
+    list_display = ('id', 'text', 'created_at', 'product') 
+    search_fields = ('text', 'user', 'likes')  
+    list_filter = ('product',)
+    ordering = ('-likes',)
+    
+    
+@admin.register(Discount)
+class DiscountAdmin(admin.ModelAdmin):
+    list_display = ('id', 'type', 'value', 'expiration_date')  
+    search_fields = ('user',)  
+    list_filter = ('is_active',)  
+    ordering = ('-expiration_date',)
