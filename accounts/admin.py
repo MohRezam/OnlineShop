@@ -4,9 +4,7 @@ from .forms import UserChangeForm, UserCreationForm
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.models import Group
 
-class User_display(admin.ModelAdmin):
-    list_display = ("first_name","last_name","phone_number","email","role")
-   
+@admin.register(Address)   
 class RegisterAdress(admin.ModelAdmin):
     list_display = ("province","city")
 
@@ -34,5 +32,4 @@ class UserAdmin(BaseUserAdmin):
         return super().str()
    
    
-admin.site.register(Address,RegisterAdress)
 admin.site.unregister(Group)
