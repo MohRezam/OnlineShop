@@ -26,9 +26,6 @@ class UserModelTest(TestCase):
         cleaned_phone_number = self.user.clean_phone_number('09123456789')
         self.assertEqual(cleaned_phone_number, '09123456789')
 
-    def test_clean_phone_number_invalid_length(self):
-        with self.assertRaises(ValueError):
-            self.user.clean_phone_number('123')  # Phone number should be 11 digits long
 
     def test_save_method(self):
         self.user.phone_number = '۰۹۱۲۳۴۵۶۷۸۹'

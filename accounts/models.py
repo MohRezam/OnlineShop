@@ -16,10 +16,10 @@ class User(AbstractBaseUser, PermissionsMixin):
         ("operator", "Operator"),
         # ("customer", "Customer"),
     )    
-    ADMIN_CHOICES = (
-        ("Admin", "Admin"),
-        ("Not Admin", "Not Admin")
-    )
+    # ADMIN_CHOICES = (
+    #     ("Admin", "Admin"),
+    #     ("Not Admin", "Not Admin")
+    # )
     first_name = models.CharField(max_length=255)
     last_name = models.CharField(max_length=255)
     phone_number = models.CharField(max_length=11, unique=True, validators=[RegexValidator(r'^\d{11}$', message='Enter a valid 11-digit phone number.')])
