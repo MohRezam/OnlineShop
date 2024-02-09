@@ -4,7 +4,7 @@ from django.utils import timezone
 
 class AppQuerySet(QuerySet):
     def delete(self):
-        self.update(is_deleted=True)
+        self.update(is_deleted=True, deleted_at=timezone.now())
 
         
 class AppManager(Manager):
