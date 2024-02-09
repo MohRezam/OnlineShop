@@ -1,9 +1,9 @@
 from django.contrib.auth.models import BaseUserManager
-from django.db.models import Manager, QuerySet
+from django.db.models import QuerySet
 
 
 class UserManager(BaseUserManager):
-    def create_user(self, phone_number, email, first_name, last_name, password, address=None):
+    def create_user(self, phone_number, email, first_name, last_name, password):
         if not phone_number:
             raise ValueError("User must have a phone number")
         
@@ -22,20 +22,18 @@ class UserManager(BaseUserManager):
             email=self.normalize_email(email),
             first_name=first_name,
             last_name=last_name,
-            address=address,
         )
         user.set_password(password)
         user.save(using=self._db)
         return user
     
-    def create_superuser(self, phone_number, email, first_name, last_name, password, address=None):
+    def create_superuser(self, phone_number, email, first_name, last_name, password):
         user = self.create_user(
             phone_number=phone_number,
             email=email,
             first_name=first_name,
             last_name = last_name,
             password=password,
-            address=address,
         )
         user.is_staff = True
         user.save(using=self._db)
