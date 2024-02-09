@@ -41,16 +41,6 @@ class Category(BaseModel):
                 self.slug = slugify(self.name)
         super().save(*args, **kwargs)
         
-    @property
-    def url(self):
-        return self.get_absolute_url()
-    
-    def get_absolute_url(self):
-        if self.is_sub:
-            return reverse("products", kwargs={"category_slug": self.parent_category.slug, "subcategory_slug": self.slug})
-        else:
-            return reverse("category", kwargs={"slug": self.slug})
-    
     
     def __str__(self) -> str:
         if self.parent_category:
@@ -88,9 +78,6 @@ class Product(BaseModel):
         if not self.slug:
             self.slug = slugify(self.category.parent_category.name + "-" + self.name)
         super().save(*args, **kwargs)
-    
-    def get_absolute_url(self):
-        return reverse("product_detail", kwargs={"pk": self.slug})
     
     
     def __str__(self) -> str:
