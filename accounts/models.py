@@ -1,9 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser
-from django.core.validators import EmailValidator
+from django.core.validators import EmailValidator, RegexValidator
 from core.models import BaseModel
 from .managers import UserManager
-from django.core.validators import RegexValidator
 import re
 from core.utils import user_image_path
 from django.utils import timezone
@@ -37,8 +36,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     
     objects = UserManager()
     
-    USERNAME_FIELD = "phone_number" # this field 'phone_number here!' must always be unique!!!
-    REQUIRED_FIELDS = ["email", "first_name", "last_name"] # password is going to be asked by django automatiacaly & phone_number will too because its in USERNAME_FIELD.
+    USERNAME_FIELD = "email" # this should always be a unique field in the model.
+    REQUIRED_FIELDS = ["phone_number", "first_name", "last_name"] # password is going to be asked by django automatiacaly & phone_number will too because its in USERNAME_FIELD.
     
          
     def convert_to_english_numbers(self, input_str):
@@ -64,10 +63,10 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def clean_phone_number(self, phone_number):
         cleaned_phone_number = self.convert_to_english_numbers(phone_number)
-        if len(cleaned_phone_number) != 11:
-            raise ValueError('Phone number should be 11 digits long.')
-
+        # if len(cleaned_phone_number) != 11: # don't need this already checked this in the phone number field with RegexValidator.
+        #     raise ValueError('Phone number should be 11 digits long.')
         return cleaned_phone_number  
+    
     def save(self, *args, **kwargs):
         if not self.image:
             self.image = 'path/to/default/image.jpg'
