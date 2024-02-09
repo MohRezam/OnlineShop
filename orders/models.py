@@ -4,7 +4,7 @@ from accounts.models import User
 from products.models import Product
 
 # Create your models here.
-# def create_order_from_cart(self, cart): # this cart is an object of Cart model
+# def create_order_from_cart(self, cart): # this cart is an object of Cart model  # fekr konam in ye method dar dakel order bayad bashe
 #     order = self.create(user=cart.user, total_price=cart.calculate_total_price())
 
 #     for cart_item in cart.cart_items.all():
