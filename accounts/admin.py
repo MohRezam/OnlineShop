@@ -1,8 +1,8 @@
 from django.contrib import admin
-from.models import User,Address
-from .forms import UserChangeForm,UserCreationForm
+from .models import User, Address
+from .forms import UserChangeForm, UserCreationForm
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
-
+from django.contrib.auth.models import Group
 
 class User_display(admin.ModelAdmin):
     list_display = ("first_name","last_name","phone_number","email","role")
@@ -10,7 +10,7 @@ class User_display(admin.ModelAdmin):
 class RegisterAdress(admin.ModelAdmin):
     list_display = ("province","city")
 
-
+@admin.register(User)
 class UserAdmin(BaseUserAdmin):
     form = UserChangeForm
     add_form = UserCreationForm
@@ -34,13 +34,5 @@ class UserAdmin(BaseUserAdmin):
         return super().str()
    
    
-admin.site.register(User,UserAdmin)
 admin.site.register(Address,RegisterAdress)
-from .models import User, Address
-from django.contrib.auth.models import Group
-
-# Register your models here.
-
-# admin.site.register(User)
-# admin.site.register(Address)
 admin.site.unregister(Group)
