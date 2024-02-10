@@ -309,7 +309,7 @@
   <script src="{% static 'js/custom.js' %}"></script>
   
   <script>
-   fetch(window.location.pathname + 'api/')
+   fetch('api/')
    .then(response => response.json())
    .then(data => {
        const categories = data.categories; 
