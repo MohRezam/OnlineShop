@@ -85,6 +85,7 @@ class Product(BaseModel):
     
     class Meta:
         verbose_name_plural = 'products'
+        ordering = ('name', 'brand')
 
 class ProductFeature(BaseModel):
     name = models.CharField(max_length=255, help_text="like color")
