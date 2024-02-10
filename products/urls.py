@@ -12,7 +12,7 @@ urlpatterns = [
     path("about/", views.AboutUsView.as_view(), name="about"),
     path("contact/", views.ContactView.as_view(), name="contact"),
 
-    
+    #APIs
     path("api/", views.HomeAPIView.as_view(), name="home_api"),
     path("api/category/<slug:category_slug>/", views.CategoryAPIView.as_view(), name="category_api"),
     path("api/category/<slug:category_slug>/<slug:subcategory_slug>/products/", views.ProductAPIView.as_view(), name="products_api"),
