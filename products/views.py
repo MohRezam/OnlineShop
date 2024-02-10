@@ -46,7 +46,7 @@ class ProductAPIView(APIView):
     def get(self, request, category_slug, subcategory_slug):
         category = get_object_or_404(Category, slug=category_slug)
         subcategory = get_object_or_404(Category, slug=subcategory_slug, parent_category=category)
-        products = Product.objects.filter(category=subcategory)
+        products = Product.objects.filter(category=subcategory, is_available="available")
         serializer = ProductSerializer(instance=products, many=True)
         
         
