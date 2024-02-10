@@ -33,7 +33,7 @@ class Category(BaseModel):
     
     def save(self, *args, **kwargs):
         if not self.image:
-            self.image = 'path/to/default/image.jpg'
+            self.image = 'notfound/notfoundimage.jpg'
         if not self.slug:
             if self.is_sub:
                 self.slug = slugify(self.parent_category.name + "-" + self.name)
@@ -74,7 +74,7 @@ class Product(BaseModel):
     
     def save(self, *args, **kwargs):
         if not self.image:
-            self.image = 'path/to/default/image.jpg'
+            self.image = 'notfound/notfoundimage.jpg'
         if not self.slug:
             self.slug = slugify(self.category.parent_category.name + "-" + self.name)
         super().save(*args, **kwargs)
