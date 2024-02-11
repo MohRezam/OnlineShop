@@ -146,3 +146,9 @@ AUTHENTICATION_BACKENDS = [
     "accounts.authenticate.EmailBackend",
     "django.contrib.auth.backends.ModelBackend",
 ]
+
+REST_FRAMEWORK = {
+
+'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+
+}
