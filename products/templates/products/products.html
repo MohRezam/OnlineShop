@@ -24,41 +24,76 @@
             </div>
         </div>
     </div>
+    <div class="button-container">
+        <button id="previousButton" class="previous" disabled>&laquo; Previous</button>
+        <button id="nextButton" class="next" disabled>Next &raquo;</button>
+    </div>
 </div>
 
 <style>
-   .product_box {
-       position: relative; /* Positioning context for absolute positioning */
-       background-color: #fff; /* Set background color */
-       border: 1px solid #ddd; /* Add border */
-       border-radius: 5px; /* Add border radius */
-       padding: 20px; /* Add padding */
-       height: 300px; /* Set a fixed height for the product box */
-       display: flex; /* Use flexbox for product box */
-       flex-direction: column; /* Stack elements vertically */
-       justify-content: center; /* Center content vertically */
-       text-align: center; /* Center text horizontally */
-   }
+    /* Products CSS */
+    .product_box {
+        background-color: #fff;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        padding: 20px;
+        height: 300px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        text-align: center;
+    }
 
-   .product_box img {
-       max-height: 200px; /* Set a maximum height for the images */
-       width: auto; /* Set width to auto to maintain aspect ratio */
-       margin: 0 auto 10px; /* Add margin below the image */
-   }
+    .product_box img {
+        max-height: 200px;
+        width: auto;
+        margin: 0 auto 10px;
+    }
 
-   .product_name {
-       font-size: 16px; /* Set font size */
-       font-weight: bold; /* Set font weight */
-       margin-top: auto; /* Align the product name to the bottom */
-   }
+    .product_name {
+        font-size: 16px;
+        font-weight: bold;
+        display: inline-block;
+        width: 100%;
+        padding: 10px;
+        border-radius: 10px;
+        background-color: #f0f0f0;
+        text-align: center;
+        text-decoration: none;
+    }
 
-   .product_name a {
-       display: inline-block; /* Make the anchor element inline-block */
-       width: 100%; /* Ensure the anchor takes up full width */
-       padding: 10px; /* Add padding */
-       border-radius: 10px; /* Add border radius */
-       background-color: #f0f0f0; /* Set background color */
-   }
+    /* Pagination Buttons CSS */
+    .button-container {
+        text-align: center;
+        margin-top: 20px;
+    }
+
+    .previous,
+    .next {
+        display: inline-block;
+        padding: 8px 16px;
+        text-decoration: none;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+        background-color: #48ca95;
+    }
+    .previous {
+        background-color:#f1f1f1; 
+    }
+
+    .previous:hover,
+    .next:hover {
+        background-color: #ddd;
+    }
+
+    .previous:disabled,
+    .next:disabled {
+        background-color: #f1f1f1;
+        color: #888;
+        cursor: not-allowed;
+    }
 </style>
 
 <!-- Javascript files-->
@@ -72,47 +107,88 @@
 <!-- end products -->
 
 <script>
-   // Fetch data from the API endpoint
-   fetch('/api' + window.location.pathname)
-       .then(response => response.json())
-       .then(data => {
-           const productsRow = document.getElementById('productsRow');
+    let currentPage = 1;
+    let totalPages = 1;
 
-           data.forEach(product => {
-               const colDiv = document.createElement('div');
-               colDiv.classList.add('col-md-4', 'margin_bottom1');
+    // Function to fetch products based on page number
+    function fetchProducts(page) {
+        
+        fetch('/api' + window.location.pathname + `?page=${page}`)
 
-               const productBox = document.createElement('div');
-               productBox.classList.add('product_box');
+            .then(response => response.json())
+            .then(data => {
+                const productsRow = document.getElementById('productsRow');
+                productsRow.innerHTML = ''; // Clear previous products
 
-               const figure = document.createElement('figure');
-               const img = document.createElement('img');
-               img.src = product.image;
-               img.alt = product.name;
-               figure.appendChild(img);
+                data.results.forEach(product => {
+                    const colDiv = document.createElement('div');
+                    colDiv.classList.add('col-md-4', 'margin_bottom1');
 
-               const productNameLink = document.createElement('a');
-               productNameLink.textContent = product.name;
-               productNameLink.href = '/products/' + product.slug 
+                    const productBox = document.createElement('div');
+                    productBox.classList.add('product_box');
 
-               productNameLink.style.display = 'block'; 
-               productNameLink.style.fontWeight = 'bold';
-               productNameLink.style.width = '60%';
-               productNameLink.style.borderRadius = '10px';
-               productNameLink.style.margin = '0 auto';
-               productNameLink.style.backgroundColor = '#f0f0f0';
-               productNameLink.style.textAlign = 'center';
+                    const figure = document.createElement('figure');
+                    const img = document.createElement('img');
+                    img.src = product.image;
+                    img.alt = product.name;
+                    figure.appendChild(img);
 
-               productBox.appendChild(figure);
-               productBox.appendChild(productNameLink);
+                    const productNameLink = document.createElement('a');
+                    productNameLink.textContent = product.name;
+                    productNameLink.href = `/products/${product.slug}`;
+                    productNameLink.classList.add('product_name');
 
-               colDiv.appendChild(productBox);
-               productsRow.appendChild(colDiv);
-           });
-       })
-       .catch(err => {
-           console.error('Error fetching products data:', err);
-       });
+                    productBox.appendChild(figure);
+                    productBox.appendChild(productNameLink);
+
+                    colDiv.appendChild(productBox);
+                    productsRow.appendChild(colDiv);
+                });
+
+                // Update current page and total pages
+                currentPage = page;
+                totalPages = Math.ceil(data.count / data.results.length);
+
+                // Update pagination buttons
+                updatePaginationButtons();
+            })
+            .catch(err => {
+                console.error('Error fetching products data:', err);
+            });
+    }
+    
+    // Function to update pagination buttons based on current page and total pages
+    function updatePaginationButtons() {
+        const previousButton = document.getElementById('previousButton');
+        const nextButton = document.getElementById('nextButton');
+
+        // Enable or disable previous button based on current page
+        previousButton.disabled = (currentPage === 1);
+
+        // Enable or disable next button based on current page and total pages
+        nextButton.disabled = (currentPage === totalPages );
+
+        // Add event listeners to buttons
+        previousButton.addEventListener('click', () => {
+            fetchProducts(currentPage - 1); // Fetch previous page
+        });
+
+        nextButton.addEventListener('click', () => {
+            fetchProducts(currentPage + 1); // Fetch next page
+        });
+    }
+
+    // Initial fetch of products when page loads
+    fetchProducts(currentPage);
 </script>
 
 {% endblock content %}
+
+
+
+
+
+
+
+
+
