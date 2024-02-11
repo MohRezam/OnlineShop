@@ -10,6 +10,7 @@ from django.shortcuts import get_object_or_404
 from rest_framework.exceptions import NotFound
 from django .views import View
 from rest_framework import filters 
+from rest_framework.pagination import PageNumberPagination
 # Create your views here.
 
 
@@ -42,15 +43,19 @@ class CategoryAPIView(APIView):
         return Response(data=serializer.data, status=status.HTTP_200_OK)
     
     
-class ProductAPIView(APIView):
+class ProductAPIView(APIView, PageNumberPagination):
+    page_size = 10
     def get(self, request, category_slug, subcategory_slug):
         category = get_object_or_404(Category, slug=category_slug)
         subcategory = get_object_or_404(Category, slug=subcategory_slug, parent_category=category)
         products = Product.objects.filter(category=subcategory, is_available="available")
-        serializer = ProductSerializer(instance=products, many=True)
+        pagination_products = self.paginate_queryset(products, request, view=self)
+        serializer = ProductSerializer(pagination_products, many=True)
+        # serializer = ProductSerializer(products, many=True)
         
         
-        return Response(data=serializer.data, status=status.HTTP_200_OK)
+        return self.get_paginated_response(serializer.data)
+        # return Response(data=serializer.data, status=status.HTTP_200_OK)
 
 
 class ProductDetailAPIView(APIView):
