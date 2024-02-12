@@ -11,6 +11,8 @@ from rest_framework.exceptions import NotFound
 from django .views import View
 from rest_framework import filters 
 from rest_framework.pagination import PageNumberPagination
+from rest_framework.filters import SearchFilter, OrderingFilter
+from rest_framework.generics import ListAPIView
 # Create your views here.
 
 
@@ -44,19 +46,23 @@ class CategoryAPIView(APIView):
     
     
 class ProductAPIView(APIView, PageNumberPagination):
-    page_size = 10
+    page_size = 6
+    filter_backends = [SearchFilter]
+    search_fields = ['name', 'brand']
     def get(self, request, category_slug, subcategory_slug):
         category = get_object_or_404(Category, slug=category_slug)
         subcategory = get_object_or_404(Category, slug=subcategory_slug, parent_category=category)
         products = Product.objects.filter(category=subcategory, is_available="available")
         pagination_products = self.paginate_queryset(products, request, view=self)
         serializer = ProductSerializer(pagination_products, many=True)
+        
         # serializer = ProductSerializer(products, many=True)
         
         
         return self.get_paginated_response(serializer.data)
         # return Response(data=serializer.data, status=status.HTTP_200_OK)
 
+  
 
 class ProductDetailAPIView(APIView):
     def get(self, request, slug):
@@ -85,13 +91,12 @@ class ProductDetailAPIView(APIView):
         
         return Response(data=response_data, status=status.HTTP_200_OK)
 
-class ProductSearchAPIView(APIView):
-    def get(self, request):
-        query = request.query_params.get('q', '')
-        products = Product.objects.filter(name__icontains=query)
-        serializer = ProductSerializer(products, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-    
+class ProductSearchAPIView(ListAPIView, PageNumberPagination):
+    queryset= Product.objects.all()
+    serializer_class = ProductSerializer
+    filter_backends = [SearchFilter]
+    search_fields = ["name", "brand"]
+    page_size = 6
     
 class HomeView(View):
     def get(self, request):
