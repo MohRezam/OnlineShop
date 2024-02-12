@@ -3,12 +3,44 @@ from .models import Category, Product, Comment, Discount, ProductFeature, Produc
 
 # Register your models here.
 
-admin.site.register(ProductFeature)
-admin.site.register(ProductFeatureValue)
-admin.site.register(News)
+
+
+@admin.register(ProductFeatureValue)
+class ProductFeatureValueAdmin(admin.ModelAdmin):
+    list_display = ("product", "feature", "value")
+    search_fields = ("value", )
+    list_filter = ("value", )
+    ordering = ("value", )
+
+
+
+@admin.register(ProductFeature)
+class ProductFeatureAdmin(admin.ModelAdmin):
+    list_display = ("name", )
+    search_fields = ("name", )
+    list_filter = ("name", )
+    ordering = ("name", )
+
+
+
+
+@admin.register(News)
+class NewsAdmin(admin.ModelAdmin):
+    list_display = ("title", "body")
+    search_fields = ("title", )
+    list_filter = ("title", )
+    ordering = ("title", )
+
+
+
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
+    list_display = ('id', 'name', 'brand', 'price', 'is_available')
+    search_fields = ("name", "brand", "price")
+    list_filter = ("is_available", )
+    
+    
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
         if db_field.name == "category":
             kwargs["queryset"] = db_field.related_model.objects.filter(is_sub=True)
@@ -16,6 +48,11 @@ class ProductAdmin(admin.ModelAdmin):
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
+    list_display = ('id', 'name', 'is_sub', 'parent_category')
+    search_fields = ('name', 'is_sub')
+    list_filter = ('is_sub', )
+    
+    
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
         if db_field.name == "parent_category":
             kwargs["queryset"] = Category.objects.filter(is_sub=False)
