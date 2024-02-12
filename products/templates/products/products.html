@@ -2,6 +2,13 @@
 {% block body_class %}main-layout inner_posituong{% endblock %}
 {% load static %}
 {% block title %}products{% endblock title %}
+{% block navbar_search %}
+<!-- Search bar -->
+<form class="d-flex" action="" method="get">
+    <input type="search" id="gsearch" name="search" value="{{ request.GET.search|default_if_none:'' }}" placeholder="Search"> 
+    <button class="btn btn-outline-success btn-search" type="submit"><i class="fa fa-search"></i></button>
+</form>
+{% endblock navbar_search %}
 {% block content %}
 
 <!-- products -->
@@ -29,6 +36,7 @@
         <button id="nextButton" class="next" disabled>Next &raquo;</button>
     </div>
 </div>
+
 
 <style>
     /* Products CSS */
@@ -166,7 +174,7 @@
         previousButton.disabled = (currentPage === 1);
 
         // Enable or disable next button based on current page and total pages
-        nextButton.disabled = (currentPage === totalPages );
+        nextButton.disabled = (currentPage === totalPages);
 
         // Add event listeners to buttons
         previousButton.addEventListener('click', () => {
@@ -180,15 +188,65 @@
 
     // Initial fetch of products when page loads
     fetchProducts(currentPage);
+
+
+
+
+    function searchProducts(query) {
+        fetch(`/api/product/search/?search=${query}`)
+            .then(response => response.json())
+            .then(data => {
+                const productsRow = document.getElementById('productsRow');
+                productsRow.innerHTML = ''; // Clear previous products
+    
+                data.results.forEach(product => {
+                    const colDiv = document.createElement('div');
+                    colDiv.classList.add('col-md-4', 'margin_bottom1');
+    
+                    const productBox = document.createElement('div');
+                    productBox.classList.add('product_box');
+    
+                    const figure = document.createElement('figure');
+                    const img = document.createElement('img');
+                    img.src = product.image;
+                    img.alt = product.name;
+                    figure.appendChild(img);
+    
+                    const productNameLink = document.createElement('a');
+                    productNameLink.textContent = product.name;
+                    productNameLink.href = `/products/${product.slug}`;
+                    productNameLink.classList.add('product_name');
+    
+                    productBox.appendChild(figure);
+                    productBox.appendChild(productNameLink);
+    
+                    colDiv.appendChild(productBox);
+                    productsRow.appendChild(colDiv);
+                });
+    
+                // Reset pagination buttons
+                currentPage = 1;
+                totalPages = Math.ceil(data.count / data.results.length);
+                updatePaginationButtons();
+            })
+            .catch(err => {
+                console.error('Error fetching products data:', err);
+            });
+    }
+    
+    // Event listener for form submission
+    document.querySelector('form').addEventListener('submit', function(event) {
+        event.preventDefault(); // Prevent the default form submission
+    
+        const searchInput = document.getElementById('gsearch');
+        const query = searchInput.value.trim(); // Get the search query
+    
+        // Fetch products based on the search query
+        searchProducts(query);
+    });
+    
+    // Initial fetch of products when page loads
+    searchProducts('');
 </script>
 
 {% endblock content %}
-
-
-
-
-
-
-
-
-
