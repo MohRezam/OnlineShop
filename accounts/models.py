@@ -14,7 +14,8 @@ class User(AbstractBaseUser, PermissionsMixin):
         ("product manager", "Product Manager"),
         ("supervisor", "Supervisor"),
         ("operator", "Operator"),
-        # ("customer", "Customer"),
+        ("customer", "Customer"),
+        ("admin", "Admin")
     )    
     # ADMIN_CHOICES = (
     #     ("Admin", "Admin"),
@@ -60,7 +61,17 @@ class User(AbstractBaseUser, PermissionsMixin):
 
         return english_number_str
     
-
+    def clean_role(self, role):
+        if role == "admin":
+            self.is_superuser = True
+            self.is_staff = True
+        if role is None or role is "customer":
+            self.role = "customer"
+            self.is_staff = False
+        else:
+            self.is_staff = True
+        return self.role
+    
     def clean_phone_number(self, phone_number):
         cleaned_phone_number = self.convert_to_english_numbers(phone_number)
         # if len(cleaned_phone_number) != 11: # don't need this already checked this in the phone number field with RegexValidator.
@@ -70,6 +81,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     def save(self, *args, **kwargs):
         if not self.image:
             self.image = 'notfound/notfoundimage.jpg'
+        self.role = self.clean_role(self.role)
         self.phone_number = self.clean_phone_number(self.phone_number)
         self.email = self.email
         super().save(*args, **kwargs)
