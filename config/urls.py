@@ -19,6 +19,12 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 
+# this are for changing the look of the admin panel.
+admin.site.site_header = "DigitBox"
+admin.site.index_title = "DigitBox Admin Panel"
+admin.site.site_title = "DigitBox" 
+
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path("", include("products.urls", namespace="products")),
