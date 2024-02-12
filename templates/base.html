@@ -75,10 +75,14 @@
                                  <a class="nav-link" href="{% url 'products:contact' %}">Contact Us</a>
                               </li>
                               <li class="nav-item d_none">
-                                 <a class="nav-link" href="#"><i class="fa fa-search" aria-hidden="true"></i></a>
+                                 <a class="nav-link" href="#">Login</a>
                               </li>
                               <li class="nav-item d_none">
-                                 <a class="nav-link" href="#">Login</a>
+                               
+                                  {% comment %} search fiield {% endcomment %}
+                                  {% block navbar_search %}
+                                  
+                                  {% endblock navbar_search %}
                               </li>
                            </ul>
                         </div>
