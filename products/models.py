@@ -81,7 +81,7 @@ class Product(BaseModel):
     
     
     def __str__(self) -> str:
-        return f"{self.name}"
+        return f"{self.category}-{self.name}"
     
     class Meta:
         verbose_name_plural = 'products'
