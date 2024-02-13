@@ -68,6 +68,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         if role is None or role is "customer":
             self.role = "customer"
             self.is_staff = False
+            self.is_active = False # if the customer sent correct otpcode it will be True.
         else:
             self.is_staff = True
         return self.role
@@ -105,6 +106,17 @@ class User(AbstractBaseUser, PermissionsMixin):
     
     class Meta:
         verbose_name_plural = 'Users'
+    
+    
+class OtpCode(models.Model):
+    phone_number = models.CharField(max_length=11)
+    code = models.PositiveSmallIntegerField()
+    create_at = models.DateTimeField(auto_now=True)
+    
+    def __str__(self) -> str:
+        return f"{self.phone_number}-{self.code}-{self.create_at}"
+    
+    
     
 class Address(BaseModel):
     province = models.CharField(max_length=255, help_text="like Alborz")
