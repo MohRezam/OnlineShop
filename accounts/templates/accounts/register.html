@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block body_class %}main-layout inner_posituong{% endblock %}
+{% load static %}
+{% block title %}Sign in{% endblock title %}
+{% block content %}
+      <!--  contact -->
+      <div class="contact">
+         <div class="container">
+            <div class="row">
+               <div class="col-md-12">
+                  <div class="titlepage">
+                     <h2>Sign up</h2>
+                  </div>
+               </div>
+            </div>
+            <div class="row">
+               <div class="col-md-10 offset-md-1">
+                  <form id="request" class="main_form" method="post" action="{% url 'accounts:user_register_api' %}" novalidate>
+                     {% csrf_token %}
+                     <div class="row">
+                        <div class="col-md-12">
+                            <input class="contactus" placeholder="Firstname" type="text" name="first_name" required> 
+                         </div>
+                         <div class="col-md-12">
+                            <input class="contactus" placeholder="Lastname" type="text" name="last_name" required> 
+                         </div>
+                         <div class="col-md-12">
+                            <input class="contactus" placeholder="Phone number" type="text" name="phone_number" maxlength="11" required> 
+                         </div>
+                        <div class="col-md-12">
+                           <input class="contactus" placeholder="Email" type="email" name="email" required> 
+                        </div>
+                        <div class="col-md-12">
+                           <input class="contactus" placeholder="Password" type="password" name="password" required>                          
+                        </div>
+                        <div class="col-md-12">
+                           <button type="submit" class="send_btn">Sign up</button>
+                        </div>
+                     </div>
+                  </form>
+               </div>
+            </div>
+         </div>
+      </div>
+      <!-- end contact -->
+       <!-- Javascript files-->
+  <script src="{% static 'js/jquery.min.js' %}"></script>
+  <script src="{% static 'js/popper.min.js' %}"></script>
+  <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+  <script src="{% static 'js/jquery-3.0.0.min.js' %}"></script>
+  <!-- sidebar -->
+  <script src="{% static 'js/jquery.mCustomScrollbar.concat.min.js' %}"></script>
+  <script src="{% static 'js/custom.js' %}"></script>
+  
+   {% endblock content %}
