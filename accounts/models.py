@@ -87,10 +87,10 @@ class User(AbstractBaseUser, PermissionsMixin):
         self.email = self.email
         super().save(*args, **kwargs)
     
-    def delete(self):
-        self.is_deleted = True
-        self.deleted_at = timezone.now()
-        self.save()
+    # def delete(self): # user soft delete
+    #     self.is_deleted = True
+    #     self.deleted_at = timezone.now()
+    #     self.save()
             
     def __str__(self) -> str:
         return f"{self.first_name} {self.last_name}"
@@ -108,13 +108,13 @@ class User(AbstractBaseUser, PermissionsMixin):
         verbose_name_plural = 'Users'
     
     
-class OtpCode(models.Model):
-    phone_number = models.CharField(max_length=11)
-    code = models.PositiveSmallIntegerField()
-    create_at = models.DateTimeField(auto_now=True)
+# class OtpCode(models.Model):
+#     phone_number = models.CharField(max_length=11)
+#     code = models.PositiveSmallIntegerField()
+#     create_at = models.DateTimeField(auto_now=True)
     
-    def __str__(self) -> str:
-        return f"{self.phone_number}-{self.code}-{self.create_at}"
+#     def __str__(self) -> str:
+#         return f"{self.phone_number}-{self.code}-{self.create_at}"
     
     
     
