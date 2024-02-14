@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import User, Address, OtpCode
+from .models import User, Address
 from .forms import UserChangeForm, UserCreationForm
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.models import Group
@@ -31,6 +31,6 @@ class UserAdmin(BaseUserAdmin):
     def str(self) -> str:
         return super().str()
    
-@admin.register(OtpCode)
-class OtpCodeAdmin(admin.ModelAdmin):
-    list_display = ("phone_number", "code", "create_at")
+# @admin.register(OtpCode)
+# class OtpCodeAdmin(admin.ModelAdmin):
+#     list_display = ("phone_number", "code", "create_at")
