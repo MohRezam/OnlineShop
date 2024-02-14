@@ -118,7 +118,6 @@
     let currentPage = 1;
     let totalPages = 1;
 
-    // Function to fetch products based on page number
     function fetchProducts(page) {
         
         fetch('/api' + window.location.pathname + `?page=${page}`)
@@ -126,7 +125,7 @@
             .then(response => response.json())
             .then(data => {
                 const productsRow = document.getElementById('productsRow');
-                productsRow.innerHTML = ''; // Clear previous products
+                productsRow.innerHTML = ''; 
 
                 data.results.forEach(product => {
                     const colDiv = document.createElement('div');
@@ -153,11 +152,9 @@
                     productsRow.appendChild(colDiv);
                 });
 
-                // Update current page and total pages
                 currentPage = page;
                 totalPages = Math.ceil(data.count / data.results.length);
 
-                // Update pagination buttons
                 updatePaginationButtons();
             })
             .catch(err => {
@@ -165,28 +162,23 @@
             });
     }
     
-    // Function to update pagination buttons based on current page and total pages
     function updatePaginationButtons() {
         const previousButton = document.getElementById('previousButton');
         const nextButton = document.getElementById('nextButton');
 
-        // Enable or disable previous button based on current page
         previousButton.disabled = (currentPage === 1);
 
-        // Enable or disable next button based on current page and total pages
         nextButton.disabled = (currentPage === totalPages);
 
-        // Add event listeners to buttons
         previousButton.addEventListener('click', () => {
-            fetchProducts(currentPage - 1); // Fetch previous page
+            fetchProducts(currentPage - 1); 
         });
 
         nextButton.addEventListener('click', () => {
-            fetchProducts(currentPage + 1); // Fetch next page
+            fetchProducts(currentPage + 1); 
         });
     }
 
-    // Initial fetch of products when page loads
     fetchProducts(currentPage);
 
 
@@ -197,7 +189,7 @@
             .then(response => response.json())
             .then(data => {
                 const productsRow = document.getElementById('productsRow');
-                productsRow.innerHTML = ''; // Clear previous products
+                productsRow.innerHTML = ''; 
     
                 data.results.forEach(product => {
                     const colDiv = document.createElement('div');
@@ -224,7 +216,6 @@
                     productsRow.appendChild(colDiv);
                 });
     
-                // Reset pagination buttons
                 currentPage = 1;
                 totalPages = Math.ceil(data.count / data.results.length);
                 updatePaginationButtons();
