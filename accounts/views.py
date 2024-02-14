@@ -8,6 +8,9 @@ from rest_framework.permissions import IsAuthenticated
 import random
 from core.utils import send_otp_code
 from django.contrib import messages
+from django.contrib.auth import authenticate, login, logout
+from django.urls import reverse
+from rest_framework.permissions import AllowAny
 
 # Create your views here.
 
@@ -18,6 +21,7 @@ class UserRegisterView(View):
     
 
 class UserRegisterAPIView(APIView):
+    permission_classes = [AllowAny, ]
     def post(self, request):
         serializer = UserRegisterSerializer(data=request.POST)
         if serializer.is_valid():
@@ -35,14 +39,16 @@ class UserRegisterAPIView(APIView):
             }
             messages.success(request, f"we sent {hidden_phone_number} a code", 'success')
             return redirect('accounts:verify_code')
-        # error_message = serializer.errors.get('email')[0]  
-        # return redirect('accounts:user_register', {'error_message': error_message})
-
-
-class VerifyCodeView(APIView):
-    def get(self, request):
-        return render(request, "accounts/verify_code.html", {})
+        error_messages = serializer.errors
+        for k, v in error_messages.items():
+            message = v[0]
+        messages.error(request, f"{message}", "danger")  
+        return redirect('accounts:user_register')
     
+class VerifyCodeView(View):
+     def get(self, request):
+        return render(request, "accounts/verify_code.html", {})
+class VerifyCodeAPIView(APIView): 
     def post(self, request):
         try:
             phone_number = request.session["user_profile_info"]["phone_number"]
@@ -79,6 +85,33 @@ class VerifyCodeView(APIView):
         # return Response(serializer.errors)
 class UserLoginView(View):
     def get(self, request):
+        if request.user.is_authenticated:
+            messages.info(request, "You are already logged in.")
+            return redirect("products:home")  
         return render(request, "accounts/login.html", {})
     
-    
+        
+
+class UserLoginAPIView(APIView):
+    def post(self, request):
+        email = request.POST["email"]
+        password = request.POST["password"]
+        
+        user = authenticate(request, username=email, password=password)
+        if user is not None:
+            user.is_active = True
+            user.save(update_fields=["is_active"])
+            login(request, user)
+            messages.success(request, "Logged in successfully")
+            return redirect("products:home")
+        else:
+            messages.error(request, "Invalid email or password")
+            return redirect("accounts:user_login")
+        
+
+        
+class UserLogOutView(View):
+    def get(self, request):
+        logout(request)
+        messages.success(request, "You logged out successfully")
+        return redirect("products:home")
