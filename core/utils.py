@@ -16,14 +16,12 @@ def news_image_path(instance, filename):
 
 
 def send_otp_code(phone_number, code):
+    print("mew")
     try:
-        api = KavenegarAPI("2F6B33347A696134443838414A6F487372493455516749386A6548736B6C4B5467446E58782B41764734303D")
-        params = {
-            'sender':'',
-            'receptor':phone_number,
-            'message': f"Code: {code}"
-        }
-        response = api.sms_send(params)
+         api = KavenegarAPI('2F6B33347A696134443838414A6F487372493455516749386A6548736B6C4B5467446E58782B41764734303D')
+         params = { 'sender' : '1000689696', 'receptor': phone_number, 'message' :f'Code: {code}'} 
+         print("heloooooooooooooo")
+         response = api.sms_send( params) 
     except APIException as e:
         print(e)
     except HTTPException as e:
