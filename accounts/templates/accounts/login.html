@@ -15,17 +15,20 @@
             </div>
             <div class="row">
                <div class="col-md-10 offset-md-1">
-                  <form id="request" class="main_form">
+                  <form id="request" class="main_form" method="post" action="{% url "accounts:user_login_api" %}">
+                     {% csrf_token %}
                      <div class="row">
                         <div class="col-md-12">
-                           <input class="contactus" placeholder="Email" type="type" name="Email" required> 
+                           <input class="contactus" placeholder="Email" type="type" name="email" required> 
                         </div>
                         <div class="col-md-12">
-                           <input class="contactus" placeholder="Password" type="type" name="Password" required>                          
+                           <input class="contactus" placeholder="Password" type="type" name="password" required>                          
                         </div>
                         <div class="col-md-12">
                            <button class="send_btn">Sign in</button>
                         </div>
+                        <div class="col-md-12 text-center mt-3"> <!-- Centered text under the button with margin top -->
+                           <p style="color: white;">Don't have an account? <a href="{% url "accounts:user_register" %}" style="color: #48ca95;">Sign up</a></p> 
                      </div>
                   </form>
                </div>
