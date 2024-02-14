@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import User, OtpCode
+from .models import User
 from django.contrib import messages
 from django.shortcuts import redirect
 import re
@@ -55,8 +55,7 @@ class UserRegisterSerializer(serializers.ModelSerializer):
 #         return value
 
 
-class OtpCodeSerializer(serializers.ModelSerializer):
-    code = serializers.CharField(required=True)
-    class Meta:
-        model = OtpCode
-        fields = ["code"]
+class OtpCodeSerializer(serializers.Serializer):
+    code = serializers.CharField()
+        
+    
