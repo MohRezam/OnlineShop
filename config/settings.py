@@ -11,11 +11,14 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
 from pathlib import Path
+import environ
+from datetime import timedelta
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
+env = environ.Env()
+environ.Env.read_env()
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
@@ -44,6 +47,7 @@ INSTALLED_APPS = [
     
     # Third Party Apps:
     'rest_framework',
+    'rest_framework_simplejwt',
 
 ]
 
@@ -87,6 +91,14 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+
+# redis
+
+REDIS_HOST = env("REDISHOST") 
+REDIS_PORT = env("REDISPORT")    
+REDIS_DB = env("REDISDB") 
+
+SECRET_KEY = env("SECRET_KEY")
 
 
 # Password validation
@@ -155,4 +167,12 @@ REST_FRAMEWORK = {
 'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
 'PAGE_SIZE':6,
 
+}
+
+SIMPLE_JWT = {
+'ACCESS_TOKEN_LIFETIME': timedelta(minutes=15), # Example token lifetime
+'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+'AUTH_HEADER_TYPES': ('Bearer',),
+'USER_ID_FIELD': 'id',
+'USER_ID_CLAIM': 'user_id',
 }
