@@ -19,10 +19,10 @@
                      {% csrf_token %}
                      <div class="row">
                         <div class="col-md-12">
-                           <input class="contactus" placeholder="Email" type="type" name="email" required> 
+                           <input class="contactus" placeholder="Email" type="email" name="email" required> 
                         </div>
                         <div class="col-md-12">
-                           <input class="contactus" placeholder="Password" type="type" name="password" required>                          
+                           <input class="contactus" placeholder="Password" type="Password" name="password" required>                          
                         </div>
                         <div class="col-md-12">
                            <button class="send_btn">Sign in</button>
@@ -44,4 +44,28 @@
   <!-- sidebar -->
   <script src="{% static 'js/jquery.mCustomScrollbar.concat.min.js' %}"></script>
   <script src="{% static 'js/custom.js' %}"></script>
+  <script>
+   const login = document.getElementById("login1")
+login.addEventListener("click",function(event) {
+event.preventDefault();
+getToken();
+})
+function getToken(){
+const username = document.getElementById("username1").value;
+const password = document.getElementById("password1").value;
+console.log(username)
+fetch("/api/token/",{method:'POST',headers:{
+"Content-Type":"application/json",
+},
+body: JSON.stringify({
+phone_number:username,
+password:password,
+}),})
+.then((response) => response.json())
+.then((data) => {
+console.log(data);
+localStorage.setItem("refresh_token",data.refresh);
+localStorage.setItem("access_token",data.access);
+});}
+  </script>
    {% endblock content %} 
