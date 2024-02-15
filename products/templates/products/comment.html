@@ -95,7 +95,13 @@
     </div>
     </div>
     <script>
-        fetch('/api' + window.location.pathname)
+        fetch('/api' + window.location.pathname ,{
+            method:"GET",
+            headers:{
+            "Content-Type":"application/json",
+            "Authorization":`Bearer ${localStorage.getItem("access_token")}`
+            }
+            })
         .then(response => response.json())
         .then(data => {
             const productList = document.getElementById('comment-list');
