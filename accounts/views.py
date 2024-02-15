@@ -97,21 +97,21 @@ class UserLoginView(View):
     
         
 
-class UserLoginAPIView(APIView):
-    def post(self, request):
-        email = request.POST["email"]
-        password = request.POST["password"]
+# class UserLoginAPIView(APIView):
+#     def post(self, request):
+#         email = request.POST["email"]
+#         password = request.POST["password"]
         
-        user = authenticate(request, username=email, password=password)
-        if user is not None:
-            user.is_active = True
-            user.save(update_fields=["is_active"])
-            login(request, user)
-            messages.success(request, "Logged in successfully")
-            return redirect("products:home")
-        else:
-            messages.error(request, "Invalid email or password")
-            return redirect("accounts:user_login")
+#         user = authenticate(request, username=email, password=password)
+#         if user is not None:
+#             user.is_active = True
+#             user.save(update_fields=["is_active"])
+#             login(request, user)
+#             messages.success(request, "Logged in successfully")
+#             return redirect("products:home")
+#         else:
+#             messages.error(request, "Invalid email or password")
+#             return redirect("accounts:user_login")
         
 
         
