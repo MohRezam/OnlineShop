@@ -15,8 +15,7 @@
             </div>
             <div class="row">
                <div class="col-md-10 offset-md-1">
-                  <form id="request" class="main_form" method="post" action="{% url "accounts:user_login_api" %}">
-                     {% csrf_token %}
+                  <form id="request" class="main_form" >
                      <div class="row">
                         <div class="col-md-12">
                            <input class="contactus" placeholder="Email" type="email" name="email" required> 
@@ -44,4 +43,71 @@
   <!-- sidebar -->
   <script src="{% static 'js/jquery.mCustomScrollbar.concat.min.js' %}"></script>
   <script src="{% static 'js/custom.js' %}"></script>
-   {% endblock content %} 
+
+  <script>
+   document.addEventListener('DOMContentLoaded', function() {
+     const form = document.getElementById("request");
+ 
+     form.addEventListener("submit", function(event) {
+       event.preventDefault();
+       getToken();
+     });
+ 
+     function getToken() {
+       const email = document.querySelector('input[name="email"]').value;
+       const password = document.querySelector('input[name="password"]').value;
+ 
+       fetch("/api/token/", {
+         method: 'POST',
+         headers: {
+           "Content-Type": "application/json"
+         },
+         body: JSON.stringify({
+           email: email,
+           password: password
+         })
+       })
+       .then(response => response.json())
+       .then(data => {
+         localStorage.setItem("access_token", data.access);
+         localStorage.setItem("refresh_token", data.refresh);
+ 
+         window.location.href = "/"; 
+       })
+       .catch(error => {
+         console.error('Error:', error);
+       });
+     }
+   });
+ 
+   function includeAuthToken() {
+     const access_token = localStorage.getItem("access_token");
+     if (access_token) {
+       return {
+         'Authorization': 'Bearer ' + access_token
+       };
+     }
+     return {};
+   }
+ 
+   function fetchData() {
+     fetch("/api/some-protected-endpoint/", {
+       method: 'GET',
+       headers: {
+         ...includeAuthToken(),
+         'Content-Type': 'application/json'
+       }
+     })
+     .then(response => response.json())
+     .then(data => {
+     })
+     .catch(error => {
+       console.error('Error:', error);
+     });
+   }
+ </script>
+ 
+ 
+   {% endblock content %}  
+
+   
