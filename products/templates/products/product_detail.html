@@ -15,32 +15,7 @@
 <footer>
     <!-- Footer content -->
 </footer>
-<style>
-   #productDetailContainer {
-      display: flex;
-      flex-direction: row-reverse; 
-  }
 
-  /* Add styles for product image column */
-  #productDetailContainer .col-md-7 {
-      flex: 1; 
-  }
-  
-  /* Add styles for product info column */
-  #productDetailContainer .col-md-5 {
-      flex: 1; 
-  }
-  /* Add styles for product info */
-   .product-info > div {
-      margin-bottom: 5px; /* Adjust bottom margin */
-      .laptop1_img img {
-         width: 40%; /* Adjust the width of the image */
-         height: auto; /* Maintain the aspect ratio */
-      }
-      .laptop1_img img:hover {
-         transform: scale(1.1); /* Increase the scale on hover */
-      }
-</style>
 
 <script src="{% static 'js/jquery.min.js' %}"></script>
 <script src="{% static 'js/popper.min.js' %}"></script>
@@ -78,7 +53,6 @@
                        <div><strong>Is Available: </strong>${product.product.is_available}</div>
                        <div><strong>Inventory quantity:</strong> ${product.product.inventory_quantity}</div>
                        <div><strong>Discount:</strong> ${product.product.discount ? product.product.discount : '-'}</div>
-                       <div>${product.comments.text}</div>
                    </div>
                    <a class="read_more" href="#">Add to Cart</a>
                    <div>
