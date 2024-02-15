@@ -13,6 +13,6 @@ urlpatterns = [
     #API
     path("api/register/", views.UserRegisterAPIView.as_view(), name="user_register_api"),
     path("api/verify/", views.VerifyCodeAPIView.as_view(), name="verify_code_api"),
-    path("api/login/", views.UserLoginAPIView.as_view(), name="user_login_api"),
+    # path("api/login/", views.UserLoginAPIView.as_view(), name="user_login_api"),
    
 ]
