@@ -14,6 +14,7 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.generics import ListAPIView
 from rest_framework.decorators import api_view
+from rest_framework.permissions import IsAuthenticated
 # Create your views here.
 
 
@@ -127,12 +128,17 @@ class ContactView(View):
         return render(request, "products/contact.html", {})
     
 
-@api_view(['GET'])
-def get_comment(request,slug):
-    product_parent = Product.objects.get(slug=slug)
-    comment = Comment.objects.filter(product = product_parent)
-    serializer = CommentSerializer(comment,many=True)
-    return Response({'comment':serializer.data})
+class CommentAPIView(APIView):
+    def get(self, request, slug):
+        try:
+            product_parent = Product.objects.get(slug=slug)
+            comments = Comment.objects.filter(product=product_parent)
+            serializer = CommentSerializer(comments, many=True)
+            return Response({'comment': serializer.data}, status=status.HTTP_200_OK)
+        except Product.DoesNotExist:
+            return Response({'error': 'Product not found'}, status=status.HTTP_404_NOT_FOUND)
 
-def comment(request,slug):
-    return render(request , 'products/comment.html' ,context={})
+
+class CommentView(View):
+    def get(self, request, slug):
+        return render(request, 'products/comment.html', context={})
