@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from .models import Category, Comment, News, Product, ProductFeature, ProductFeatureValue, Discount
+from accounts.models import User
 
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
@@ -29,13 +30,16 @@ class ProductFeatureValueSerializer(serializers.ModelSerializer):
         model = ProductFeatureValue
         fields = ["value", "product", "feature"]
         
-
-        
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields ='__all__'
+            
 class CommentSerializer(serializers.ModelSerializer):
-    user = serializers.StringRelatedField()
+    user = UserSerializer()
     class Meta:
         model = Comment
-        fields = ["text", "likes", "user", "product"]
+        fields = ["text", "likes", "user", "product", "created_at"]
 
 
 

@@ -82,10 +82,11 @@
                    </div>
                    <a class="read_more" href="#">Add to Cart</a>
                    <div>
-                    <strong>Comments:</strong>
+                    <div>
+                        <a class="read_more" href="/comment/${product.product.slug}">comments</a>
+                    </div>    
                     <ul>
-                        ${product.comments.map(comment => `<li><strong></stong> ${comment.user}:   ${comment.text}</li>`).join('')}
-                        
+                                
                     </ul>
                 </div>
                `;

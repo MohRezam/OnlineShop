@@ -13,6 +13,7 @@ from rest_framework import filters
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.generics import ListAPIView
+from rest_framework.decorators import api_view
 # Create your views here.
 
 
@@ -125,3 +126,13 @@ class ContactView(View):
     def get(self, request):
         return render(request, "products/contact.html", {})
     
+
+@api_view(['GET'])
+def get_comment(request,slug):
+    product_parent = Product.objects.get(slug=slug)
+    comment = Comment.objects.filter(product = product_parent)
+    serializer = CommentSerializer(comment,many=True)
+    return Response({'comment':serializer.data})
+
+def comment(request,slug):
+    return render(request , 'products/comment.html' ,context={})
