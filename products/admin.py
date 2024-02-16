@@ -36,9 +36,11 @@ class NewsAdmin(admin.ModelAdmin):
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name', 'brand', 'price', 'is_available')
+    list_display = ('name', 'brand', 'price', 'is_available')
+    radio_fields = {"is_available":admin.HORIZONTAL}
     search_fields = ("name", "brand", "price")
     list_filter = ("is_available", )
+    date_hierarchy = "created_at"
     
     
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
@@ -48,9 +50,10 @@ class ProductAdmin(admin.ModelAdmin):
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name', 'is_sub', 'parent_category')
+    list_display = ('name', 'is_sub', 'parent_category')
     search_fields = ('name', 'is_sub')
     list_filter = ('is_sub', )
+    date_hierarchy = "created_at"
     
     
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
@@ -61,15 +64,21 @@ class CategoryAdmin(admin.ModelAdmin):
 
 @admin.register(Comment)
 class CommentAdmin(admin.ModelAdmin):
-    list_display = ('id', 'text', 'created_at', 'product') 
+    list_display = ('user_email', 'text', 'created_at', 'product') 
+    list_select_related = ("user",) # we add this for efficiency. it reduce the SQL queries in simple word!
     search_fields = ('text', 'user', 'likes')  
     list_filter = ('product',)
     ordering = ('-likes',)
+    date_hierarchy = "created_at"
+    
+    def user_email(self, obj):
+        return obj.user.email
     
     
 @admin.register(Discount)
 class DiscountAdmin(admin.ModelAdmin):
-    list_display = ('id', 'type', 'value', 'expiration_date')  
+    list_display = ('type', 'value', 'expiration_date')  
     search_fields = ('user',)  
     list_filter = ('is_active',)  
     ordering = ('-expiration_date',)
+    date_hierarchy = "created_at"
