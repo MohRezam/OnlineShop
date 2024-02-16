@@ -16,18 +16,22 @@ class OrderAdmin(admin.ModelAdmin):
     search_fields = ('id', 'user')
     list_filter = ('is_paid', 'created_at')
     ordering = ('-created_at',)
+    date_hierarchy = "created_at"
 
 @admin.register(OrderItem)
 class OrderItemAdmin(admin.ModelAdmin):
     list_display = ('id', 'order', 'product', 'quantity')
+    date_hierarchy = "created_at"
 
 @admin.register(Cart)
 class CartAdmin(admin.ModelAdmin):
     list_display = ('id', 'user', 'created_at', 'updated_at')
+    date_hierarchy = "created_at"
 
 @admin.register(CartItem)
 class CartItemAdmin(admin.ModelAdmin):
     list_display = ('id', 'cart', 'product', 'quantity')
+    date_hierarchy = "created_at"
 
 @admin.register(Coupon)
 class CouponAdmin(admin.ModelAdmin):
