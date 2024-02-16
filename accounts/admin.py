@@ -7,9 +7,11 @@ from django.contrib.auth.models import Group
 @admin.register(Address)   
 class RegisterAdress(admin.ModelAdmin):
     list_display = ("province","city")
+    date_hierarchy = "created_at"
 
 @admin.register(User)
 class UserAdmin(BaseUserAdmin):
+    radio_fields = {"role":admin.VERTICAL}
     form = UserChangeForm
     add_form = UserCreationForm
    
@@ -28,6 +30,8 @@ class UserAdmin(BaseUserAdmin):
     ordering = ('first_name',)
     filter_horizontal = ('groups','user_permissions')
    
+    date_hierarchy = "created_at"
+    
     def str(self) -> str:
         return super().str()
    
