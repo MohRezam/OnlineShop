@@ -1,0 +1,59 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cart</title>
+    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+    <div class="container">
+        <h1>Cart</h1>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">Quantity</th>
+                    <th scope="col">Unit Price</th>
+                    <th scope="col">Total Price</th>
+                </tr>
+            </thead>
+            <tbody id="cartBody">
+                <!-- Table rows will be inserted here dynamically -->
+            </tbody>
+        </table>
+        <p>Total Price: <span id="totalPrice"></span></p>
+    </div>
+
+    <script src="{% static 'js/jquery.min.js' %}"></script>
+    <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+    <script>
+        $(document).ready(function() {
+            // Fetch cart data from API
+            $.getJSON('/orders/api/cart/laptop-creator', function(data) {
+                // Clear previous data
+                $('#cartBody').empty();
+
+                // Populate table rows dynamically
+                $.each(data.data, function(index, item) {
+                    $('#cartBody').append(
+                        `<tr>
+                            <th scope="row">${index + 1}</th>
+                            <td>${item.product.name}</td>
+                            <td>${item.quantity}</td>
+                            <td>${item.product.price}</td>
+                            <td>${item.total_price}</td>
+                        </tr>`
+                    );
+                });
+
+                // Update total price
+                $('#totalPrice').text(data.cart_total_price);
+            });
+        });
+    </script>
+</body>
+</html>
