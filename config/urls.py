@@ -18,7 +18,6 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
-from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 # this are for changing the look of the admin panel.
 admin.site.site_header = "DigitBox"
@@ -31,8 +30,7 @@ urlpatterns = [
     path("", include("products.urls", namespace="products")),
     path("orders/", include("orders.urls", namespace="orders")),
     path("accounts/", include("accounts.urls", namespace="accounts")),
-    path('api/token/', TokenObtainPairView.as_view(), name="token_obtain_pair"),
-    path('api/token/refresh/', TokenRefreshView.as_view(), name="token_refresh"),
+
 ] 
 
 if settings.DEBUG:
