@@ -12,7 +12,6 @@ from django.http import JsonResponse
 
 class CartView(View):   
     def get(self, request):
-        print(request.user)
         return render(request, "orders/cart.html")
     
 # with session
