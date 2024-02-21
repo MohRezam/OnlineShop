@@ -10,17 +10,24 @@ from .models import Order, OrderItem, Coupon, Transaction, Cart, CartItem
 # admin.site.register(Coupon)
 # admin.site.register(Transaction)
 
+
+
+
+class OrderItemInline(admin.TabularInline):
+    model = OrderItem
+# @admin.register(OrderItem)
+# class OrderItemAdmin(admin.ModelAdmin):
+#     list_display = ('id', 'order', 'product', 'quantity')
+#     date_hierarchy = "created_at"
+
+
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
     list_display = ('id', 'user', 'is_paid', 'created_at', 'updated_at')
+    inlines = (OrderItemInline,)
     search_fields = ('id', 'user')
     list_filter = ('is_paid', 'created_at')
     ordering = ('-created_at',)
-    date_hierarchy = "created_at"
-
-@admin.register(OrderItem)
-class OrderItemAdmin(admin.ModelAdmin):
-    list_display = ('id', 'order', 'product', 'quantity')
     date_hierarchy = "created_at"
 
 @admin.register(Cart)
