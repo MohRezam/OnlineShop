@@ -7,8 +7,10 @@ from rest_framework import status
 from products.models import Product
 from django.shortcuts import redirect
 from django.http import JsonResponse
-# Create your views here.
-
+from django.contrib.auth.mixins import LoginRequiredMixin
+from .models import Order, OrderItem
+from rest_framework.permissions import IsAuthenticated
+from .serializers import OrderSerializer, ProductSerializer
 
 class CartView(View):   
     def get(self, request):
@@ -92,6 +94,19 @@ class CartRemoveView(View):
         return redirect("orders:cart")
         
         
-class ORdercreate(APIView):
+class OrderView(LoginRequiredMixin, View):
     def get(self, request):
-        pass
+        cart = Cart(request)
+        order = Order.objects.create(user=request.user, total_price=cart.get_total_price())
+        for item in cart:
+            OrderItem.objects.create(order=order, product= item['product'], quantity=item['quantity'])
+            cart.clear()
+        return render(request, "orders/checkout.html")
+    
+class OrderAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+    def get(self, request, order_id):
+        order = get_object_or_404(Order, pk=order_id)
+        serializer = OrderSerializer(instance=order)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
