@@ -19,7 +19,7 @@ class Order(BaseModel):
         ("paid", "Paid"),
         ("not paid", "Not Paid"),
     )
-    # total_price = models.DecimalField(max_digits=10, decimal_places=2)
+    total_price = models.DecimalField(max_digits=10, decimal_places=2)
     is_paid = models.CharField(max_length=25, choices=PAYMENT_CHOICES, default=False) # when we create order from cart we have to set is_paid to True
     province = models.CharField(max_length=255, blank=True, null=True, help_text="like Alborz") # if user dont fill this it is going to fill by user address model informations
     city = models.CharField(max_length=255, blank=True, null=True, help_text="like karaj")
@@ -32,9 +32,6 @@ class Order(BaseModel):
     
     def __str__(self) -> str:
         return f"Total: {self.total_price}, Payment: {self.is_paid}"
-    
-    def calculate_total_price(self):
-        return sum(item.total_price() for item in self.order_items.all())
     class Meta:
         verbose_name_plural = 'orders'
     
@@ -47,9 +44,6 @@ class OrderItem(BaseModel):
     
     def __str__(self) -> str:
         return f"number of {self.product.name}: {self.quantity}"
-    
-    def total_price(self):
-        return self.quantity * self.product.price
     class Meta:
         verbose_name_plural = 'order items'
 
