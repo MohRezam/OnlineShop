@@ -114,7 +114,7 @@
 
     function addToCart(productSlug) {
         const quantity = document.getElementById('quantity').value;
-        fetch(`/orders/api/cart/${productSlug}`, {
+        fetch(`/orders/api/cart/${productSlug}/`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
