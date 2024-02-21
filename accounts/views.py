@@ -92,8 +92,24 @@ class UserLoginView(View):
     def get(self, request):
         if request.user.is_authenticated:
             messages.info(request, "You are already logged in.")
-            return redirect("products:home")  
+            return redirect("products:home")
         return render(request, "accounts/login.html", {})
+    
+    def post(self, request):
+        email = request.POST.get('email')
+        password = request.POST.get('password')
+        user = authenticate(request, email=email, password=password)
+        
+        if user is not None:
+            login(request, user)
+            # Redirect to a success page, or wherever you want
+            messages.success(request, "You are logged in successfully", "success")
+            return redirect("products:home")
+        else:
+            # Invalid login credentials
+            messages.error(request, "Invalid email or password. Please try again.", "danger")
+            return render(request, "accounts/login.html", {})
+    
     
         
 
@@ -119,9 +135,6 @@ class UserLogOutView(View):
     def get(self, request):
         if request.user.is_authenticated:
             user = request.user
-            if not user.is_staff:
-                user.is_active = False
-                user.save(update_fields=["is_active"])
-                logout(request)
-                messages.success(request, "You logged out successfully")
+            logout(request)
+            messages.success(request, "You logged out successfully", "success")
         return redirect("products:home")
