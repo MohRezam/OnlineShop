@@ -102,6 +102,11 @@ REDIS_DB = env("REDISDB")
 SECRET_KEY = env("SECRET_KEY")
 
 
+# saving sessions in redis
+
+SESSION_ENGINE = 'core.sessions.redis'
+# SESSION_COOKIE_AGE = 60
+
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
 
