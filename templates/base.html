@@ -61,6 +61,9 @@
                         </button>
                         <div class="collapse navbar-collapse" id="navbarsExample04">
                            <ul class="navbar-nav mr-auto">
+                              <li class="nav-item">
+                                 <a class="nav-link" href="{% url 'orders:cart'  %}">Cart {{cart | length}}</a>
+                              </li>
                               <li class="nav-item active">
                                  <a class="nav-link" href="{% url 'products:home' %}">Home</a>
                               </li>
