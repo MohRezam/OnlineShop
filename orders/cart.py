@@ -4,7 +4,7 @@ from django.conf import settings
 from .serializers import ProductSerializer
 from .models import Product
 import json
-from django.http import HttpResponse
+
 
 CART_SESSION_ID = 'cart'
 
@@ -110,7 +110,7 @@ class Cart:
 #             }
 #         self.cart[product_id]["quantity"] += int(quantity)
 
-#     def remove(self, product, response):
+#     def remove(self, product):
 #         """
 #         Remove a product from the cart
 #         """
@@ -118,7 +118,7 @@ class Cart:
 
 #         if product_id in self.cart:
 #             del self.cart[product_id]
-#             self.save_cart_to_cookies(response)
+#             self.save_cart_to_cookies()
 
 #     def __iter__(self):
 #         """
