@@ -91,3 +91,7 @@ class CartRemoveView(View):
         cart.remove(product)        
         return redirect("orders:cart")
         
+        
+class ORdercreate(APIView):
+    def get(self, request):
+        pass
