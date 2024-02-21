@@ -32,6 +32,10 @@ class Order(BaseModel):
     
     def __str__(self) -> str:
         return f"Total: {self.total_price}, Payment: {self.is_paid}"
+    
+    
+    def calculate_total_price(self):
+        return sum(item.total_price() for item in self.order_items.all())
     class Meta:
         verbose_name_plural = 'orders'
     
@@ -44,6 +48,9 @@ class OrderItem(BaseModel):
     
     def __str__(self) -> str:
         return f"number of {self.product.name}: {self.quantity}"
+    
+    def total_price(self):
+        return self.quantity * self.product.price
     class Meta:
         verbose_name_plural = 'order items'
 
