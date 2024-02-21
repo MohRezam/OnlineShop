@@ -65,10 +65,10 @@ class User(AbstractBaseUser, PermissionsMixin):
         if role == "admin":
             self.is_superuser = True
             self.is_staff = True
-        if role is None or role is "customer":
+        if role is None or role == "customer":
             self.role = "customer"
             self.is_staff = False
-            self.is_active = False # if the customer sent correct otpcode it will be True.
+            # self.is_active = False # if the customer sent correct otpcode it will be True.
         else:
             self.is_staff = True
         return self.role
