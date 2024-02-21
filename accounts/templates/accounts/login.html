@@ -15,7 +15,7 @@
             </div>
             <div class="row">
                <div class="col-md-10 offset-md-1">
-                <form id="login-form" class="main_form" method="post" action="{% url 'accounts:user_login' %}">
+                <form id="request" class="main_form">
                     {% csrf_token %}
                      <div class="row">
                         <div class="col-md-12">
@@ -30,7 +30,8 @@
                         <div class="col-md-12 text-center mt-3"> <!-- Centered text under the button with margin top -->
                            <p style="color: white;">Don't have an account? <a href="{% url "accounts:user_register" %}" style="color: #48ca95;">Sign up</a></p> 
                      </div>
-                  </form>                
+                  </form>
+                
                </div>
             </div>
          </div>
@@ -58,7 +59,7 @@
        const email = document.querySelector('input[name="email"]').value;
        const password = document.querySelector('input[name="password"]').value;
  
-       fetch("/api/token/", {
+       fetch("api/", {
          method: 'POST',
          headers: {
            "Content-Type": "application/json"
