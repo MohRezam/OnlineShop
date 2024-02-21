@@ -5,7 +5,7 @@ app_name = "orders"
 
 urlpatterns = [
     path("cart/", views.CartView.as_view(), name="cart"),
-    path("cart/remove/<slug:product_slug>", views.CartRemoveView.as_view(), name="cart_remove"),
+    path("cart/remove/<slug:product_slug>/", views.CartRemoveView.as_view(), name="cart_remove"),
     
     
     #APIs
