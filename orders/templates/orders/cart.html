@@ -119,6 +119,7 @@
             </tbody>
         </table>
         <p>Total Price: <span id="totalPrice"></span></p>
+        <a href="{% url 'products:home' %}" class="read_more" onclick="addToCart('${product.product.slug}')">Checkout</a>
     </div>
 
     <script src="{% static 'js/jquery.min.js' %}"></script>
@@ -132,7 +133,7 @@
     <script>
         $(document).ready(function() {
             // Fetch cart data from API
-            $.getJSON('/orders/api/cart/slug', function(data) {
+            $.getJSON('/orders/api/cart/slug2', function(data) {
                 // Clear previous data
                 $('#cartBody').empty();
 
