@@ -13,6 +13,8 @@ from django.urls import reverse
 from rest_framework.permissions import AllowAny
 from django.conf import settings
 import redis
+from rest_framework_simplejwt.tokens import RefreshToken
+from django.http import JsonResponse
 
 # redis
 redis_client = redis.StrictRedis(host=settings.REDIS_HOST, port=settings.REDIS_PORT, db=settings.REDIS_DB)
@@ -95,22 +97,33 @@ class UserLoginView(View):
             return redirect("products:home")
         return render(request, "accounts/login.html", {})
     
-    def post(self, request):
-        email = request.POST.get('email')
-        password = request.POST.get('password')
-        user = authenticate(request, email=email, password=password)
+    # def post(self, request):
+    #     email = request.POST.get('email')
+    #     password = request.POST.get('password')
+    #     user = authenticate(request, email=email, password=password)
         
-        if user is not None:
-            login(request, user)
-            # Redirect to a success page, or wherever you want
-            messages.success(request, "You are logged in successfully", "success")
-            return redirect("products:home")
-        else:
-            # Invalid login credentials
-            messages.error(request, "Invalid email or password. Please try again.", "danger")
-            return render(request, "accounts/login.html", {})
+    #     if user is not None:
+    #         login(request, user)
+    #         # Redirect to a success page, or wherever you want
+    #         messages.success(request, "You are logged in successfully", "success")
+    #         return redirect("products:home")
+    #     else:
+    #         # Invalid login credentials
+    #         messages.error(request, "Invalid email or password. Please try again.", "danger")
+    #         return render(request, "accounts/login.html", {})
     
-    
+class LoginView(APIView):
+    def post(self, request):
+        email = request.data.get("email")
+        password = request.data.get("password")
+        user = authenticate(username=email, password=password)
+        login(request, user)
+        messages.success(request, "You are logged in successfully", "success")
+        refresh = RefreshToken.for_user(user)
+        return JsonResponse({
+            'refresh':str(refresh),
+            'access':str(refresh.access_token)
+        })
         
 
 # class UserLoginAPIView(APIView):
