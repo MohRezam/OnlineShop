@@ -115,7 +115,7 @@
                 </tr>
             </thead>
             <tbody id="cartBody">
-                <!-- Table rows will be inserted here dynamically -->
+               {% comment %} table here {% endcomment %}
             </tbody>
         </table>
         <p>Total Price: <span id="totalPrice"></span></p>
@@ -132,12 +132,9 @@
 
     <script>
         $(document).ready(function() {
-            // Fetch cart data from API
             $.getJSON('/orders/api/cart/slug2', function(data) {
-                // Clear previous data
                 $('#cartBody').empty();
 
-                // Populate table rows dynamically
                 $.each(data.data, function(index, item) {
                     $('#cartBody').append(
                         `<tr>
@@ -151,7 +148,6 @@
                     );
                 });
 
-                // Update total price
                 $('#totalPrice').text(data.cart_total_price);
             });
         });
