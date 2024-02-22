@@ -8,9 +8,9 @@ from products.models import Product
 from django.shortcuts import redirect
 from django.http import JsonResponse
 from django.contrib.auth.mixins import LoginRequiredMixin
-from .models import Order, OrderItem
+from .models import Order, OrderItem, Coupon
 from rest_framework.permissions import IsAuthenticated
-from .serializers import OrderSerializer, ProductSerializer
+from .serializers import OrderSerializer, ProductSerializer, CouponSerializer
 
 class CartView(View):   
     def get(self, request):
@@ -18,9 +18,6 @@ class CartView(View):
     
 # with session
 class CartAPI(APIView):
-    """
-    Single API to handle cart operations
-    """
     def get(self, request, slug, format=None):
         cart = Cart(request)
 
@@ -107,6 +104,14 @@ class OrderAPIView(APIView):
     permission_classes = [IsAuthenticated]
     def get(self, request, order_id):
         order = get_object_or_404(Order, pk=order_id)
-        serializer = OrderSerializer(instance=order)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        # coupon = Coupon(order=order)
+        # coupon_ser = CouponSerializer(instance=coupon)
+        order_ser = OrderSerializer(instance=order)
+        
+        responses_data = {
+            # "coupon":coupon_ser.data,
+            "order":order_ser.data,
+            
+        }
+        return Response(data=responses_data, status=status.HTTP_200_OK)
     
