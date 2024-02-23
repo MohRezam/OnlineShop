@@ -130,27 +130,42 @@
   <script src="{% static 'js/jquery.mCustomScrollbar.concat.min.js' %}"></script>
   <script src="{% static 'js/custom.js' %}"></script>
 
-    <script>
-        $(document).ready(function() {
-            $.getJSON('/orders/api/cart/slug2', function(data) {
-                $('#cartBody').empty();
+  <script>
+   $(document).ready(function() {
+       function removeFromCart(productSlug, currentUrl) {
+           $.getJSON(`/orders/cart/remove/${productSlug}`, function(data) {
+               
+               window.location.href = currentUrl;
+           });
+       }
 
-                $.each(data.data, function(index, item) {
-                    $('#cartBody').append(
-                        `<tr>
-                            <th scope="row">${index + 1}</th>
-                            <td>${item.product.name}</td>
-                            <td>${item.quantity}</td>
-                            <td>${item.product.price}</td>
-                            <td>${item.total_price}</td>
-                            <td><a href="${window.location.pathname}remove/${item.product.slug}">Remove</a></td>
-                        </tr>`
-                    );
-                });
+       $.getJSON('/orders/api/cart/slug2', function(data) {
+           $('#cartBody').empty();
 
-                $('#totalPrice').text(data.cart_total_price);
-            });
-        });
-    </script>
+           $.each(data.data, function(index, item) {
+               $('#cartBody').append(
+                   `<tr>
+                       <th scope="row">${index + 1}</th>
+                       <td>${item.product.name}</td>
+                       <td>${item.quantity}</td>
+                       <td>${item.product.price}</td>
+                       <td>${item.total_price}</td>
+                       <td><a href="#" class="remove-link" data-slug="${item.product.slug}">Remove</a></td>
+                   </tr>`
+               );
+           });
+
+           $('#totalPrice').text(data.cart_total_price);
+
+           var currentUrl = window.location.href;
+
+           $('.remove-link').click(function(event) {
+               event.preventDefault(); 
+               var productSlug = $(this).data('slug');
+               removeFromCart(productSlug, currentUrl); 
+           });
+       });
+   });
+</script>
 </body>
 </html>
