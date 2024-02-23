@@ -11,52 +11,19 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from .models import Order, OrderItem, Coupon
 from rest_framework.permissions import IsAuthenticated
 from .serializers import OrderSerializer, ProductSerializer, CouponSerializer
+from django.contrib import messages
 
 class CartView(View):   
     def get(self, request):
         return render(request, "orders/cart.html")
     
-# with session
-class CartAPI(APIView):
-    def get(self, request, slug, format=None):
-        cart = Cart(request)
-
-        return Response(
-            {"data": list(cart.__iter__()), 
-            "cart_total_price": cart.get_total_price()},
-            status=status.HTTP_200_OK
-            )
-
-    def post(self, request, slug,**kwargs):
-        cart = Cart(request)
-
-        if "remove" in request.data:
-            product = request.data["product"]
-            cart.remove(product)
-
-        elif "clear" in request.data:
-            cart.clear()
-
-        else:
-            product = request.data
-            cart.add(
-                    product=get_object_or_404(Product, slug=product["product"]),
-                    quantity=product["quantity"],
-                )
-        return Response(
-            {"message": "cart updated"},
-            status=status.HTTP_202_ACCEPTED)
-
-# with cookies
+# # with session
 # class CartAPI(APIView):
-#     """
-#     Single API to handle cart operations
-#     """
 #     def get(self, request, slug, format=None):
 #         cart = Cart(request)
 
-#         return JsonResponse(
-#             {"data": list(cart), 
+#         return Response(
+#             {"data": list(cart.__iter__()), 
 #             "cart_total_price": cart.get_total_price()},
 #             status=status.HTTP_200_OK
 #             )
@@ -77,18 +44,54 @@ class CartAPI(APIView):
 #                     product=get_object_or_404(Product, slug=product["product"]),
 #                     quantity=product["quantity"],
 #                 )
-#         response = JsonResponse(
+#         return Response(
 #             {"message": "cart updated"},
 #             status=status.HTTP_202_ACCEPTED)
-#         cart.save_cart_to_cookies(response)
-#         return response
+
+# with cookies
+class CartAPI(APIView):
+    """
+    Single API to handle cart operations
+    """
+    def get(self, request, slug, format=None):
+        cart = Cart(request)
+
+        return JsonResponse(
+            {"data": list(cart), 
+            "cart_total_price": cart.get_total_price()},
+            status=status.HTTP_200_OK
+            )
+
+    def post(self, request, slug,**kwargs):
+        cart = Cart(request)
+
+        if "remove" in request.data:
+            product = request.data["product"]
+            cart.remove(product)
+
+        elif "clear" in request.data:
+            cart.clear()
+
+        else:
+            product = request.data
+            cart.add(
+                    product=get_object_or_404(Product, slug=product["product"]),
+                    quantity=product["quantity"],
+                )
+        response = JsonResponse(
+            {"message": "cart updated"},
+            status=status.HTTP_202_ACCEPTED)
+        cart.save_cart_to_cookies(response)
+        return response
     
 class CartRemoveView(View):
     def get(self, request, product_slug):
-        cart = Cart(request)
         product = get_object_or_404(Product, slug=product_slug)
-        cart.remove(product)        
-        return redirect("orders:cart")
+        cart = Cart(request)
+        response = JsonResponse({'message': 'Product removed successfully'})
+        cart.remove(product, response)
+        messages.success(request, f"{product.name} removed successfully", "success")
+        return response
         
         
 class OrderView(LoginRequiredMixin, View):
