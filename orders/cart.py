@@ -133,6 +133,15 @@ class Cart:
         for item in cart.values():
             item["total_price"] = Decimal(item["price"]) * item["quantity"]
             yield item
+    # def __iter__(self):
+    #     product_ids=self.cart.keys()
+    #     products=Product.objects.filter(id__in=product_ids)
+    #     cart=self.cart.copy()
+    #     for product in products:
+    #         cart[str(product.id)]['product']=product
+    #     for item in cart.values():
+    #         item['total_price']=int(item['price'])*item['quantity']
+    #     yield item
     
     def __len__(self):
         """
@@ -143,6 +152,8 @@ class Cart:
     def get_total_price(self):
         return sum(Decimal(item["price"]) * item["quantity"] for item in self.cart.values())
 
-    def clear(self):
-        # Clear the cart by setting it to an empty dictionary
+    def clear(self, response):
         self.cart = {}
+        self.cookies['cart'] = {}
+        self.save_cart_to_cookies(response)
+        

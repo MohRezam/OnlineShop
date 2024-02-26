@@ -86,7 +86,7 @@ class CartAPI(APIView):
         cart.save_cart_to_cookies(response)
         return response
     
-class CartRemoveView(View):
+class CartRemoveView(APIView):
     def get(self, request, product_slug):
         product = get_object_or_404(Product, slug=product_slug)
         cart = Cart(request)
@@ -102,42 +102,46 @@ class OrderDetailView(LoginRequiredMixin, View):
         return render(request, "orders/checkout.html")
            
      
-class OrderCreateView(LoginRequiredMixin, View):
-    def get(self, request):
-        cart = Cart(request)
-        order = Order.objects.create(user=request.user)
-        
-        for item in cart:
-            product = item['product'] 
-            product_serializer = ProductSerializer(data=product)
-            print(f"Serialized product data: {product}")
-            if product_serializer.is_valid():
-                print("Product serializer is valid.")
-                product_instance = product_serializer.save()
-                OrderItem.objects.create(order=order, product=product_instance, quantity=item['quantity'])
-            else:
-                print("Product serializer is NOT valid. Errors:", product_serializer.errors)
-        
-        cart.clear() 
-        return redirect("orders:order_detail", order.id)
-    
-    
 # class OrderCreateView(LoginRequiredMixin, View):
 #     def get(self, request):
 #         cart = Cart(request)
 #         order = Order.objects.create(user=request.user)
+        
 #         for item in cart:
-#             OrderItem.objects.create(order=order, product= item['product'], quantity=item['quantity'])
-#             cart.clear()
-#         return render(request, "orders/checkout.html")
+#             product = item['product'] 
+#             product_serializer = ProductSerializer(data=product)
+#             print(f"Serialized product data: {product}")
+#             if product_serializer.is_valid():
+#                 print("Product serializer is valid.")
+#                 product_instance = product_serializer.save()
+#                 OrderItem.objects.create(order=order, product=product_instance, quantity=item['quantity'])
+#             else:
+#                 print("Product serializer is NOT valid. Errors:", product_serializer.errors)
+        
+#         cart.clear() 
+#         return redirect("orders:order_detail", order.id)
+    
+    
+class OrderCreateView(LoginRequiredMixin, View):
+    # permission_classes = [IsAuthenticated]
+    
+    def get(self, request):
+        cart = Cart(request)
+        order = Order.objects.create(user=request.user)
+        for item in cart:
+            product_id = item["product"]["id"]
+            quantity = item["quantity"]
+            product = Product.objects.get(id=product_id)
+            OrderItem.objects.create(order=order, product= product, quantity=quantity)
+        return render(request, 'orders/checkout.html')  
     
 class OrderAPIView(APIView):
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
     def get(self, request, order_id):
         order = get_object_or_404(Order, pk=order_id)
         # coupon = Coupon(order=order)
         # coupon_ser = CouponSerializer(instance=coupon)
-        order_ser = OrderSerializer(instance=order)
+        order_ser = OrderSerializer(order)
         
         responses_data = {
             # "coupon":coupon_ser.data,
