@@ -97,7 +97,7 @@ class Cart:
         Save the current cart data to cookies
         """
         cart_data = json.dumps(self.cart)
-        response.set_cookie(key=CART_COOKIE_NAME, value=cart_data, max_age=3600)
+        response.set_cookie(key=CART_COOKIE_NAME, value=cart_data, max_age=604800)
 
     def add(self, product, quantity=1, overide_quantity=False):
         """
@@ -133,7 +133,7 @@ class Cart:
         for item in cart.values():
             item["total_price"] = Decimal(item["price"]) * item["quantity"]
             yield item
-
+    
     def __len__(self):
         """
         Count all items in the cart

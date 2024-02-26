@@ -18,10 +18,10 @@ class BaseModel(models.Model):
     is_deleted = models.BooleanField(default=False)
     deleted_at = models.DateTimeField(null=True, default=None, editable=False)
     
-    def delete(self):
-        self.is_deleted = True
-        self.deleted_at = timezone.now()
-        self.save()
+    # def delete(self):
+    #     self.is_deleted = True
+    #     self.deleted_at = timezone.now()
+    #     self.save()
     
     class Meta:
         abstract = True

@@ -119,7 +119,7 @@
             </tbody>
         </table>
         <p>Total Price: <span id="totalPrice"></span></p>
-        <a href="{% url 'orders:order' %}" class="read_more" onclick="addToCart('${product.product.slug}')">Checkout</a>
+        <a href="{% url 'orders:order_create' %}" class="read_more" onclick="addToCart('${product.product.slug}')">Checkout</a>
     </div>
 
     <script src="{% static 'js/jquery.min.js' %}"></script>

@@ -12,6 +12,8 @@ from .models import Order, OrderItem, Coupon
 from rest_framework.permissions import IsAuthenticated
 from .serializers import OrderSerializer, ProductSerializer, CouponSerializer
 from django.contrib import messages
+from rest_framework.renderers import JSONRenderer
+from rest_framework.serializers import ValidationError
 
 class CartView(View):   
     def get(self, request):
@@ -93,15 +95,41 @@ class CartRemoveView(View):
         messages.success(request, f"{product.name} removed successfully", "success")
         return response
         
-        
-class OrderView(LoginRequiredMixin, View):
+   
+class OrderDetailView(LoginRequiredMixin, View):
+    def get(self, request, order_id):
+        order = get_object_or_404(Order, id=order_id)
+        return render(request, "orders/checkout.html")
+           
+     
+class OrderCreateView(LoginRequiredMixin, View):
     def get(self, request):
         cart = Cart(request)
-        order = Order.objects.create(user=request.user, total_price=cart.get_total_price())
+        order = Order.objects.create(user=request.user)
+        
         for item in cart:
-            OrderItem.objects.create(order=order, product= item['product'], quantity=item['quantity'])
-            cart.clear()
-        return render(request, "orders/checkout.html")
+            product = item['product'] 
+            product_serializer = ProductSerializer(data=product)
+            print(f"Serialized product data: {product}")
+            if product_serializer.is_valid():
+                print("Product serializer is valid.")
+                product_instance = product_serializer.save()
+                OrderItem.objects.create(order=order, product=product_instance, quantity=item['quantity'])
+            else:
+                print("Product serializer is NOT valid. Errors:", product_serializer.errors)
+        
+        cart.clear() 
+        return redirect("orders:order_detail", order.id)
+    
+    
+# class OrderCreateView(LoginRequiredMixin, View):
+#     def get(self, request):
+#         cart = Cart(request)
+#         order = Order.objects.create(user=request.user)
+#         for item in cart:
+#             OrderItem.objects.create(order=order, product= item['product'], quantity=item['quantity'])
+#             cart.clear()
+#         return render(request, "orders/checkout.html")
     
 class OrderAPIView(APIView):
     permission_classes = [IsAuthenticated]

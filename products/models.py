@@ -60,7 +60,7 @@ class Product(BaseModel):
     brand = models.CharField(max_length=255)
     price = models.DecimalField(max_digits=10, decimal_places=2)
     description = models.TextField(blank=True, null=True)
-    slug = models.SlugField(unique=True, blank=True)
+    slug = models.SlugField(blank=True)
     inventory_quantity = models.PositiveIntegerField()
     is_available = models.CharField(max_length=25, choices=PRODUCT_AVAILABLE_CHOICES, default=True)
     image = models.ImageField(upload_to=product_image_path, blank=True, null=True)
