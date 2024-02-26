@@ -23,7 +23,7 @@ class OrderSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Order
-        fields = ['id', 'is_paid', 'user', 'coupon', 'calculate_total_price']
+        fields = ['id', 'is_paid', 'user', 'coupon', 'calculate_total_price', 'created_at', 'province', 'city', 'detailed_address', 'postal_code']
         
     def calculate_total_price(self, obj):
         return obj.calculate_total_price()
