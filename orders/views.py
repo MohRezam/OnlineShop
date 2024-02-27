@@ -17,6 +17,7 @@ from rest_framework.serializers import ValidationError
 from django.conf import settings
 import requests
 import json
+from django.urls import reverse
 
 class CartView(View):   
     def get(self, request):
@@ -140,8 +141,19 @@ class OrderCreateView(LoginRequiredMixin, View):
             product_id = item["product"]["id"]
             quantity = item["quantity"]
             product = Product.objects.get(id=product_id)
-            OrderItem.objects.create(order=order, product= product, quantity=quantity)
-        return redirect('orders:order_detail', order.id)  
+            OrderItem.objects.create(order=order, product=product, quantity=quantity)
+        
+        # Construct the JSON response
+        response_data = {
+            "message": "Cart cleared successfully",
+            "redirect_url": reverse("orders:order_detail", kwargs={"order_id": order.id})  # Replace "some_url_name" with the name of the URL you want to redirect to
+        }
+        response = JsonResponse(response_data)
+        
+        # Clear the cart
+        cart.clear(response)
+        
+        return response
     
 # class OrderAPIView(APIView):
 #     # permission_classes = [IsAuthenticated]
