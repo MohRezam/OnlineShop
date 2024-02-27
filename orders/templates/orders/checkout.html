@@ -38,6 +38,9 @@
       <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.5/jquery.fancybox.min.css" media="screen">
    </head>
 <body>
+  <div class="loader_bg">
+    <div class="loader"><img src="{% static 'images/loading.gif' %}" alt="#" /></div>
+ </div>
    <section class="h-100 gradient-custom">
     <div class="container py-5 h-100">
       <div class="row d-flex justify-content-center align-items-center h-100">
@@ -103,11 +106,19 @@
       </div>
     </div>
   </section>
+
+  <script src="{% static 'js/jquery.min.js' %}"></script>
+  <script src="{% static 'js/popper.min.js' %}"></script>
+  <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+  <script src="{% static 'js/jquery-3.0.0.min.js' %}"></script>
+  <!-- sidebar -->
+  <script src="{% static 'js/jquery.mCustomScrollbar.concat.min.js' %}"></script>
+  <script src="{% static 'js/custom.js' %}"></script>
+
   <script>
     fetch('api/')
     .then(response => response.json())
     .then(data => {
-        // Replace the innerHTML of the elements with the data from the API
         console.log(data.calculate_total_price)
         document.getElementById('username').innerHTML = 'Thanks for your Order '+data.serializer.user.first_name;
         document.getElementById('total-price').innerHTML = 'total price: '+data.serializer.calculate_total_price;
@@ -139,13 +150,10 @@
       fetch('api/')
       .then(response => response.json())
       .then(data => {
-          // Get the order ID from data.serializer.id
           var orderId = data.serializer.id;
 
-          // Construct the URL with the order ID
           var url = "{% url 'orders:order_pay' 0 %}".replace('0', orderId);
 
-          // Redirect to the constructed URL
           window.location.href = url;
       })
       .catch(error => console.error('Error:', error));
@@ -187,7 +195,6 @@
         var cookies = document.cookie.split(';');
         for (var i = 0; i < cookies.length; i++) {
             var cookie = cookies[i].trim();
-            // Does this cookie string begin with the name we want?
             if (cookie.substring(0, name.length + 1) === (name + '=')) {
                 cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
                 break;
@@ -198,28 +205,23 @@
 }
 
     document.getElementById('payButton').addEventListener('click', function(event) {
-      // Prevent the default form submission behavior
       event.preventDefault();
 
-      // Get the address data from the form
       var province = document.getElementById('province').value;
       var city = document.getElementById('city').value;
       var detail = document.getElementById('detail').value;
       var post_code = document.getElementById('post_code').value;
 
-      // Check if at least one field is filled in
       if (province === '' && city === '' && detail === '' && post_code === '') {
-          // If no fields are filled in, display an error message and return
           alert('Please fill in at least one field.');
           return;
       }
 
-      // Make a POST request to the Django API endpoint
       fetch('/api/address/', {
           method: 'POST',
           headers: {
               'Content-Type': 'application/json',
-              'X-CSRFToken': getCookie('csrftoken') // Include the CSRF token
+              'X-CSRFToken': getCookie('csrftoken')
           },
           body: JSON.stringify({
               province: province,
@@ -230,10 +232,8 @@
       })
       .then(response => {
           if (response.ok) {
-              // If the POST request is successful, reload the page
               window.location.reload();
           } else {
-              // If there is an error, display an error message
               console.error('Error:', response.statusText);
               alert('An error occurred while saving the address.');
           }
