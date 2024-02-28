@@ -1,8 +1,10 @@
 from rest_framework import serializers
-from .models import User
+from .models import User, Address
 from django.contrib import messages
 from django.shortcuts import redirect
 import re
+from djoser.serializers import UserSerializer as BaseUserSerializer, UserCreateSerializer as BaseUserCreateSerializer
+from products.serializers import UserSerializer
 
 class UserRegisterSerializer(serializers.ModelSerializer):
     first_name = serializers.CharField(required=True)
@@ -58,4 +60,16 @@ class UserRegisterSerializer(serializers.ModelSerializer):
 class OtpCodeSerializer(serializers.Serializer):
     code = serializers.CharField()
         
-    
+
+
+class UserCreateSerializer(BaseUserCreateSerializer):
+    class Meta(BaseUserCreateSerializer.Meta):
+        fields = ['id', 'phone_number', 'email', 'password','first_name','last_name']
+        
+
+
+class AddressSerializer(serializers.Serializer):
+    user = UserSerializer()
+    class Meta:
+        model = Address
+        fields = ["province", "city", "detailed_address", "postal_code", "is_actual_person", "user"]
