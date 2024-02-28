@@ -30,6 +30,8 @@ urlpatterns = [
     path("", include("products.urls", namespace="products")),
     path("orders/", include("orders.urls", namespace="orders")),
     path("accounts/", include("accounts.urls", namespace="accounts")),
+    path('auth/', include('djoser.urls')),
+    path('auth/', include('djoser.urls.jwt')),
 
 ] 
 
