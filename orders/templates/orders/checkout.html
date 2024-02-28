@@ -12,7 +12,7 @@
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <!-- site metas -->
-      <title>News</title>
+      <title>Checkout</title>
       <meta name="keywords" content="">
       <meta name="description" content="">
       <meta name="author" content="">
@@ -44,8 +44,11 @@
    <section class="h-100 gradient-custom">
     <div class="container py-5 h-100">
       <div class="row d-flex justify-content-center align-items-center h-100">
+        
         <div class="col-lg-10 col-xl-8">
+          
           <div class="card" style="border-radius: 10px;">
+            
             <div class="card-header px-4 py-5">
               <h5 class="text-muted mb-0" id="username">Thanks for your Order, <span style="color: #a8729a;">Anna</span>!</h5>
             </div>
@@ -93,14 +96,23 @@
               <div class="d-flex justify-content-between mb-5">
                 <a href="#" class="btn btn-success btn-lg" id="payButton">Save Adress</a>
               </div>
+              
+            
             </div>
             <div class="card-footer border-0 px-4 py-5"
               style="background-color: #a8729a; border-bottom-left-radius: 10px; border-bottom-right-radius: 10px;">
               <h5 class="d-flex align-items-center justify-content-end text-white text-uppercase mb-0">Total
                 paid: <span class="h2 mb-0 ms-2" id="total-paid">$1040</span></h5>
+                <div class="col-md-12">
+                  <input class="form-control form-control-user mb-3" placeholder="Coupon Code" type="text" name="coupon_code" id="coupon_code"> 
+                  <!-- Display error message if needed -->
+                  <div id="couponError" style="color: red;"></div>
+              </div>
+              <button id="applyCouponBtn" class="btn btn-primary">Apply Coupon</button><br><br>
                 <a href="pay/" class="btn btn-success btn-lg" onclick="payOrder()" id="payButton">Pay</a>
 
             </div>
+            
           </div>
         </div>
       </div>
@@ -124,7 +136,7 @@
         document.getElementById('total-price').innerHTML = 'total price: '+data.serializer.calculate_total_price;
         document.getElementById('created-at').innerHTML = 'created at '+data.serializer.created_at;
         document.getElementById('Paid').innerHTML = 'is paid: '+data.serializer.is_paid;
-        document.getElementById('Coupon').innerHTML = 'coupon: '+data.serializer.coupon;
+        document.getElementById('Coupon').innerHTML = 'coupon: '+data.coupon_data.coupon;
         document.getElementById('total-paid').innerHTML = data.serializer.calculate_total_price;
         document.getElementById('province-detail').innerHTML = 'province: '+data.serializer.province;
         document.getElementById('city-detail').innerHTML = 'city: '+data.serializer.city;
@@ -204,44 +216,71 @@
     return cookieValue;
 }
 
-    document.getElementById('payButton').addEventListener('click', function(event) {
-      event.preventDefault();
+document.getElementById('payButton').addEventListener('click', function(event) {
+  event.preventDefault();
 
-      var province = document.getElementById('province').value;
-      var city = document.getElementById('city').value;
-      var detail = document.getElementById('detail').value;
-      var post_code = document.getElementById('post_code').value;
+  var province = document.getElementById('province').value;
+  var city = document.getElementById('city').value;
+  var detail = document.getElementById('detail').value;
+  var post_code = document.getElementById('post_code').value;
+  var coupon_code = document.getElementById('coupon_code').value; // Get the entered coupon code
 
-      if (province === '' && city === '' && detail === '' && post_code === '') {
-          alert('Please fill in at least one field.');
-          return;
-      }
+  // Your existing code to validate form fields
+  // ...
 
-      fetch('/api/address/', {
-          method: 'POST',
-          headers: {
-              'Content-Type': 'application/json',
-              'X-CSRFToken': getCookie('csrftoken')
-          },
-          body: JSON.stringify({
-              province: province,
-              city: city,
-              detail_address: detail,
-              postal_code: post_code
-          })
+  fetch('api/', {
+      method: 'POST',
+      headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': getCookie('csrftoken')
+      },
+      body: JSON.stringify({
+          province: province,
+          city: city,
+          detail_address: detail,
+          postal_code: post_code,
+          coupon_code: coupon_code // Include the coupon code in the request body
       })
-      .then(response => {
-          if (response.ok) {
-              window.location.reload();
-          } else {
-              console.error('Error:', response.statusText);
-              alert('An error occurred while saving the address.');
-          }
-      })
-      .catch(error => {
-          console.error('Error:', error);
+  })
+  .then(response => {
+      if (response.ok) {
+          window.location.reload();
+      } else {
+          console.error('Error:', response.statusText);
           alert('An error occurred while saving the address.');
-      });
-    });
+      }
+  })
+  .catch(error => {
+      console.error('Error:', error);
+      alert('An error occurred while saving the address.');
+  });
+});
+document.getElementById('applyCouponBtn').addEventListener('click', function(event) {
+  event.preventDefault();
+
+  // Get the coupon code from the input field
+  var couponCode = document.getElementById('coupon_code').value;
+
+  // Send the coupon code to the backend
+  fetch('api/', {
+      method: 'POST',
+      headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': getCookie('csrftoken')
+      },
+      body: JSON.stringify({
+          coupon_code: couponCode
+      })
+  })
+  .then(response => response.json())
+  .then(data => {
+      // Update the total price on the page with the new value received from the backend
+      document.getElementById('total-price').innerHTML = 'Total: $' + data.new_total_price;
+  })
+  .catch(error => {
+      console.error('Error:', error);
+      alert('An error occurred while applying the coupon.');
+  });
+});
   </script>
 </body>
