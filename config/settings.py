@@ -47,7 +47,7 @@ INSTALLED_APPS = [
     
     # Third Party Apps:
     'rest_framework',
-    'rest_framework_simplejwt',
+    'djoser'
 
 ]
 
@@ -166,21 +166,21 @@ AUTHENTICATION_BACKENDS = [
 ]
 
 REST_FRAMEWORK = {
-'DEFAULT_AUTHENTICATION_CLASSES':[
-  'rest_framework_simplejwt.authentication.JWTAuthentication', 
-],
-
-'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-'PAGE_SIZE':6,
-
+'COERCE_DECIMAL_TO_STRING': False,
+'DEFAULT_AUTHENTICATION_CLASSES': (
+'rest_framework_simplejwt.authentication.JWTAuthentication',
+),
 }
 
+from datetime import timedelta
 SIMPLE_JWT = {
-'ACCESS_TOKEN_LIFETIME': timedelta(minutes=15), # Example token lifetime
-'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
-'AUTH_HEADER_TYPES': ('Bearer',),
-'USER_ID_FIELD': 'id',
-'USER_ID_CLAIM': 'user_id',
+'AUTH_HEADER_TYPES': ('JWT',),
+'ACCESS_TOKEN_LIFETIME': timedelta(days=3)
+}
+DJOSER = {
+'SERIALIZERS': {
+'user_create': 'accounts.serializers.UserCreateSerializer'
+},
 }
 
 # Zarinpal
