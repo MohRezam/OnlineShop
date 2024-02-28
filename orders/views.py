@@ -15,6 +15,8 @@ from django.conf import settings
 import requests
 import json
 from django.urls import reverse
+import datetime
+from accounts.serializers import AddressSerializer
 
 class CartView(View):   
     def get(self, request):
@@ -98,10 +100,46 @@ class CartRemoveView(APIView):
         
    
 class OrderDetailAPIView(APIView):
+    permission_classes = [IsAuthenticated]
     def get(self, request, order_id):
+        print(request.user)
         order = get_object_or_404(Order, id=order_id)
-        serializer = OrderSerializer(order)
-        return Response({'serializer':serializer.data})
+        order_ser = OrderSerializer(instance=order)
+        coupon = order.coupon
+        coupon_ser = CouponSerializer(instance=coupon)
+        
+        response_data = {
+            "serializer":order_ser.data,
+            "coupon_data":coupon_ser.data,
+        }
+        
+        return Response(data=response_data, status=status.HTTP_200_OK)
+    def post(self, request, order_id):
+        now = datetime.datetime.now()
+        coupon = CouponSerializer(data=request.data)
+        if coupon.is_valid():
+            code = coupon.validated_data["coupon_code"]
+            try:
+                coupon = Coupon.objects.get(code__exact=code, valid__from__lte=now, valid_to__gte=now, is_active=True)
+            except Coupon.DoesNotExist:
+                return Response({"message":"this coupon does not exists"})
+            order = Order.objects.get(id=order_id)
+            # order.discount = coupon.discount
+            order.save()
+            order_ser = OrderSerializer(order)
+            coupon_ser = CouponSerializer(coupon)
+        address = AddressSerializer(request.data)
+        if address.is_valid():
+            city = address.validated_data["city"]
+            order = get_object_or_404(Order, id=order_id)
+            order.city = city
+            order.save()
+            
+        response_data = {
+            "serializer":order_ser.data,
+            "coupon_data":coupon_ser.data,
+        }
+        return Response(data=response_data)
            
            
 class OrderDetailView(View):
@@ -129,7 +167,7 @@ class OrderDetailView(View):
     
     
 class OrderCreateView(LoginRequiredMixin, View):
-    # permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
     
     def get(self, request):
         cart = Cart(request)
