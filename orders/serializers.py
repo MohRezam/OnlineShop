@@ -5,12 +5,9 @@ from products.serializers import ProductSerializer, UserSerializer
 
 
 class CouponSerializer(serializers.ModelSerializer):
-    user = UserSerializer()
-    
-    
     class Meta:
         model = Coupon
-        fields = ['code', 'percentage', 'expiration_date', 'available_quantity', 'usage_limit_per_user', 'is_active', 'user']
+        fields = ['code']
         
 
 
