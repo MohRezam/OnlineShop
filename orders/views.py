@@ -5,15 +5,12 @@ from .cart import Cart
 from rest_framework.response import Response
 from rest_framework import status
 from products.models import Product
-from django.shortcuts import redirect
 from django.http import JsonResponse
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .models import Order, OrderItem, Coupon
 from rest_framework.permissions import IsAuthenticated
 from .serializers import OrderSerializer, ProductSerializer, CouponSerializer
 from django.contrib import messages
-from rest_framework.renderers import JSONRenderer
-from rest_framework.serializers import ValidationError
 from django.conf import settings
 import requests
 import json
