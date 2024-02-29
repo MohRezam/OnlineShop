@@ -15,6 +15,7 @@ from django.conf import settings
 import redis
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.http import JsonResponse
+import json
 
 # redis
 redis_client = redis.StrictRedis(host=settings.REDIS_HOST, port=settings.REDIS_PORT, db=settings.REDIS_DB)
@@ -114,16 +115,13 @@ class UserLoginView(View):
     
 class LoginView(APIView):
     def post(self, request):
-        email = request.data.get("email")
-        password = request.data.get("password")
+        data = json.loads(request.body)
+        email = data.get("email")
+        password = data.get("password")
         user = authenticate(username=email, password=password)
         login(request, user)
         messages.success(request, "You are logged in successfully", "success")
-        refresh = RefreshToken.for_user(user)
-        return JsonResponse({
-            'refresh':str(refresh),
-            'access':str(refresh.access_token)
-        })
+        return redirect("products:home")
         
 
 # class UserLoginAPIView(APIView):
