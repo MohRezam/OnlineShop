@@ -53,13 +53,14 @@
      form.addEventListener("submit", function(event) {
        event.preventDefault();
        getToken();
+       fetchData(); 
      });
  
      function getToken() {
        const email = document.querySelector('input[name="email"]').value;
        const password = document.querySelector('input[name="password"]').value;
  
-       fetch("api/", {
+       fetch("http://127.0.0.1:8000/auth/jwt/create/", {
          method: 'POST',
          headers: {
            "Content-Type": "application/json"
@@ -73,7 +74,8 @@
        .then(data => {
          localStorage.setItem("access_token", data.access);
          localStorage.setItem("refresh_token", data.refresh);
- 
+        
+         fetchData({ email: email, password: password });
          window.location.href = "/"; 
        })
        .catch(error => {
@@ -86,19 +88,20 @@
      const access_token = localStorage.getItem("access_token");
      if (access_token) {
        return {
-         'Authorization': 'Bearer ' + access_token
+         'Authorization': 'JWT ' + access_token
        };
      }
      return {};
    }
  
-   function fetchData() {
-     fetch("/api/some-protected-endpoint/", {
-       method: 'GET',
+   function fetchData(data) {
+     fetch("api/", {
+       method: 'POST',
        headers: {
          ...includeAuthToken(),
          'Content-Type': 'application/json'
-       }
+       },
+       body: JSON.stringify(data)
      })
      .then(response => response.json())
      .then(data => {
