@@ -3,6 +3,9 @@ from .models import Category, Comment, News, Product, ProductFeature, ProductFea
 from accounts.models import User
 
 class CategorySerializer(serializers.ModelSerializer):
+    """
+    Serializer for the Category model.
+    """
     class Meta:
         model = Category
         fields = ["name", "slug", "is_sub", "image", "parent_category", "discount"]
@@ -10,6 +13,9 @@ class CategorySerializer(serializers.ModelSerializer):
 
 
 class ProductSerializer(serializers.ModelSerializer):
+    """
+    Serializer for the Product model.
+    """
     class Meta:
         model = Product
         fields = ["id", "name", "brand", "price", "description", "slug",
@@ -19,6 +25,9 @@ class ProductSerializer(serializers.ModelSerializer):
         
 
 class ProductFeatureSerializer(serializers.ModelSerializer):
+    """
+    Serializer for the ProductFeature model.
+    """
     class Meta:
         model = ProductFeature
         fields = ["name", "products"]
@@ -26,6 +35,9 @@ class ProductFeatureSerializer(serializers.ModelSerializer):
 
     
 class ProductFeatureValueSerializer(serializers.ModelSerializer):
+    """
+    Serializer for the ProductFeatureValue model.
+    """
     class Meta:
         model = ProductFeatureValue
         fields = ["value", "product", "feature"]
@@ -36,6 +48,9 @@ class UserSerializer(serializers.ModelSerializer):
         fields = "__all__"
             
 class CommentSerializer(serializers.ModelSerializer):
+    """
+    Serializer for the Comment model.
+    """
     user = UserSerializer()
     class Meta:
         model = Comment
@@ -44,6 +59,9 @@ class CommentSerializer(serializers.ModelSerializer):
 
 
 class DiscountSerializer(serializers.ModelSerializer):
+    """
+    Serializer for the Discount model.
+    """
     class Meta:
         model = Discount
         fields = ["type", "value", "max_value", "expiration_date", "is_active", "user"]
@@ -51,6 +69,9 @@ class DiscountSerializer(serializers.ModelSerializer):
 
         
 class NewsSerializer(serializers.ModelSerializer):
+    """
+    Serializer for the News model.
+    """
     class Meta:
         model = News
         fields = ["title", "body", "image", "user"]

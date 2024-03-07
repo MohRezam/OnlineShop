@@ -79,6 +79,42 @@ from django.http import HttpResponse
 CART_COOKIE_NAME = "cart"
 
 class Cart:
+    """
+    Shopping cart management class.
+
+    This class provides methods for managing a user's shopping cart.
+    It allows adding, removing, and clearing items from the cart, as well
+    as calculating total prices.
+
+    Attributes:
+        CART_COOKIE_NAME (str): The name of the cookie used to store cart data.
+
+    Methods:
+        __init__(request):
+            Initializes the cart with data from the request's cookies.
+
+        save_cart_to_cookies(response):
+            Saves the current cart data to cookies in the response.
+
+        add(product, quantity=1, override_quantity=False):
+            Adds a product to the cart or updates its quantity.
+
+        remove(product, response):
+            Removes a product from the cart and updates the cart data in the response cookies.
+
+        __iter__():
+            Iterates through cart items and fetches product details from the database.
+
+        __len__():
+            Counts the total number of items in the cart.
+
+        get_total_price():
+            Calculates the total price of all items in the cart.
+
+        clear(response):
+            Clears all items from the cart and updates the cart data in the response cookies.
+    """
+    
     def __init__(self, request):
         """
         initialize the cart

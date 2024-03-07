@@ -30,8 +30,87 @@ class UserRegisterView(View):
     def get(self, request):
         return render(request, "accounts/register.html", {})
     
+    
+class VerifyCodeView(View):
+     def get(self, request):
+        return render(request, "accounts/verify_code.html", {})
+    
+    
+    
+class UserLoginView(View):
+    def get(self, request):
+        if request.user.is_authenticated:
+            messages.info(request, "You are already logged in.")
+            return redirect("products:home")
+        return render(request, "accounts/login.html", {})
+    
+    # def post(self, request):
+    #     email = request.POST.get('email')
+    #     password = request.POST.get('password')
+    #     user = authenticate(request, email=email, password=password)
+        
+    #     if user is not None:
+    #         login(request, user)
+    #         # Redirect to a success page, or wherever you want
+    #         messages.success(request, "You are logged in successfully", "success")
+    #         return redirect("products:home")
+    #     else:
+    #         # Invalid login credentials
+    #         messages.error(request, "Invalid email or password. Please try again.", "danger")
+    #         return render(request, "accounts/login.html", {})
+    
+    
+class UserLogOutView(View):
+    def get(self, request):
+        if request.user.is_authenticated:
+            user = request.user
+            logout(request)
+            messages.success(request, "You logged out successfully", "success")
+        return redirect("products:home")
+    
 
+
+class CustomerPanelView(View):
+    def get(self, request):
+        return render(request, "accounts/customer_panel.html")
+    
+    
+    
+class CustomerAddressView(View):
+    def get(self, request, address_id):
+        return render(request, "accounts/customer_panel_address_edit.html")
+
+class CustomerPanelEditView(View):
+    def get(self, request):
+        return render(request, "accounts/customer_panel_edit.html")    
+    
+    
+    
+class OrderHistroy(View):
+    def get(self, request):
+        return render(request, "accounts/order_history.html")    
+    
 class UserRegisterAPIView(APIView):
+    """
+    API view for registering a new user.
+
+    This view handles the registration process for new users. It receives a POST request
+    containing user registration data and validates it using the UserRegisterSerializer.
+    If the data is valid, it generates a random OTP code, sends it to the user's phone number,
+    and stores it in Redis for verification. It also stores the user's registration data in the
+    session for later use. If the data is invalid, it returns appropriate error messages.
+
+    Methods:
+        post(request):
+            Handles POST requests for user registration.
+            Args:
+                request (HttpRequest): The HTTP request object containing user registration data.
+
+            Returns:
+                HttpResponseRedirect: Redirects to the verification page if successful, or
+                redirects back to the registration page with error messages if validation fails.
+    """
+    
     # permission_classes = [AllowAny, ]
     def post(self, request):
         serializer = UserRegisterSerializer(data=request.POST)
@@ -57,10 +136,28 @@ class UserRegisterAPIView(APIView):
         messages.error(request, f"{message}", "danger")  
         return redirect('accounts:user_register')
     
-class VerifyCodeView(View):
-     def get(self, request):
-        return render(request, "accounts/verify_code.html", {})
-class VerifyCodeAPIView(APIView): 
+
+class VerifyCodeAPIView(APIView):
+    """
+    API view for verifying OTP code and completing user registration.
+
+    This view handles the verification of the OTP code entered by the user during
+    the registration process. If the OTP code is correct, it creates a new user
+    using the provided registration data stored in the session. If the code is incorrect,
+    it returns an error message. If the session data is missing or expired, it prompts
+    the user to register again.
+
+    Methods:
+        post(request):
+            Handles POST requests for verifying OTP code and completing user registration.
+            Args:
+                request (HttpRequest): The HTTP request object containing OTP code data.
+
+            Returns:
+                HttpResponseRedirect: Redirects to the login page if registration is successful,
+                or redirects back to the verification page with error messages if verification fails.
+    """
+     
     def post(self, request):
         try:
             phone_number = request.session["user_profile_info"]["phone_number"]
@@ -96,27 +193,8 @@ class VerifyCodeAPIView(APIView):
             return redirect("accounts:verify_code")
         return redirect(request, "accounts:user_login")
         # return Response(serializer.errors)
-class UserLoginView(View):
-    def get(self, request):
-        if request.user.is_authenticated:
-            messages.info(request, "You are already logged in.")
-            return redirect("products:home")
-        return render(request, "accounts/login.html", {})
-    
-    # def post(self, request):
-    #     email = request.POST.get('email')
-    #     password = request.POST.get('password')
-    #     user = authenticate(request, email=email, password=password)
         
-    #     if user is not None:
-    #         login(request, user)
-    #         # Redirect to a success page, or wherever you want
-    #         messages.success(request, "You are logged in successfully", "success")
-    #         return redirect("products:home")
-    #     else:
-    #         # Invalid login credentials
-    #         messages.error(request, "Invalid email or password. Please try again.", "danger")
-    #         return render(request, "accounts/login.html", {})
+
     
 class LoginView(APIView):
     def post(self, request):
@@ -147,22 +225,30 @@ class LoginView(APIView):
         
 
         
-class UserLogOutView(View):
-    def get(self, request):
-        if request.user.is_authenticated:
-            user = request.user
-            logout(request)
-            messages.success(request, "You logged out successfully", "success")
-        return redirect("products:home")
-    
 
-
-class CustomerPanelView(View):
-    def get(self, request):
-        return render(request, "accounts/customer_panel.html")
  
 
 class CustomerPanelAPIView(APIView):
+    """
+    API view for retrieving and updating customer information and addresses.
+
+    This view provides GET and PUT methods for managing customer information and addresses.
+    The GET method retrieves the current user's information and associated addresses.
+    The PUT method updates the current user's information.
+
+    Methods:
+        get(request):
+            Handles GET requests to retrieve customer information and addresses.
+            Returns:
+                Response: Returns customer information and addresses as JSON data.
+
+        put(request):
+            Handles PUT requests to update customer information.
+            Returns:
+                Response: Returns a success message and redirect URL if successful,
+                or error messages if validation fails.
+    """
+    
     def get(self, request):
         user_ser = UserSerializer(instance=request.user)
         addresses = Address.objects.filter(user=request.user)
@@ -187,6 +273,31 @@ class CustomerPanelAPIView(APIView):
     
 
 class EditAddressAPIView(APIView):
+    """
+    API view for retrieving and updating addresses.
+
+    This view provides GET and PUT methods for managing addresses.
+    The GET method retrieves information about a specific address.
+    The PUT method updates the information of a specific address.
+
+    Methods:
+        get(request, address_id):
+            Handles GET requests to retrieve information about a specific address.
+            Args:
+                address_id (int): The ID of the address to retrieve.
+            Returns:
+                Response: Returns the address information as JSON data if found,
+                or a 404 error if the address does not exist.
+
+        put(request, address_id):
+            Handles PUT requests to update information about a specific address.
+            Args:
+                address_id (int): The ID of the address to update.
+            Returns:
+                Response: Returns a success message and redirect URL if successful,
+                or error messages if validation fails.
+    """
+    
     def get(self, request, address_id):
         address = get_object_or_404(Address, pk=address_id)
         serializer = AddressSerializer(instance=address)
@@ -203,23 +314,34 @@ class EditAddressAPIView(APIView):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class CustomerAddressView(View):
-    def get(self, request, address_id):
-        return render(request, "accounts/customer_panel_address_edit.html")
 
-class CustomerPanelEditView(View):
-    def get(self, request):
-        return render(request, "accounts/customer_panel_edit.html")
     
     
 class OrderHistoryApi(APIView):
+    """
+    API view for retrieving order history.
+
+    This view provides GET method to retrieve the order history for the authenticated user.
+
+    Attributes:
+        permission_classes (list): List of permission classes required for accessing this view.
+
+    Methods:
+        get(request):
+            Handles GET requests to retrieve order history for the authenticated user.
+            Args:
+                request (HttpRequest): The HTTP request object.
+            Returns:
+                Response: Returns the order history data as JSON data.
+    """
+    
     permission_classes = [IsAuthenticated]
     def get(self, request):
+        """
+        Handles GET requests to retrieve order history for the authenticated user.
+        """
+        
         queryset = Order.objects.filter(user=request.user)
         serializer = OrderSerializer(queryset, many=True)
         return Response({'queryset': serializer.data})
     
-    
-class OrderHistroy(View):
-    def get(self, request):
-        return render(request, "accounts/order_history.html")

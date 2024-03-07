@@ -8,6 +8,30 @@ from django.core.exceptions import ValidationError
 # Create your models here.
 
 class Category(BaseModel):
+    """
+    Represents a product category.
+
+    Attributes:
+        name (str): The name of the category.
+        slug (str): The slugified version of the category name, used for SEO-friendly URLs.
+                    It must be unique within the database.
+        is_sub (bool): A boolean field indicating whether the category is a subcategory.
+        image (ImageField): The image associated with the category.
+        parent_category (ForeignKey): A reference to the parent category if this category is a subcategory.
+        discount (ForeignKey): A reference to the discount applied to products within this category.
+
+    Methods:
+        clean(): Custom validation method ensuring correct setup for subcategories and parent categories.
+        validate_unique(): Custom validation method to ensure unique names for main categories.
+        save(*args, **kwargs): Overrides the save method to set a default image and slug based on the category's properties.
+
+    String Representation:
+        __str__(): Returns a string representation of the category, showing the name and, if applicable, the parent category.
+
+    Meta Options:
+        verbose_name_plural (str): Specifies the plural name for the model in the admin interface.
+    """
+    
     name = models.CharField(max_length=255)
     slug = models.SlugField(unique=True, blank=True)
     is_sub = models.BooleanField(default=False)
@@ -52,6 +76,33 @@ class Category(BaseModel):
         verbose_name_plural = 'categories'
             
 class Product(BaseModel):
+    """
+    Represents a product available for sale.
+
+    Attributes:
+        name (str): The name of the product.
+        brand (str): The brand of the product.
+        price (Decimal): The price of the product.
+        description (str): A description of the product.
+        slug (str): The slugified version of the product name, used for SEO-friendly URLs.
+        inventory_quantity (int): The quantity of the product available in stock.
+        is_available (str): The availability status of the product, chosen from predefined choices.
+        image (ImageField): The image associated with the product.
+        user (ForeignKey): A reference to the user (staff) who added the product.
+        category (ForeignKey): A reference to the category to which the product belongs.
+        discount (ForeignKey): A reference to the discount applied to the product.
+
+    Methods:
+        save(*args, **kwargs): Overrides the save method to set a default image and slug based on the product's properties.
+
+    String Representation:
+        __str__(): Returns a string representation of the product, showing the category and name.
+
+    Meta Options:
+        verbose_name_plural (str): Specifies the plural name for the model in the admin interface.
+        ordering (tuple): Specifies the default ordering for query sets of this model.
+    """
+    
     PRODUCT_AVAILABLE_CHOICES = (
         ("available", "Available"),
         ("not available", "Not Available"),
@@ -88,6 +139,19 @@ class Product(BaseModel):
         ordering = ('name', 'brand')
 
 class ProductFeature(BaseModel):
+    """
+    Represents a feature that can be associated with products.
+
+    Attributes:
+        name (str): The name of the feature, e.g., "color".
+
+    Methods:
+        __str__(): Returns a string representation of the feature, showing its name.
+
+    Meta Options:
+        verbose_name_plural (str): Specifies the plural name for the model in the admin interface.
+    """
+    
     name = models.CharField(max_length=255, help_text="like color")
     
     # text_value = models.TextField(blank=True, null=True)
@@ -104,6 +168,23 @@ class ProductFeature(BaseModel):
         verbose_name_plural = 'features'
         
 class ProductFeatureValue(BaseModel):
+    """
+    Represents a specific value of a product feature associated with a product.
+
+    Attributes:
+        value (str): The value of the product feature, e.g., "red".
+
+    Foreign Keys:
+        product (ForeignKey): A reference to the product associated with this feature value.
+        feature (ForeignKey): A reference to the product feature to which this value belongs.
+
+    Methods:
+        __str__(): Returns a string representation of the feature value, showing its value and associated feature name.
+
+    Meta Options:
+        verbose_name_plural (str): Specifies the plural name for the model in the admin interface.
+    """
+    
     value = models.CharField(max_length=255)
     
     # Foreign Keys
@@ -117,6 +198,24 @@ class ProductFeatureValue(BaseModel):
         verbose_name_plural = 'feature values'
         
 class Comment(BaseModel):
+    """
+    Represents a comment on a product.
+
+    Attributes:
+        text (str): The content of the comment.
+        likes (int): The number of likes the comment has received.
+
+    Foreign Keys:
+        user (ForeignKey): A reference to the user who made the comment.
+        product (ForeignKey): A reference to the product the comment is associated with.
+
+    Methods:
+        __str__(): Returns a string representation of the comment, showing its text and the name of the user who made it.
+
+    Meta Options:
+        verbose_name_plural (str): Specifies the plural name for the model in the admin interface.
+    """
+    
     text = models.TextField()
     likes = models.PositiveIntegerField(default=0)
     
@@ -131,6 +230,26 @@ class Comment(BaseModel):
         verbose_name_plural = 'comments'
         
 class Discount(BaseModel):
+    """
+    Represents a discount that can be applied to products.
+
+    Attributes:
+        type (str): The type of discount, e.g., "percentage" or "decimal".
+        value (Decimal): The value of the discount.
+        max_value (Decimal, optional): The maximum value the discount can have.
+        expiration_date (datetime): The expiration date of the discount.
+        is_active (bool): Indicates whether the discount is currently active.
+
+    Foreign Keys:
+        user (ManyToManyField): References to the users who can access this discount.
+
+    Methods:
+        __str__(): Returns a string representation of the discount, showing its type and value.
+
+    Meta Options:
+        verbose_name_plural (str): Specifies the plural name for the model in the admin interface.
+    """
+    
     DISCOUNT_TYPE = (
         ("percentage", "Percentage"),
         ("decimal", "Decimal"),
@@ -151,6 +270,24 @@ class Discount(BaseModel):
     
     
 class News(BaseModel):
+    """
+    Represents a news article.
+
+    Attributes:
+        title (str): The title of the news article.
+        body (str): The content of the news article.
+        image (ImageField): An image associated with the news article.
+
+    Foreign Keys:
+        user (ForeignKey): A reference to the user who created the news article.
+
+    Methods:
+        __str__(): Returns a string representation of the news article, showing its title and creation date.
+
+    Meta Options:
+        verbose_name_plural (str): Specifies the plural name for the model in the admin interface.
+    """
+    
     title = models.CharField(max_length=255)
     body = models.TextField()
     image = models.ImageField(upload_to=news_image_path)

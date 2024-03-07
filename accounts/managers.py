@@ -3,6 +3,44 @@ from django.db.models import QuerySet
 
 
 class UserManager(BaseUserManager):
+    """
+    Manager for the custom user model.
+
+    This manager provides methods for creating and retrieving user objects.
+    It also excludes deleted users from queryset by default.
+
+    Methods:
+        create_user(phone_number, email, first_name, last_name, password):
+            Creates a new user object with the provided details.
+            Args:
+                phone_number (str): The phone number of the user.
+                email (str): The email address of the user.
+                first_name (str): The first name of the user.
+                last_name (str): The last name of the user.
+                password (str): The password of the user.
+
+            Returns:
+                User: The newly created user object.
+
+        create_superuser(phone_number, email, first_name, last_name, password):
+            Creates a new superuser object with the provided details.
+            Args:
+                phone_number (str): The phone number of the user.
+                email (str): The email address of the user.
+                first_name (str): The first name of the user.
+                last_name (str): The last name of the user.
+                password (str): The password of the user.
+
+            Returns:
+                User: The newly created superuser object.
+
+        get_queryset():
+            Returns a queryset containing all non-deleted users.
+
+            Returns:
+                QuerySet: A queryset containing non-deleted user objects.
+    """
+    
     def create_user(self, phone_number, email, first_name, last_name, password):
         if not phone_number:
             raise ValueError("User must have a phone number")

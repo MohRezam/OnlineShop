@@ -22,7 +22,15 @@ from django.utils.decorators import method_decorator
 # Create your views here.
 
 class HomeAPIView(APIView):
+    """
+    API view to retrieve data for the home page including categories, top comments, and news.
+    """
+    
     def get(self, request):
+        """
+        Retrieve data for the home page.
+        """
+        
         categories = Category.objects.filter(is_sub=False)
         comments = Comment.objects.all().order_by('-likes')[:10]
         news = News.objects.all()
@@ -42,7 +50,15 @@ class HomeAPIView(APIView):
     
     
 class CategoryAPIView(APIView):
+    """
+    API view to retrieve subcategories of a specific category.
+    """
+    
     def get(self, request, category_slug):
+        """
+        Retrieve subcategories of a specific category.
+        """
+        
         category = get_object_or_404(Category, slug=category_slug)
         subcategories = Category.objects.filter(parent_category=category)
         serializer = CategorySerializer(instance=subcategories, many=True)
@@ -51,10 +67,18 @@ class CategoryAPIView(APIView):
     
     
 class ProductAPIView(APIView, PageNumberPagination):
+    """
+    API view to retrieve products belonging to a specific category and subcategory.
+    """
+    
     page_size = 6
     filter_backends = [SearchFilter]
     search_fields = ['name', 'brand']
     def get(self, request, category_slug, subcategory_slug):
+        """
+        Retrieve products belonging to a specific category and subcategory.
+        """
+        
         category = get_object_or_404(Category, slug=category_slug)
         subcategory = get_object_or_404(Category, slug=subcategory_slug, parent_category=category)
         products = Product.objects.filter(category=subcategory, is_available="available")
@@ -70,7 +94,15 @@ class ProductAPIView(APIView, PageNumberPagination):
   
 
 class ProductDetailAPIView(APIView):
+    """
+    API view to retrieve detailed information about a specific product.
+    """
+    
     def get(self, request, slug):
+        """
+        Retrieve detailed information about a specific product.
+        """
+        
         product = get_object_or_404(Product, slug=slug)
         serializer = ProductSerializer(instance=product)
         
@@ -97,6 +129,10 @@ class ProductDetailAPIView(APIView):
         return Response(data=response_data, status=status.HTTP_200_OK)
 
 class ProductSearchAPIView(ListAPIView, PageNumberPagination):
+    """
+    API view to search products based on a search query.
+    """
+    
     queryset= Product.objects.all()
     serializer_class = ProductSerializer
     filter_backends = [SearchFilter]

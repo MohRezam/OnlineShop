@@ -57,9 +57,37 @@ class CartView(View):
 # with cookies
 class CartAPI(APIView):
     """
-    Single API to handle cart operations
+    Single API to handle cart operations.
+
+    This API handles operations related to a user's shopping cart, including
+    retrieving the cart contents, adding or removing items, and clearing the cart.
+
+    Methods:
+        get(request, slug, format=None):
+            Handles GET requests to retrieve the contents of the cart.
+
+        post(request, slug, **kwargs):
+            Handles POST requests to update the cart by adding, removing, or clearing items.
+
+    Attributes:
+        None
     """
     def get(self, request, slug, format=None):
+        """
+        Retrieves the contents of the cart.
+
+        Args:
+            request (HttpRequest): The HTTP request object.
+            slug (str): The slug parameter used to identify the user.
+            format (str, optional): The format of the response data. Defaults to None.
+
+        Returns:
+            JsonResponse: A JSON response containing the cart data and total price.
+
+        Raises:
+            None
+        """
+        
         cart = Cart(request)
 
         return JsonResponse(
@@ -69,6 +97,21 @@ class CartAPI(APIView):
             )
 
     def post(self, request, slug,**kwargs):
+        """
+        Updates the cart by adding, removing, or clearing items.
+
+        Args:
+            request (HttpRequest): The HTTP request object.
+            slug (str): The slug parameter used to identify the user.
+            kwargs (dict): Additional keyword arguments.
+
+        Returns:
+            JsonResponse: A JSON response indicating the cart update status.
+
+        Raises:
+            None
+        """
+        
         cart = Cart(request)
 
         if "remove" in request.data:
@@ -91,7 +134,32 @@ class CartAPI(APIView):
         return response
     
 class CartRemoveView(APIView):
+    """
+    API view to remove a product from the cart.
+
+    Methods:
+        get(request, product_slug):
+            Handles GET requests to remove a product from the cart.
+
+    Attributes:
+        None
+    """
+    
     def get(self, request, product_slug):
+        """
+        Removes a product from the cart.
+
+        Args:
+            request (HttpRequest): The HTTP request object.
+            product_slug (str): The slug of the product to be removed.
+
+        Returns:
+            JsonResponse: A JSON response indicating the success of the operation.
+
+        Raises:
+            None
+        """
+        
         product = get_object_or_404(Product, slug=product_slug)
         cart = Cart(request)
         response = JsonResponse({'message': 'Product removed successfully'})
@@ -101,8 +169,36 @@ class CartRemoveView(APIView):
         
    
 class OrderDetailAPIView(APIView):
+    """
+    API view to retrieve and update order details.
+
+    Methods:
+        get(request, order_id):
+            Handles GET requests to retrieve order details.
+
+        post(request, order_id):
+            Handles POST requests to update order details.
+
+    Attributes:
+        permission_classes (list): A list of permission classes to apply to the view.
+    """
+    
     permission_classes = [IsAuthenticated]
     def get(self, request, order_id):
+        """
+        Retrieves order details.
+
+        Args:
+            request (HttpRequest): The HTTP request object.
+            order_id (int): The ID of the order to retrieve details for.
+
+        Returns:
+            Response: A JSON response containing order details, coupon data, and address data.
+
+        Raises:
+            None
+        """
+        
         order = get_object_or_404(Order, id=order_id)
         order_ser = OrderSerializer(instance=order)
         coupon = order.coupon
@@ -118,6 +214,20 @@ class OrderDetailAPIView(APIView):
         
         return Response(data=response_data, status=status.HTTP_200_OK)
     def post(self, request, order_id):
+        """
+        Updates order details.
+
+        Args:
+            request (HttpRequest): The HTTP request object.
+            order_id (int): The ID of the order to update details for.
+
+        Returns:
+            Response: A JSON response containing updated order details and coupon data.
+
+        Raises:
+            None
+        """
+        
         now = datetime.datetime.now()
         coupon = CouponSerializer(data=request.data)
         if coupon.is_valid():

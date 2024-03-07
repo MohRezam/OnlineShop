@@ -10,6 +10,32 @@ from django.contrib.auth.models import PermissionsMixin
 
 # Create your models here.
 class User(AbstractBaseUser, PermissionsMixin):
+    """
+    Custom user model representing a user in the system.
+
+    Attributes:
+        first_name (str): The first name of the user.
+        last_name (str): The last name of the user.
+        phone_number (str): The phone number of the user.
+        email (str): The email address of the user.
+        image (str): The profile image of the user.
+        role (str): The role of the user in the system. Choices are "product manager", "supervisor", "operator", "customer", or "admin".
+        created_at (datetime): The date and time when the user was created.
+        updated_at (datetime): The date and time when the user was last updated.
+        is_deleted (bool): Indicates if the user is deleted.
+        deleted_at (datetime): The date and time when the user was deleted.
+        is_active (bool): Indicates if the user account is active.
+        is_staff (bool): Indicates if the user is a staff member.
+
+    Methods:
+        convert_to_english_numbers(input_str): Converts Persian numbers in the input string to English numbers.
+        clean_role(role): Cleans and sets the role of the user.
+        clean_phone_number(phone_number): Cleans the phone number by converting Persian numbers to English.
+        save(*args, **kwargs): Overrides the save method to handle additional functionality.
+        __str__(): Returns the string representation of the user.
+    """
+    
+    
     ROLE_CHOICES = (
         ("product manager", "Product Manager"),
         ("supervisor", "Supervisor"),
@@ -17,6 +43,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         ("customer", "Customer"),
         ("admin", "Admin")
     )    
+   
     # ADMIN_CHOICES = (
     #     ("Admin", "Admin"),
     #     ("Not Admin", "Not Admin")
@@ -119,6 +146,26 @@ class User(AbstractBaseUser, PermissionsMixin):
     
     
 class Address(BaseModel):
+    """
+    Model representing a user's address.
+
+    Attributes:
+        province (str): The province of the address.
+        city (str): The city of the address.
+        detailed_address (str): The detailed address information.
+        postal_code (int): The postal code of the address.
+        is_actual_person (bool): Indicates if the address belongs to an actual person.
+        receiver_name (str): The first name of the receiver.
+        receiver_last_name (str): The last name of the receiver.
+        receiver_phone_number (str): The phone number of the receiver.
+
+    Foreign Keys:
+        user (User): The user associated with this address.
+
+    Methods:
+        __str__(): Returns the string representation of the address.
+    """
+    
     province = models.CharField(max_length=255, help_text="like Alborz")
     city = models.CharField(max_length=255, help_text="like karaj")
     detailed_address = models.TextField()
