@@ -9,10 +9,15 @@ urlpatterns = [
     path("login/", views.UserLoginView.as_view(), name="user_login"),
     path("verify/", views.VerifyCodeView.as_view(), name="verify_code"),
     path("logout/", views.UserLogOutView.as_view(), name="user_logout"),
+    path("panel/", views.CustomerPanelView.as_view(), name="user_panel"),
+    path("panel/edit/", views.CustomerPanelEditView.as_view(), name="user_panel_edit"),
+    path("address/edit/<int:address_id>/", views.CustomerAddressView.as_view(), name="edit_address"),
     
     #API
     path("api/register/", views.UserRegisterAPIView.as_view(), name="user_register_api"),
     path("api/verify/", views.VerifyCodeAPIView.as_view(), name="verify_code_api"),
     path("login/api/", views.LoginView.as_view(), name="user_login_api"),
+    path("panel/api/v1/", views.CustomerPanelAPIView.as_view(), name="user_panel_api"),
+    path('address/edit/<int:address_id>/api/v1/', views.EditAddressAPIView.as_view(), name='edit_address_api_v1'),
    
 ]
