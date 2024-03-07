@@ -16,8 +16,10 @@ from rest_framework.generics import ListAPIView
 from rest_framework.decorators import api_view
 from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth.mixins import LoginRequiredMixin
-# Create your views here.
+from django.views.decorators.cache import cache_page
+from django.utils.decorators import method_decorator
 
+# Create your views here.
 
 class HomeAPIView(APIView):
     def get(self, request):
@@ -100,13 +102,14 @@ class ProductSearchAPIView(ListAPIView, PageNumberPagination):
     filter_backends = [SearchFilter]
     search_fields = ["name", "brand"]
     page_size = 6
-    
+
+@method_decorator(cache_page(60 * 30), name='dispatch')    
 class HomeView(View):
     def get(self, request):
         return render(request, "products/index.html", {})
     
 
-
+@method_decorator(cache_page(60 * 30), name='dispatch')
 class CategoryView(View):
     def get(self, request, category_slug):
         return render(request, "products/subcategories.html", {})
