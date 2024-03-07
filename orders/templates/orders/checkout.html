@@ -65,12 +65,11 @@
               <div class="d-flex justify-content-between mb-5">
                 <p class="text-muted mb-0" id="Coupon"><span class="fw-bold me-4">Coupon:</span> ?</p>
               </div>
-              <div class="d-flex justify-content-between mb-5">
-                <p class="text-muted mb-0" id="province-detail"><span class="fw-bold me-4">province:</span> ?</p>
-                <p class="text-muted mb-0" id="city-detail"><span class="fw-bold me-4">province:</span> ?</p>
-                <p class="text-muted mb-0" id="detailed"><span class="fw-bold me-4">province:</span> ?</p>
-                <p class="text-muted mb-0" id="postal-detail"><span class="fw-bold me-4">province:</span> ?</p>
-              </div>
+           
+              <select class="form-control form-control-user mb-3" id="addressDropdown">
+                <option value="">Select Address</option>
+            </select>
+            
               <div class="d-flex justify-content-between mb-5">
                 <form class="user" action="#" method="post" id="myForm">
                   <div class="row mb-3">
@@ -132,155 +131,146 @@
     .then(response => response.json())
     .then(data => {
         console.log(data.calculate_total_price)
-        document.getElementById('username').innerHTML = 'Thanks for your Order '+data.serializer.user.first_name;
-        document.getElementById('total-price').innerHTML = 'total price: '+data.serializer.calculate_total_price;
-        document.getElementById('created-at').innerHTML = 'created at '+data.serializer.created_at;
-        document.getElementById('Paid').innerHTML = 'is paid: '+data.serializer.is_paid;
-        document.getElementById('Coupon').innerHTML = 'coupon: '+data.coupon_data.coupon;
+        document.getElementById('username').innerHTML = 'Thanks for your Order ' + data.serializer.user.first_name;
+        document.getElementById('total-price').innerHTML = 'total price: ' + data.serializer.calculate_total_price;
+        document.getElementById('created-at').innerHTML = 'created at ' + data.serializer.created_at;
+        document.getElementById('Paid').innerHTML = 'is paid: ' + data.serializer.is_paid;
+        document.getElementById('Coupon').innerHTML = 'coupon: ' + data.coupon_data.coupon;
         document.getElementById('total-paid').innerHTML = data.serializer.calculate_total_price;
-        document.getElementById('province-detail').innerHTML = 'province: '+data.serializer.province;
-        document.getElementById('city-detail').innerHTML = 'city: '+data.serializer.city;
-        document.getElementById('detailed').innerHTML = 'adress detail: '+data.serializer.detailed_address;
-        document.getElementById('postal-detail').innerHTML = 'postal code: '+data.serializer.postal_code;
 
         if (data.serializer.province != null) {
-          document.getElementById('province').parentNode.classList.add('d-none');
-      }
-      if (data.serializer.city != null) {
-          document.getElementById('city').parentNode.classList.add('d-none');
-      }
-      if (data.serializer.detailed_address != null) {
-          document.getElementById('detail').parentNode.classList.add('d-none');
-      }
-      if (data.serializer.postal_code != null) {
-          document.getElementById('post_code').parentNode.classList.add('d-none');
-      }
+            document.getElementById('province').parentNode.classList.add('d-none');
+        }
+        if (data.serializer.city != null) {
+            document.getElementById('city').parentNode.classList.add('d-none');
+        }
+        if (data.serializer.detailed_address != null) {
+            document.getElementById('detail').parentNode.classList.add('d-none');
+        }
+        if (data.serializer.postal_code != null) {
+            document.getElementById('post_code').parentNode.classList.add('d-none');
+        }
     })
     .catch(error => console.error('Error:', error));
 
-     function payOrder() {
-      fetch('api/')
-      .then(response => response.json())
-      .then(data => {
-          var orderId = data.serializer.id;
-
-          var url = "{% url 'orders:order_pay' 0 %}".replace('0', orderId);
-
-          window.location.href = url;
-      })
-      .catch(error => console.error('Error:', error));
-  } 
-
-    function validateForm() {
-      var province = document.getElementById('province').value;
-      var city = document.getElementById('city').value;
-      var detail = document.getElementById('detail').value;
-      var post_code = document.getElementById('post_code').value;
-      var error = false;
-  
-      if (province == "") {
-          document.getElementById('provinceError').innerHTML = 'Please enter Province';
-          error = true;
-      }
-      if (city == "") {
-          document.getElementById('cityError').innerHTML = 'Please enter City';
-          error = true;
-      }
-      if (detail == "") {
-          document.getElementById('detailError').innerHTML = 'Please enter Detail';
-          error = true;
-      }
-      if (post_code == "") {
-          document.getElementById('postalError').innerHTML = 'Please enter Postal code';
-          error = true;
-      }
-  
-      if (error) {
-          return false;
-      }
-      return true;
-  }
-
-  function getCookie(name) {
-    var cookieValue = null;
-    if (document.cookie && document.cookie !== '') {
-        var cookies = document.cookie.split(';');
-        for (var i = 0; i < cookies.length; i++) {
-            var cookie = cookies[i].trim();
-            if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                break;
-            }
-        }
-    }
-    return cookieValue;
+function payOrder() {
+    fetch('api/')
+        .then(response => response.json())
+        .then(data => {
+            var orderId = data.serializer.id;
+            var url = "{% url 'orders:order_pay' 0 %}".replace('0', orderId);
+            window.location.href = url;
+        })
+        .catch(error => console.error('Error:', error));
 }
 
-document.getElementById('payButton').addEventListener('click', function(event) {
-  event.preventDefault();
+fetch('api/')
+    .then(response => response.json())
+    .then(data => {
+        // Iterate over user addresses and add options to the dropdown
+        data.address_data.forEach(address => {
+            const option = document.createElement('option');
+            option.value = address.id; // Assuming each address has an ID
+            option.text = `${address.province}, ${address.city}, ${address.detailed_address}`;
+            document.getElementById('addressDropdown').appendChild(option);
+        });
+    })
+    .catch(error => console.error('Error:', error));
 
-  var province = document.getElementById('province').value;
-  var city = document.getElementById('city').value;
-  var detail = document.getElementById('detail').value;
-  var post_code = document.getElementById('post_code').value;
-  var coupon_code = document.getElementById('coupon_code').value; // Get the entered coupon code
+// Function to disable or enable form fields based on whether an address is selected
+function toggleFormFields(disabled) {
+    var formElements = document.querySelectorAll('#myForm input');
+    formElements.forEach(function(element) {
+        element.disabled = disabled;
+    });
+}
 
-  // Your existing code to validate form fields
-  // ...
+// Event listener to toggle form fields when an address is selected from the dropdown
+document.getElementById('addressDropdown').addEventListener('change', function(event) {
+    // Get the selected address value
+    var selectedAddress = this.value;
 
-  fetch('api/', {
-      method: 'POST',
-      headers: {
-          'Content-Type': 'application/json',
-          'X-CSRFToken': getCookie('csrftoken')
-      },
-      body: JSON.stringify({
-          province: province,
-          city: city,
-          detail_address: detail,
-          postal_code: post_code,
-          coupon_code: coupon_code // Include the coupon code in the request body
-      })
-  })
-  .then(response => {
-      if (response.ok) {
-          window.location.reload();
-      } else {
-          console.error('Error:', response.statusText);
-          alert('An error occurred while saving the address.');
-      }
-  })
-  .catch(error => {
-      console.error('Error:', error);
-      alert('An error occurred while saving the address.');
-  });
+    // Disable or enable form fields based on whether an address is selected
+    toggleFormFields(selectedAddress !== '');
+
+    // Also disable the "Save Address" button if an address is selected
+    document.getElementById('payButton').disabled = selectedAddress !== '';
 });
+
+// Event listener for form submission
+document.getElementById('payButton').addEventListener('click', function(event) {
+    event.preventDefault();
+
+    // Check if an address is selected
+    if (isAddressSelected()) {
+        alert('Please select an address.');
+        return;
+    }
+
+    var province = document.getElementById('province').value;
+    var city = document.getElementById('city').value;
+    var detail = document.getElementById('detail').value;
+    var post_code = document.getElementById('post_code').value;
+    var coupon_code = document.getElementById('coupon_code').value;
+
+    // Validate form fields
+    if (!validateForm()) {
+        return;
+    }
+
+    // Fetch API to save address
+    fetch('api/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: JSON.stringify({
+                province: province,
+                city: city,
+                detail_address: detail,
+                postal_code: post_code,
+                coupon_code: coupon_code
+            })
+        })
+        .then(response => {
+            if (response.ok) {
+                window.location.reload();
+            } else {
+                console.error('Error:', response.statusText);
+                alert('An error occurred while saving the address.');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while saving the address.');
+        });
+});
+
+// Event listener for applying coupon
 document.getElementById('applyCouponBtn').addEventListener('click', function(event) {
-  event.preventDefault();
+    event.preventDefault();
 
-  // Get the coupon code from the input field
-  var couponCode = document.getElementById('coupon_code').value;
+    var couponCode = document.getElementById('coupon_code').value;
 
-  // Send the coupon code to the backend
-  fetch('api/', {
-      method: 'POST',
-      headers: {
-          'Content-Type': 'application/json',
-          'X-CSRFToken': getCookie('csrftoken')
-      },
-      body: JSON.stringify({
-          coupon_code: couponCode
-      })
-  })
-  .then(response => response.json())
-  .then(data => {
-      // Update the total price on the page with the new value received from the backend
-      document.getElementById('total-price').innerHTML = 'Total: $' + data.new_total_price;
-  })
-  .catch(error => {
-      console.error('Error:', error);
-      alert('An error occurred while applying the coupon.');
-  });
+    fetch('api/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: JSON.stringify({
+                coupon_code: couponCode
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('total-price').innerHTML = 'Total: $' + data.new_total_price;
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while applying the coupon.');
+        });
 });
   </script>
 </body>
