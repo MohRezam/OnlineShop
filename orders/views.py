@@ -17,6 +17,7 @@ import json
 from django.urls import reverse
 import datetime
 from accounts.serializers import AddressSerializer
+from accounts.models import Address
 
 class CartView(View):   
     def get(self, request):
@@ -102,15 +103,17 @@ class CartRemoveView(APIView):
 class OrderDetailAPIView(APIView):
     permission_classes = [IsAuthenticated]
     def get(self, request, order_id):
-        print(request.user)
         order = get_object_or_404(Order, id=order_id)
         order_ser = OrderSerializer(instance=order)
         coupon = order.coupon
         coupon_ser = CouponSerializer(instance=coupon)
+        addreses = Address.objects.filter(user=request.user)
+        address_ser = AddressSerializer(instance=addreses, many=True)
         
         response_data = {
             "serializer":order_ser.data,
             "coupon_data":coupon_ser.data,
+            "address_data":address_ser.data,
         }
         
         return Response(data=response_data, status=status.HTTP_200_OK)
@@ -131,8 +134,12 @@ class OrderDetailAPIView(APIView):
         address = AddressSerializer(request.data)
         if address.is_valid():
             city = address.validated_data["city"]
+            province = address.validated_data["province"]
+            detail_address = address.validated_data["detail_address"]
             order = get_object_or_404(Order, id=order_id)
+            order.province = province
             order.city = city
+            order.detailed_address = detail_address
             order.save()
             
         response_data = {
