@@ -68,8 +68,8 @@ class UserCreateSerializer(BaseUserCreateSerializer):
         
 
 
-class AddressSerializer(serializers.Serializer):
+class AddressSerializer(serializers.ModelSerializer):
     user = UserSerializer()
     class Meta:
         model = Address
-        fields = ["province", "city", "detailed_address", "postal_code", "is_actual_person", "user"]
+        fields = ["id", "province", "city", "detailed_address", "postal_code", "is_actual_person", "user"]
