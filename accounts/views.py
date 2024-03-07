@@ -1,7 +1,7 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.views import View
 from .serializers import UserRegisterSerializer, OtpCodeSerializer
-from .models import User
+from .models import User, Address
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
@@ -16,6 +16,9 @@ import redis
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.http import JsonResponse
 import json
+from products.serializers import UserSerializer
+from .serializers import AddressSerializer
+from rest_framework import status
 
 # redis
 redis_client = redis.StrictRedis(host=settings.REDIS_HOST, port=settings.REDIS_PORT, db=settings.REDIS_DB)
@@ -149,3 +152,60 @@ class UserLogOutView(View):
             logout(request)
             messages.success(request, "You logged out successfully", "success")
         return redirect("products:home")
+    
+
+
+class CustomerPanelView(View):
+    def get(self, request):
+        return render(request, "accounts/customer_panel.html")
+ 
+
+class CustomerPanelAPIView(APIView):
+    def get(self, request):
+        user_ser = UserSerializer(instance=request.user)
+        addresses = Address.objects.filter(user=request.user)
+        address_ser = AddressSerializer(instance=addresses, many=True)
+        
+        responses_data = {
+            "customer_info":user_ser.data,
+            "address_info":address_ser.data,
+        }
+        
+        return Response(data=responses_data, status=status.HTTP_200_OK)
+    
+    def put(self, request):
+        # Update user information
+        user_ser = UserSerializer(instance=request.user, data=request.data, partial=True)
+        if user_ser.is_valid():
+            user_ser.save()
+        else:
+            return Response(user_ser.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        redirect_url = reverse("accounts:user_panel")  
+        return Response({'redirect_url': redirect_url}, status=status.HTTP_200_OK)
+    
+
+class EditAddressAPIView(APIView):
+    def get(self, request, address_id):
+        address = get_object_or_404(Address, pk=address_id)
+        serializer = AddressSerializer(instance=address)
+        return Response(serializer.data)
+
+    def put(self, request, address_id):
+        address = get_object_or_404(Address, pk=address_id)
+        serializer = AddressSerializer(instance=address, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            redirect_url = reverse("accounts:user_panel")  
+            return Response({'redirect_url': redirect_url}, status=status.HTTP_200_OK)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class CustomerAddressView(View):
+    def get(self, request, address_id):
+        return render(request, "accounts/customer_panel_address_edit.html")
+
+class CustomerPanelEditView(View):
+    def get(self, request):
+        return render(request, "accounts/customer_panel_edit.html")
