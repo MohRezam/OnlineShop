@@ -19,6 +19,8 @@ import json
 from products.serializers import UserSerializer
 from .serializers import AddressSerializer
 from rest_framework import status
+from orders.models import Order
+from orders.serializers import OrderSerializer
 
 # redis
 redis_client = redis.StrictRedis(host=settings.REDIS_HOST, port=settings.REDIS_PORT, db=settings.REDIS_DB)
@@ -174,7 +176,6 @@ class CustomerPanelAPIView(APIView):
         return Response(data=responses_data, status=status.HTTP_200_OK)
     
     def put(self, request):
-        # Update user information
         user_ser = UserSerializer(instance=request.user, data=request.data, partial=True)
         if user_ser.is_valid():
             user_ser.save()
@@ -209,3 +210,16 @@ class CustomerAddressView(View):
 class CustomerPanelEditView(View):
     def get(self, request):
         return render(request, "accounts/customer_panel_edit.html")
+    
+    
+class OrderHistoryApi(APIView):
+    permission_classes = [IsAuthenticated]
+    def get(self, request):
+        queryset = Order.objects.filter(user=request.user)
+        serializer = OrderSerializer(queryset, many=True)
+        return Response({'queryset': serializer.data})
+    
+    
+class OrderHistroy(View):
+    def get(self, request):
+        return render(request, "accounts/order_history.html")
