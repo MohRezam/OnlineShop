@@ -113,7 +113,8 @@ class HomeView(View):
 class CategoryView(View):
     def get(self, request, category_slug):
         return render(request, "products/subcategories.html", {})
-
+    
+@method_decorator(cache_page(60 * 30), name='dispatch')    
 class ProductView(View):
     def get(self, request, category_slug, subcategory_slug):
         return render(request, 'products/products.html', {})    
