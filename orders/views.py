@@ -283,7 +283,7 @@ class OrderDetailView(View):
 #         return redirect("orders:order_detail", order.id)
     
     
-class OrderCreateView(LoginRequiredMixin, View):
+class OrderCreateView(APIView):
     permission_classes = [IsAuthenticated]
     
     def get(self, request):
@@ -300,7 +300,7 @@ class OrderCreateView(LoginRequiredMixin, View):
             "message": "Cart cleared successfully",
             "redirect_url": reverse("orders:order_detail", kwargs={"order_id": order.id})  # Replace "some_url_name" with the name of the URL you want to redirect to
         }
-        response = JsonResponse(response_data)
+        response = Response(data=response_data, status=status.HTTP_200_OK)
         
         # Clear the cart
         cart.clear(response)
