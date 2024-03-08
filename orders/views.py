@@ -168,6 +168,8 @@ class CartRemoveView(APIView):
         return response
         
    
+from django.utils import timezone
+
 class OrderDetailAPIView(APIView):
     """
     API view to retrieve and update order details.
@@ -182,8 +184,9 @@ class OrderDetailAPIView(APIView):
     Attributes:
         permission_classes (list): A list of permission classes to apply to the view.
     """
-    
+
     permission_classes = [IsAuthenticated]
+
     def get(self, request, order_id):
         """
         Retrieves order details.
@@ -198,21 +201,22 @@ class OrderDetailAPIView(APIView):
         Raises:
             None
         """
-        
+
         order = get_object_or_404(Order, id=order_id)
         order_ser = OrderSerializer(instance=order)
         coupon = order.coupon
         coupon_ser = CouponSerializer(instance=coupon)
-        addreses = Address.objects.filter(user=request.user)
-        address_ser = AddressSerializer(instance=addreses, many=True)
-        
+        addresses = Address.objects.filter(user=request.user)
+        address_ser = AddressSerializer(instance=addresses, many=True)
+
         response_data = {
-            "serializer":order_ser.data,
-            "coupon_data":coupon_ser.data,
-            "address_data":address_ser.data,
+            "serializer": order_ser.data,
+            "coupon_data": coupon_ser.data,
+            "address_data": address_ser.data,
         }
-        
+
         return Response(data=response_data, status=status.HTTP_200_OK)
+
     def post(self, request, order_id):
         """
         Updates order details.
@@ -227,38 +231,47 @@ class OrderDetailAPIView(APIView):
         Raises:
             None
         """
-        
-        now = datetime.datetime.now()
-        coupon = CouponSerializer(data=request.data)
-        if coupon.is_valid():
-            code = coupon.validated_data["coupon_code"]
-            try:
-                coupon = Coupon.objects.get(code__exact=code, valid__from__lte=now, valid_to__gte=now, is_active=True)
-            except Coupon.DoesNotExist:
-                return Response({"message":"this coupon does not exists"})
+
+        try:
             order = Order.objects.get(id=order_id)
-            # order.discount = coupon.discount
-            order.save()
-            order_ser = OrderSerializer(order)
-            coupon_ser = CouponSerializer(coupon)
-        address = AddressSerializer(request.data)
-        if address.is_valid():
-            city = address.validated_data["city"]
-            province = address.validated_data["province"]
-            detail_address = address.validated_data["detail_address"]
-            order = get_object_or_404(Order, id=order_id)
-            order.province = province
-            order.city = city
-            order.detailed_address = detail_address
-            order.save()
+        except Order.DoesNotExist:
+            return Response({"message": "Order does not exist."}, status=status.HTTP_404_NOT_FOUND)
+
+        coupon_code = request.data.get("coupon_code")
+        if coupon_code:
+            now = timezone.now()
+            try:
+                coupon = Coupon.objects.get(
+                    code__exact=coupon_code,
+                    # valid_from__lte=now,
+                    # valid_to__gte=now,
+                    is_active=True
+                )
+            except Coupon.DoesNotExist:
+                return Response({"message": "Coupon does not exist or is not valid."}, status=status.HTTP_400_BAD_REQUEST)
             
+            order.coupon = coupon
+            order.save()
+        data = request.data
+        if data:
+            address_serializer = AddressSerializer(data=data)
+            if address_serializer.is_valid():
+                order.province = address_serializer.validated_data["province"]
+                order.city = address_serializer.validated_data["city"]
+                order.detailed_address = address_serializer.validated_data["detailed_address"]
+                order.postal_code = address_serializer.validated_data["postal_code"]
+                order.save()
+            else:
+                return Response(address_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        order_serializer = OrderSerializer(order)
+        coupon_serializer = CouponSerializer(order.coupon)
+
         response_data = {
-            "serializer":order_ser.data,
-            "coupon_data":coupon_ser.data,
+            "serializer": order_serializer.data,
+            "coupon_data": coupon_serializer.data,
         }
-        return Response(data=response_data)
-           
-           
+        return Response(data=response_data, status=status.HTTP_200_OK)
 class OrderDetailView(View):
     def get(self, request, order_id):
         return render(request, 'orders/checkout.html')
