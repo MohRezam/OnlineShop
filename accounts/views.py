@@ -86,9 +86,7 @@ class CustomerPanelEditView(View):
     
     
     
-class OrderHistroy(View):
-    def get(self, request):
-        return render(request, "accounts/order_history.html")    
+
     
 class UserRegisterAPIView(APIView):
     """
@@ -312,6 +310,14 @@ class EditAddressAPIView(APIView):
             return Response({'redirect_url': redirect_url}, status=status.HTTP_200_OK)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    def post(self, request):
+        serializer = AddressSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 
@@ -345,3 +351,7 @@ class OrderHistoryApi(APIView):
         serializer = OrderSerializer(queryset, many=True)
         return Response({'queryset': serializer.data})
     
+
+class OrderHistory(View):
+    def get(self, request):
+        return render(request, "accounts/order_history.html")

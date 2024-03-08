@@ -12,7 +12,7 @@ urlpatterns = [
     path("panel/", views.CustomerPanelView.as_view(), name="user_panel"),
     path("panel/edit/", views.CustomerPanelEditView.as_view(), name="user_panel_edit"),
     path("address/edit/<int:address_id>/", views.CustomerAddressView.as_view(), name="edit_address"),
-    path('order_history/' , views.OrderHistroy.as_view() , name="order_history"),
+    path('order_history/' , views.OrderHistory.as_view() , name="order_history"),
     
     #API
     path("api/register/", views.UserRegisterAPIView.as_view(), name="user_register_api"),
