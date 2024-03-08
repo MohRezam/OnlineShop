@@ -132,7 +132,7 @@ class AddressSerializer(serializers.ModelSerializer):
         user (UserSerializer): Serializer for the associated user object.
     """
     
-    user = UserSerializer()
     class Meta:
         model = Address
-        fields = ["id", "province", "city", "detailed_address", "postal_code", "is_actual_person", "user"]
+        fields = ["id", "province", "city", "detailed_address", "postal_code", "is_actual_person"]
+    
