@@ -231,7 +231,6 @@ class OrderDetailAPIView(APIView):
         Raises:
             None
         """
-
         try:
             order = Order.objects.get(id=order_id)
         except Order.DoesNotExist:
@@ -253,7 +252,7 @@ class OrderDetailAPIView(APIView):
             order.coupon = coupon
             order.save()
         data = request.data
-        if data:
+        if data["selected_address_id"] == '':
             address_serializer = AddressSerializer(data=data)
             if address_serializer.is_valid():
                 order.province = address_serializer.validated_data["province"]
@@ -262,16 +261,20 @@ class OrderDetailAPIView(APIView):
                 order.postal_code = address_serializer.validated_data["postal_code"]
                 order.save()
             else:
+                
                 return Response(address_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-        order_serializer = OrderSerializer(order)
-        coupon_serializer = CouponSerializer(order.coupon)
-
+        else:
+            address = Address.objects.get(pk=data["selected_address_id"])
+            order.province = address.province
+            order.city = address.city
+            order.detailed_address = address.detailed_address
+            order.postal_code = address.postal_code
+            order.save()
         response_data = {
-            "serializer": order_serializer.data,
-            "coupon_data": coupon_serializer.data,
+        "redirect_url": reverse("orders:order_pay", kwargs={"order_id": order.id}) 
         }
         return Response(data=response_data, status=status.HTTP_200_OK)
+    
 class OrderDetailView(View):
     def get(self, request, order_id):
         return render(request, 'orders/checkout.html')
@@ -308,14 +311,12 @@ class OrderCreateView(APIView):
             product = Product.objects.get(id=product_id)
             OrderItem.objects.create(order=order, product=product, quantity=quantity)
         
-        # Construct the JSON response
         response_data = {
             "message": "Cart cleared successfully",
-            "redirect_url": reverse("orders:order_detail", kwargs={"order_id": order.id})  # Replace "some_url_name" with the name of the URL you want to redirect to
+            "redirect_url": reverse("orders:order_detail", kwargs={"order_id": order.id})  
         }
         response = Response(data=response_data, status=status.HTTP_200_OK)
         
-        # Clear the cart
         cart.clear(response)
         
         return response
