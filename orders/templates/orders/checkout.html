@@ -50,24 +50,24 @@
           <div class="card" style="border-radius: 10px;">
             
             <div class="card-header px-4 py-5">
-              <h5 class="text-muted mb-0" id="username">Thanks for your Order, <span style="color: #a8729a;">Anna</span>!</h5>
+              <h3 class="text-muted mb-0" id="username"><span style="color: #a8729a;"></span>!</h3>
             </div>
             <div class="card-body p-4">
               <div class="d-flex justify-content-between pt-2">
-                <p class="fw-bold mb-0">Order Details</p>
-                <p class="text-muted mb-0" id="total-price"><span class="fw-bold me-4">Total</span> $898.00</p>
+                <p class="fw-bold mb-0"><b>Order Details:</b></p>
+                <p class="text-muted mb-0" id="total-price"><span class="fw-bold me-4"></span> </p>
               </div>
   
               <div class="d-flex justify-content-between pt-2">
-                <p class="text-muted mb-0" id="created-at"><span class="fw-bold me-4">Created at </span> ?</p>
-                <p class="text-muted mb-0" id="Paid"><span class="fw-bold me-4">paid: </span> ?</p>
+                <p class="text-muted mb-0" id="created-at"><span class="fw-bold me-4">Created at </span></p>
+                <p class="text-muted mb-0" id="Paid"><span class="fw-bold me-4">paid: </span></p>
               </div>
               <div class="d-flex justify-content-between mb-5">
-                <p class="text-muted mb-0" id="Coupon"><span class="fw-bold me-4">Coupon:</span> ?</p>
+                <p class="text-muted mb-0" id="Coupon"><span class="fw-bold me-4">Coupon:</span></p>
               </div>
            
               <select class="form-control form-control-user mb-3" id="addressDropdown">
-                <option value="">Select Address</option>
+                <option value="">Select Your Address</option>
             </select>
             
               <div class="d-flex justify-content-between mb-5">
@@ -82,7 +82,7 @@
                           <div id="cityError" style="color: red;"></div>
                       </div>
                       <div class="col-md-12">
-                          <input class="form-control form-control-user mb-3" placeholder="Detai adress" type="text" name="detail" required id="detail"> 
+                          <input class="form-control form-control-user mb-3" placeholder="Detail address" type="text" name="detail" required id="detail"> 
                           <div id="detailError" style="color: red;"></div>
                       </div>
                       <div class="col-md-12">
@@ -92,23 +92,19 @@
                   </div>
               </form>
               </div>
-              <div class="d-flex justify-content-between mb-5">
-                <a href="#" class="btn btn-success btn-lg" id="payButton">Save Adress</a>
-              </div>
-              
             
             </div>
             <div class="card-footer border-0 px-4 py-5"
               style="background-color: #a8729a; border-bottom-left-radius: 10px; border-bottom-right-radius: 10px;">
               <h5 class="d-flex align-items-center justify-content-end text-white text-uppercase mb-0">Total
-                paid: <span class="h2 mb-0 ms-2" id="total-paid">$1040</span></h5>
+                paid: <span class="h2 mb-0 ms-2" id="total-paid"></span></h5>
                 <div class="col-md-12">
                   <input class="form-control form-control-user mb-3" placeholder="Coupon Code" type="text" name="coupon_code" id="coupon_code"> 
                   <!-- Display error message if needed -->
                   <div id="couponError" style="color: red;"></div>
               </div>
               <button id="applyCouponBtn" class="btn btn-primary">Apply Coupon</button><br><br>
-                <a href="pay/" class="btn btn-success btn-lg" onclick="submitFormData()" id="payButton">Pay</a>
+                <a href="#" class="btn btn-success btn-lg" onclick="submitFormData()" id="payButton">Pay</a>
 
             </div>
             
@@ -127,95 +123,117 @@
   <script src="{% static 'js/custom.js' %}"></script>
 
     <script>
-      // Function to send form data to API endpoint
-      function submitFormData() {
-          var province = document.getElementById('province').value;
-          var city = document.getElementById('city').value;
-          var detail = document.getElementById('detail').value;
-          var post_code = document.getElementById('post_code').value;
-          var coupon_code = document.getElementById('coupon_code').value;
-  
-          // Fetch API to send form data
-          fetch('api/', {
-                  method: 'POST',
-                  headers: {
-                      'Content-Type': 'application/json',
-                      'X-CSRFToken': getCookie('csrftoken')
-                  },
-                  body: JSON.stringify({
-                      province: province,
-                      city: city,
-                      detailed_address: detail,
-                      postal_code: post_code,
-                      coupon_code: coupon_code
-                  })
-              })
-              .then(response => {
-                  if (response.ok) {
-                      return response.json();
-                  } else {
-                      throw new Error('Error:', response.statusText);
-                  }
-              })
-              .then(data => {
-                  // Process response data if needed
-                  console.log(data);
-                  // Redirect or perform other actions as required
-              })
-              .catch(error => {
-                  console.error('Error:', error);
-                  alert('An error occurred while processing the payment.');
-              });
-      }
-  
-      // Event listener for form submission
-      document.getElementById('payButton').addEventListener('click', function(event) {
-          event.preventDefault();
-  
-          // Validate form fields before submitting
-          if (!validateForm()) {
-              return;
-          }
-  
-          // Submit form data to API endpoint
-          submitFormData();
+      fetch('api/')
+    .then(response => response.json())
+    .then(data => {
+        console.log(data.calculate_total_price)
+        document.getElementById('username').innerHTML = 'Thanks for your Order ' + data.serializer.user.first_name;
+        document.getElementById('total-price').innerHTML = 'total price: ' + data.serializer.calculate_total_price;
+        document.getElementById('created-at').innerHTML = 'created at ' + data.serializer.created_at;
+        document.getElementById('Paid').innerHTML = 'is paid: ' + data.serializer.is_paid;
+        document.getElementById('Coupon').innerHTML = 'coupon: ' + data.coupon_data.coupon;
+        document.getElementById('total-paid').innerHTML = data.serializer.calculate_total_price;
+        data.address_data.forEach(address => {
+          const option = document.createElement('option');
+          option.value = address.id; 
+          option.text = `${address.province}, ${address.city}, ${address.detailed_address}`;
+          document.getElementById('addressDropdown').appendChild(option);
       });
-  
-      // Function to validate form fields
-      function validateForm() {
-          var province = document.getElementById('province').value;
-          var city = document.getElementById('city').value;
-          var detail = document.getElementById('detail').value;
-          var post_code = document.getElementById('post_code').value;
-  
-          // Add your validation logic here
-          // Example: Check if any field is empty
-          if (province.trim() === '' || city.trim() === '' || detail.trim() === '' || post_code.trim() === '') {
-              alert('Please fill in all the required fields.');
-              return false;
-          }
-  
-          // Add more validation checks if needed
-  
-          return true; // Return true if form is valid
+
+      
+    })
+    .catch(error => console.error('Error:', error));
+
+    document.getElementById('addressDropdown').addEventListener('change', function(event) {
+      var selectedAddressId = this.value;
+      if (selectedAddressId) {
+          var selectedAddress = data.address_data.find(address => address.id === parseInt(selectedAddressId));
+          document.getElementById('province').value = selectedAddress.province;
+          document.getElementById('city').value = selectedAddress.city;
+          document.getElementById('detail').value = selectedAddress.detailed_address;
+          document.getElementById('post_code').value = selectedAddress.postal_code;
       }
-  
-      // Function to get CSRF token cookie
-      function getCookie(name) {
-          var cookieValue = null;
-          if (document.cookie && document.cookie !== '') {
-              var cookies = document.cookie.split(';');
-              for (var i = 0; i < cookies.length; i++) {
-                  var cookie = cookies[i].trim();
-                  // Does this cookie string begin with the name we want?
-                  if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                      cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                      break;
-                  }
-              }
-          }
-          return cookieValue;
-      }
-  
+  }); 
+      function submitFormData() {
+        var province = document.getElementById('province').value;
+        var city = document.getElementById('city').value;
+        var detail = document.getElementById('detail').value;
+        var post_code = document.getElementById('post_code').value;
+        var coupon_code = document.getElementById('coupon_code').value;
+        var selectedAddressId = document.getElementById('addressDropdown').value;
+
+      
+
+        fetch('api/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: JSON.stringify({
+                province: province,
+                city: city,
+                detailed_address: detail,
+                postal_code: post_code,
+                coupon_code: coupon_code,
+                selected_address_id: selectedAddressId
+            })
+        })
+        .then(response => {
+            if (response.ok) {
+                return response.json();
+            } else {
+                throw new Error('Error:', response.statusText);
+            }
+        })
+        .then(data => {
+            window.location.href = data.redirect_url; 
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while processing the payment.');
+        });
+    }
+
+    document.getElementById('payButton').addEventListener('click', function(event) {
+        event.preventDefault();
+
+        if (!validateForm()) {
+            return;
+        }
+
+        submitFormData();
+    });
+
+
+    function validateForm() {
+        var province = document.getElementById('province').value;
+        var city = document.getElementById('city').value;
+        var detail = document.getElementById('detail').value;
+        var post_code = document.getElementById('post_code').value;
+
+        if (province.trim() === '' || city.trim() === '' || detail.trim() === '' || post_code.trim() === '') {
+            alert('Please fill in all the required fields.');
+            return false;
+        }
+
+
+        return true; 
+    }
+
+    function getCookie(name) {
+        var cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            var cookies = document.cookie.split(';');
+            for (var i = 0; i < cookies.length; i++) {
+                var cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
   </script>
 </body>
