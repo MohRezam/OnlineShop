@@ -188,20 +188,6 @@ class OrderDetailAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, order_id):
-        """
-        Retrieves order details.
-
-        Args:
-            request (HttpRequest): The HTTP request object.
-            order_id (int): The ID of the order to retrieve details for.
-
-        Returns:
-            Response: A JSON response containing order details, coupon data, and address data.
-
-        Raises:
-            None
-        """
-
         order = get_object_or_404(Order, id=order_id)
         order_ser = OrderSerializer(instance=order)
         coupon = order.coupon
@@ -218,19 +204,6 @@ class OrderDetailAPIView(APIView):
         return Response(data=response_data, status=status.HTTP_200_OK)
 
     def post(self, request, order_id):
-        """
-        Updates order details.
-
-        Args:
-            request (HttpRequest): The HTTP request object.
-            order_id (int): The ID of the order to update details for.
-
-        Returns:
-            Response: A JSON response containing updated order details and coupon data.
-
-        Raises:
-            None
-        """
         try:
             order = Order.objects.get(id=order_id)
         except Order.DoesNotExist:
@@ -247,7 +220,8 @@ class OrderDetailAPIView(APIView):
                     is_active=True
                 )
             except Coupon.DoesNotExist:
-                return Response({"message": "Coupon does not exist or is not valid."}, status=status.HTTP_400_BAD_REQUEST)
+                messages.error(request, "Coupon does not exist or is not valid.", "danger")
+                return Response(status=status.HTTP_400_BAD_REQUEST)
             
             order.coupon = coupon
             order.save()
@@ -261,8 +235,8 @@ class OrderDetailAPIView(APIView):
                 order.postal_code = address_serializer.validated_data["postal_code"]
                 order.save()
             else:
-                
-                return Response(address_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+                messages.error(request, "Please fill in all the required fields or choose from your addresses", "danger") # in the front I used reload so the message will be shown.
+                return Response(status=status.HTTP_404_NOT_FOUND)
         else:
             address = Address.objects.get(pk=data["selected_address_id"])
             order.province = address.province
