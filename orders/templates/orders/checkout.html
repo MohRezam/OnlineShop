@@ -100,7 +100,7 @@
               <h5 class="d-flex align-items-center justify-content-end text-white text-uppercase mb-0">Total
                 paid: <span class="h2 mb-0 ms-2" id="total-paid"></span></h5>
                 <div class="col-md-12">
-                  <input class="form-control form-control-user mb-3" placeholder="Coupon Code" type="text" name="coupon_code" id="coupon_code"> 
+                  <input class="form-control form-control-user mb-3" placeholder="Coupon Code" type="text" name="code" id="coupon_code"> 
                   <!-- Display error message if needed -->
                   <div id="couponError" style="color: red;"></div>
               </div>
@@ -220,7 +220,7 @@
               'X-CSRFToken': getCookie('csrftoken')
           },
           body: JSON.stringify({
-              coupon_code: coupon_code,
+              code: coupon_code,
           })
       })
       .then(response => {
