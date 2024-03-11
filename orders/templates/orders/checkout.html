@@ -43,12 +43,13 @@
  </div>
    <section class="h-100 gradient-custom">
     <div class="container py-5 h-100">
+      {% include "inc/messages.html" %}
+
       <div class="row d-flex justify-content-center align-items-center h-100">
-        
+
         <div class="col-lg-10 col-xl-8">
           
           <div class="card" style="border-radius: 10px;">
-            
             <div class="card-header px-4 py-5">
               <h3 class="text-muted mb-0" id="username"><span style="color: #a8729a;"></span>!</h3>
             </div>
@@ -95,7 +96,7 @@
             
             </div>
             <div class="card-footer border-0 px-4 py-5"
-              style="background-color: #a8729a; border-bottom-left-radius: 10px; border-bottom-right-radius: 10px;">
+              style="background-color: #43baaf; border-bottom-left-radius: 10px; border-bottom-right-radius: 10px;">
               <h5 class="d-flex align-items-center justify-content-end text-white text-uppercase mb-0">Total
                 paid: <span class="h2 mb-0 ms-2" id="total-paid"></span></h5>
                 <div class="col-md-12">
@@ -122,47 +123,62 @@
   <script src="{% static 'js/jquery.mCustomScrollbar.concat.min.js' %}"></script>
   <script src="{% static 'js/custom.js' %}"></script>
 
-    <script>
-      fetch('api/')
-    .then(response => response.json())
-    .then(data => {
-        console.log(data.calculate_total_price)
-        document.getElementById('username').innerHTML = 'Thanks for your Order ' + data.serializer.user.first_name;
-        document.getElementById('total-price').innerHTML = 'total price: ' + data.serializer.calculate_total_price;
-        document.getElementById('created-at').innerHTML = 'created at ' + data.serializer.created_at;
-        document.getElementById('Paid').innerHTML = 'is paid: ' + data.serializer.is_paid;
-        document.getElementById('Coupon').innerHTML = 'coupon: ' + data.coupon_data.coupon;
-        document.getElementById('total-paid').innerHTML = data.serializer.calculate_total_price;
-        data.address_data.forEach(address => {
-          const option = document.createElement('option');
-          option.value = address.id; 
-          option.text = `${address.province}, ${address.city}, ${address.detailed_address}`;
-          document.getElementById('addressDropdown').appendChild(option);
-      });
+  <script>
+    var data; // Declare a global variable to hold the fetched data
 
-      
-    })
-    .catch(error => console.error('Error:', error));
+    fetch('api/')
+        .then(response => response.json())
+        .then(data => {
+            // Store the fetched data in the global variable
+            console.log(data.calculate_total_price)
+            document.getElementById('username').innerHTML = 'Thanks for your Order ' + data.serializer.user.first_name;
+            document.getElementById('total-price').innerHTML = 'total price: ' + data.serializer.calculate_total_price;
+            document.getElementById('created-at').innerHTML = 'created at ' + data.serializer.created_at;
+            document.getElementById('Paid').innerHTML = 'is paid: ' + data.serializer.is_paid;
+            document.getElementById('Coupon').innerHTML = 'coupon: ' + data.coupon_data.coupon;
+            document.getElementById('total-paid').innerHTML = data.serializer.calculate_total_price;
+            data.address_data.forEach(address => {
+                const option = document.createElement('option');
+                option.value = address.id; 
+                option.text = `${address.province}, ${address.city}, ${address.detailed_address}`;
+                document.getElementById('addressDropdown').appendChild(option);
+            });
+            // Store the fetched data in the global variable
+            this.data = data;
+        })
+        .catch(error => console.error('Error:', error));
 
+    // Add event listener for dropdown change
     document.getElementById('addressDropdown').addEventListener('change', function(event) {
-      var selectedAddressId = this.value;
-      if (selectedAddressId) {
-          var selectedAddress = data.address_data.find(address => address.id === parseInt(selectedAddressId));
-          document.getElementById('province').value = selectedAddress.province;
-          document.getElementById('city').value = selectedAddress.city;
-          document.getElementById('detail').value = selectedAddress.detailed_address;
-          document.getElementById('post_code').value = selectedAddress.postal_code;
-      }
-  }); 
-      function submitFormData() {
+        var selectedAddressId = this.value;
+        if (selectedAddressId) {
+            var selectedAddress = data.address_data.find(address => address.id === parseInt(selectedAddressId));
+            document.getElementById('province').value = selectedAddress.province;
+            document.getElementById('city').value = selectedAddress.city;
+            document.getElementById('detail').value = selectedAddress.detailed_address;
+            document.getElementById('post_code').value = selectedAddress.postal_code;
+
+            // Disable the input fields
+            document.getElementById('province').disabled = true;
+            document.getElementById('city').disabled = true;
+            document.getElementById('detail').disabled = true;
+            document.getElementById('post_code').disabled = true;
+        } else {
+            // Enable the input fields if no address is selected
+            document.getElementById('province').disabled = false;
+            document.getElementById('city').disabled = false;
+            document.getElementById('detail').disabled = false;
+            document.getElementById('post_code').disabled = false;
+        }
+    }); 
+
+    function submitFormData() {
         var province = document.getElementById('province').value;
         var city = document.getElementById('city').value;
         var detail = document.getElementById('detail').value;
         var post_code = document.getElementById('post_code').value;
         var coupon_code = document.getElementById('coupon_code').value;
         var selectedAddressId = document.getElementById('addressDropdown').value;
-
-      
 
         fetch('api/', {
             method: 'POST',
@@ -189,9 +205,8 @@
         .then(data => {
             window.location.href = data.redirect_url; 
         })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('An error occurred while processing the payment.');
+        .catch(error => { 
+            window.location.reload();
         });
     }
 
@@ -205,7 +220,6 @@
         submitFormData();
     });
 
-
     function validateForm() {
         var province = document.getElementById('province').value;
         var city = document.getElementById('city').value;
@@ -213,10 +227,8 @@
         var post_code = document.getElementById('post_code').value;
 
         if (province.trim() === '' || city.trim() === '' || detail.trim() === '' || post_code.trim() === '') {
-            alert('Please fill in all the required fields.');
             return false;
         }
-
 
         return true; 
     }
@@ -235,5 +247,6 @@
         }
         return cookieValue;
     }
-  </script>
+</script>
+
 </body>
