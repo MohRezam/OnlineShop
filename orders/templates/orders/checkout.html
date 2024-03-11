@@ -104,7 +104,7 @@
                   <!-- Display error message if needed -->
                   <div id="couponError" style="color: red;"></div>
               </div>
-              <button id="applyCouponBtn" class="btn btn-primary">Apply Coupon</button><br><br>
+              <button id="applyCouponBtn" class="btn btn-primary" onclick="submitCoupon()">Apply Coupon</button><br><br>
                 <a href="#" class="btn btn-success btn-lg" onclick="submitFormData()" id="payButton">Pay</a>
 
             </div>
@@ -135,7 +135,6 @@
             document.getElementById('total-price').innerHTML = 'total price: ' + data.serializer.calculate_total_price;
             document.getElementById('created-at').innerHTML = 'created at ' + data.serializer.created_at;
             document.getElementById('Paid').innerHTML = 'is paid: ' + data.serializer.is_paid;
-            document.getElementById('Coupon').innerHTML = 'coupon: ' + data.coupon_data.coupon;
             document.getElementById('total-paid').innerHTML = data.serializer.calculate_total_price;
             data.address_data.forEach(address => {
                 const option = document.createElement('option');
@@ -209,6 +208,35 @@
             window.location.reload();
         });
     }
+    
+
+    function submitCoupon() {
+      var coupon_code = document.getElementById('coupon_code').value;
+
+      fetch('api/', {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json',
+              'X-CSRFToken': getCookie('csrftoken')
+          },
+          body: JSON.stringify({
+              coupon_code: coupon_code,
+          })
+      })
+      .then(response => {
+          if (response.ok) {
+              return response.json();
+          } else {
+              throw new Error('Error:', response.statusText);
+          }
+      })
+      .then(data => {
+          window.location.href = data.redirect_url; 
+      })
+      .catch(error => { 
+          window.location.reload();
+      });
+  }
 
     document.getElementById('payButton').addEventListener('click', function(event) {
         event.preventDefault();
