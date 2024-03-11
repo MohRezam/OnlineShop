@@ -41,12 +41,11 @@ class OrderSerializer(serializers.ModelSerializer):
     """
     
     user = UserSerializer()
-    coupon = CouponSerializer()
     
     
     class Meta:
         model = Order
-        fields = ['id', 'is_paid', 'user', 'coupon', 'calculate_total_price', 'created_at', 'province', 'city', 'detailed_address', 'postal_code']
+        fields = ['id', 'is_paid', 'user', 'calculate_total_price', 'created_at', 'province', 'city', 'detailed_address', 'postal_code']
         
     def calculate_total_price(self, obj):
         """

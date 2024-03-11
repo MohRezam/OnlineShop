@@ -42,10 +42,10 @@ class CartItemAdmin(admin.ModelAdmin):
 
 @admin.register(Coupon)
 class CouponAdmin(admin.ModelAdmin):
-    list_display = ('id', 'code', 'percentage', 'expiration_date', 'available_quantity')
+    list_display = ('code', 'discount', 'valid_from', 'valid_to')
     search_fields = ('code',)
-    list_filter = ('expiration_date',)
-    ordering = ('-expiration_date',)
+    list_filter = ('valid_to',)
+    ordering = ('-valid_to',)
 
 @admin.register(Transaction)
 class TransactionAdmin(admin.ModelAdmin):

@@ -2,6 +2,7 @@ from django.db import models
 from core.models import BaseModel
 from accounts.models import User
 from products.models import Product
+from django.core.validators import MinValueValidator, MaxValueValidator
 
 # Create your models here.
 # def create_order_from_cart(self, cart): # this cart is an object of Cart model  # fekr konam in ye method dar dakel order bayad bashe not so sure.
@@ -52,17 +53,24 @@ class Order(BaseModel):
     city = models.CharField(max_length=255, blank=True, null=True, help_text="like karaj")
     detailed_address = models.TextField(blank=True, null=True)
     postal_code = models.PositiveIntegerField(blank=True, null=True, help_text="like 3149757953")
-    
+    discount = models.IntegerField(blank=True, null=True, default=None)
+    # max_discount = models.IntegerField(blank=True, null=True, default=None)
+
     # Foreign Keys
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="orders")
-    coupon = models.ForeignKey("Coupon", on_delete=models.CASCADE, blank=True, null=True, related_name="orders")
     
     def __str__(self) -> str:
         return f"Total: {self.calculate_total_price()}, Payment: {self.is_paid}"
     
     
     def calculate_total_price(self):
-        return sum(item.total_price() for item in self.order_items.all())
+        total = sum(item.total_price() for item in self.order_items.all())
+        if self.discount:
+            discount_price = (self.discount / 100) * float(total)
+            # if self.max_discount != None and discount_price > self.max_discount:
+            #     return int(float(total) - self.max_discount)
+            return int(float(total) - discount_price)
+        return total
     class Meta:
         verbose_name_plural = 'orders'
     
@@ -215,17 +223,20 @@ class Coupon(BaseModel):
         verbose_name_plural (str): Plural name for the model in the admin interface.
     """
     
-    code = models.CharField(max_length=100, unique=True, help_text="like DJke21x")
-    percentage = models.PositiveIntegerField(default=1)
-    expiration_date = models.DateTimeField()
-    available_quantity = models.PositiveIntegerField()
-    usage_limit_per_user = models.PositiveIntegerField()
-    is_active = models.BooleanField(default=True)
+    code = models.CharField(max_length=30, unique=True, help_text="like DJke21x")
+    valid_from = models.DateTimeField()
+    valid_to = models.DateTimeField()
+    discount = models.IntegerField(validators=[MinValueValidator(0), MaxValueValidator(90)], db_column="discount")
+    # max_discount = models.IntegerField()
+    # available_quantity = models.PositiveIntegerField()
+    # usage_limit_per_user = models.PositiveIntegerField()
+    is_active = models.BooleanField(default=False)
     
-    user = models.ManyToManyField(User, blank=True) # fekr shavad
+    #Foreign Key
+    user = models.ForeignKey(User, blank=True, on_delete=models.CASCADE, related_name="coupons") 
     
     def __str__(self) -> str:
-        return f"{self.code} with {self.percentage} percentage is active until {self.expiration_date} for {self.available_quantity} people"
+        return f"{self.code} with {self.discount} percentage is active until {self.valid_to}."
     
     class Meta:
         verbose_name_plural = 'coupons'
