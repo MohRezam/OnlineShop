@@ -50,7 +50,7 @@ class ProductAdmin(admin.ModelAdmin):
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
-    list_display = ('name', 'is_sub', 'parent_category')
+    list_display = ('slug', 'is_sub', 'parent_category')
     search_fields = ('name', 'is_sub')
     list_filter = ('is_sub', )
     date_hierarchy = "created_at"
