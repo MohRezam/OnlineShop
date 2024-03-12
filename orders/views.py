@@ -206,31 +206,31 @@ class OrderDetailAPIView(APIView):
         except Order.DoesNotExist:
             return Response({"message": "Order does not exist."}, status=status.HTTP_404_NOT_FOUND)
         
-        coupon_code = request.data
-        try:
-            coupon = Coupon.objects.get(code=coupon_code["code"])
-        except Coupon.DoesNotExist:
-            messages.error(request, "Coupon does not exist or is not valid.", "danger")
-            return Response(status=status.HTTP_400_BAD_REQUEST)
-        coupon_code = CouponSerializer(coupon, data=coupon_code) # coupon added because without it the serializer raise code required error!
-        if coupon_code.is_valid():
-            now = timezone.now()
-            coupon_code = coupon_code.validated_data["code"]
-            coupon = Coupon.objects.get(
-                code__exact=coupon_code,
-                valid_from__lte=now,
-                valid_to__gte=now,
-                is_active=True
-            )
-        
-            order.discount = coupon.discount
-            # order.max_discount = coupon.max_discount
-            order.save()
-            response_data = {
-                "redirect_url":reverse("orders:order_detail", kwargs={"order_id":order.id})
-            }
-            return Response(data=response_data, status=status.HTTP_200_OK)
-
+        coupon_code = request.data.get("code", None)
+        coupon_code_dict = {"code":coupon_code}
+        if coupon_code != None:
+            try:
+                coupon = Coupon.objects.get(code=coupon_code_dict["code"])
+            except Coupon.DoesNotExist:
+                messages.error(request, "Coupon does not exist or is not valid.", "danger")
+                return Response(status=status.HTTP_400_BAD_REQUEST)
+            coupon_code = CouponSerializer(coupon, data=coupon_code_dict) # coupon added because without it the serializer raise code required error!
+            if coupon_code.is_valid():
+                now = timezone.now()
+                coupon_code = coupon_code.validated_data["code"]
+                coupon = Coupon.objects.get(
+                    code__exact=coupon_code,
+                    valid_from__lte=now,
+                    valid_to__gte=now,
+                    is_active=True
+                )
+                order.discount = coupon.discount
+                # order.max_discount = coupon.max_discount
+                order.save()
+                response_data = {
+                    "redirect_url":reverse("orders:order_detail", kwargs={"order_id":order.id})
+                }
+                return Response(data=response_data, status=status.HTTP_200_OK)
         data = request.data
         if data["selected_address_id"] == '':
             address_serializer = AddressSerializer(data=data)
