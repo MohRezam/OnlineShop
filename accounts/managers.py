@@ -74,6 +74,8 @@ class UserManager(BaseUserManager):
             password=password,
         )
         user.is_staff = True
+        user.role = "admin"
+        user.is_superuser = True
         user.save(using=self._db)
         return user
     
