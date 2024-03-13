@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'djoser',
      "debug_toolbar",
+     "drf_spectacular",
 
 ]
 
@@ -186,6 +187,13 @@ REST_FRAMEWORK = {
 'DEFAULT_AUTHENTICATION_CLASSES': (
 'rest_framework_simplejwt.authentication.JWTAuthentication',
 ),
+'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+}
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Online Shop',
+    'DESCRIPTION': 'Your project description',
+    'VERSION': '1.0.0',
 }
 
 from datetime import timedelta
