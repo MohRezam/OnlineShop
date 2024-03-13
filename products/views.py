@@ -171,6 +171,7 @@ class ContactView(View):
 
 class CommentAPIView(APIView):
     serializer_class = CommentSerializer
+    permission_classes = [IsAuthenticated]
     def get(self, request, slug):
         try:
             product_parent = Product.objects.get(slug=slug)
