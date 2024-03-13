@@ -179,6 +179,14 @@ class CommentAPIView(APIView):
             return Response({'comment': serializer.data}, status=status.HTTP_200_OK)
         except Product.DoesNotExist:
             return Response({'error': 'Product not found'}, status=status.HTTP_404_NOT_FOUND)
+    def post(self, request, slug):
+        comment = CommentSerializer(data=request.data)
+        product = Product.objects.get(slug=slug)
+        if comment.is_valid():
+            Comment.objects.create(text=comment.validated_data["text"], user=request.user, product=product)
+            return Response(status=status.HTTP_200_OK)
+        print(comment.errors)
+        return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
 class CommentView(View):
