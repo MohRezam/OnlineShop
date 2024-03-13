@@ -15,15 +15,14 @@ def news_image_path(instance, filename):
     return f'news/{instance.title}/{filename}'
 
 
-def send_otp_code(phone_number, code):
-    try:
-         api = KavenegarAPI('2F6B33347A696134443838414A6F487372493455516749386A6548736B6C4B5467446E58782B41764734303D')
-         params = { 'sender' : '1000689696', 'receptor': phone_number, 'message' :f'Code: {code}'} 
-         response = api.sms_send( params) 
-    except APIException as e:
-        print(e)
-    except HTTPException as e:
-        print(e)
+from django.core.mail import send_mail
+
+def send_otp_email(email, otp):
+    subject = 'Your OTP Code'
+    message = f'Your OTP code is: {otp}'
+    from_email = 'mkalhor81126@gmail.com'
+    recipient_list = [email]
+    send_mail(subject, message, from_email, recipient_list)
 
 # from kavenegar import *
 # try:
