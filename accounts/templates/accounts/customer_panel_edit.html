@@ -106,7 +106,7 @@
     <script src="{% static 'js/theme.js' %}"></script>
 
   <script>
-    // Fetch user data and populate form fields
+
     fetch('/accounts/panel/api/v1/')
         .then(response => response.json())
         .then(data => {
@@ -133,7 +133,6 @@
               email: document.getElementById('user-email').value,
           };
       
-          // Making the PUT request
           fetch("/accounts/panel/api/v1/", {
               method: 'PUT',
               headers: {
@@ -145,12 +144,12 @@
           .then(data => {
               if (data.redirect_url) {
                   window.location.href = data.redirect_url;
-                  console.log('Success:', data); // Handle success response here
+                  console.log('Success:', data); 
                   alert('Form submitted successfully!');
               }
           })
           .catch(error => {
-              console.error('Error:', error); // Handle error
+              console.error('Error:', error); 
               alert('Error submitting form!');
           });
       }
