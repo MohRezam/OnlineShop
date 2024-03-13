@@ -217,11 +217,11 @@ class Comment(BaseModel):
     """
     
     text = models.TextField()
-    likes = models.PositiveIntegerField(default=0)
+    likes = models.PositiveIntegerField(blank=True, null=True, default=0)
     
     # Foreign Keys
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="comments")
-    product = models.ForeignKey("Product", on_delete=models.CASCADE, related_name="comments")
+    product = models.ForeignKey("Product", on_delete=models.CASCADE, related_name="comments", blank=True, null=True)
     
     def __str__(self) -> str:
         return f"{self.text} by {self.user.first_name} {self.user.last_name}"
