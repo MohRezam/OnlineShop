@@ -1,6 +1,6 @@
 # onlineShop
 
-**Online Digital Products Store**
+**Online Digital Product Store**
 
 
 # Introduction ==>
