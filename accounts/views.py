@@ -109,7 +109,7 @@ class UserRegisterAPIView(APIView):
                 redirects back to the registration page with error messages if validation fails.
     """
     
-    # permission_classes = [AllowAny, ]
+    serializer_class = UserRegisterSerializer
     def post(self, request):
         serializer = UserRegisterSerializer(data=request.POST)
         if serializer.is_valid():
@@ -155,7 +155,7 @@ class VerifyCodeAPIView(APIView):
                 HttpResponseRedirect: Redirects to the login page if registration is successful,
                 or redirects back to the verification page with error messages if verification fails.
     """
-     
+    serializer_class = OtpCodeSerializer
     def post(self, request):
         try:
             phone_number = request.session["user_profile_info"]["phone_number"]
@@ -246,7 +246,8 @@ class CustomerPanelAPIView(APIView):
                 Response: Returns a success message and redirect URL if successful,
                 or error messages if validation fails.
     """
-    
+    serializer_class = UserSerializer
+    permission_classes = [IsAuthenticated]
     def get(self, request):
         user_ser = UserSerializer(instance=request.user)
         addresses = Address.objects.filter(user=request.user)
@@ -295,11 +296,12 @@ class EditAddressAPIView(APIView):
                 Response: Returns a success message and redirect URL if successful,
                 or error messages if validation fails.
     """
-    
+    permission_classes = [IsAuthenticated]
+    serializer_class = AddressSerializer
     def get(self, request, address_id):
         address = get_object_or_404(Address, pk=address_id)
         serializer = AddressSerializer(instance=address)
-        return Response(serializer.data)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
     def put(self, request, address_id):
         address = get_object_or_404(Address, pk=address_id)
@@ -342,6 +344,7 @@ class OrderHistoryApi(APIView):
     """
     
     permission_classes = [IsAuthenticated]
+    serializer_class = OrderSerializer
     def get(self, request):
         """
         Handles GET requests to retrieve order history for the authenticated user.
