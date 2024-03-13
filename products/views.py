@@ -25,7 +25,7 @@ class HomeAPIView(APIView):
     """
     API view to retrieve data for the home page including categories, top comments, and news.
     """
-    
+    serializer_class = CategorySerializer
     def get(self, request):
         """
         Retrieve data for the home page.
@@ -53,7 +53,7 @@ class CategoryAPIView(APIView):
     """
     API view to retrieve subcategories of a specific category.
     """
-    
+    serializer_class = CategorySerializer
     def get(self, request, category_slug):
         """
         Retrieve subcategories of a specific category.
@@ -70,7 +70,7 @@ class ProductAPIView(APIView, PageNumberPagination):
     """
     API view to retrieve products belonging to a specific category and subcategory.
     """
-    
+    serializer_class = ProductSerializer
     page_size = 6
     filter_backends = [SearchFilter]
     search_fields = ['name', 'brand']
@@ -97,7 +97,7 @@ class ProductDetailAPIView(APIView):
     """
     API view to retrieve detailed information about a specific product.
     """
-    
+    serializer_class = ProductSerializer
     def get(self, request, slug):
         """
         Retrieve detailed information about a specific product.
@@ -170,6 +170,7 @@ class ContactView(View):
     
 
 class CommentAPIView(APIView):
+    serializer_class = CommentSerializer
     def get(self, request, slug):
         try:
             product_parent = Product.objects.get(slug=slug)
