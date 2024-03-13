@@ -211,3 +211,11 @@ DJOSER = {
 
 MERCHANT = "00000000-0000-0000-0000-000000000000"
 SANDBOX = True
+
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'mkalhor81126@gmail.com'
+EMAIL_HOST_PASSWORD = 'egtp wuyg evxt ztrp'
+EMAIL_USE_TLS = True
