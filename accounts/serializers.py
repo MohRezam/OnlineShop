@@ -131,8 +131,8 @@ class AddressSerializer(serializers.ModelSerializer):
         is_actual_person (bool): Indicates if the address belongs to an actual person.
         user (UserSerializer): Serializer for the associated user object.
     """
-    
+    user = UserSerializer()
     class Meta:
         model = Address
-        fields = ["id", "province", "city", "detailed_address", "postal_code", "is_actual_person"]
+        fields = ["id", "province", "city", "user", "detailed_address", "postal_code", "is_actual_person"]
     
