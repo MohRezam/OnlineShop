@@ -112,8 +112,15 @@
                 commentContainer.classList.add('be-comment');
     
                 commentContainer.innerHTML = `
-                <div class="be-comment-content">    
-                
+                <div class="be-comment-content">
+                    <div class="be-img-comment">    
+                        <a href="blog-detail-2.html">
+                            <img src="${product.user.image}" alt="" class="be-ava-comment">
+                        </a>
+                    </div>    
+                    <span class="be-comment-name">
+                        <a href="blog-detail-2.html">${product.user.first_name}</a>
+                        </span>
                     <span class="be-comment-time">
                         <i class="fa fa-clock-o"></i>
                         ${product.created_at}
