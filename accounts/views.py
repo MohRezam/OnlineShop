@@ -20,7 +20,7 @@ from .serializers import AddressSerializer
 from rest_framework import status
 from orders.models import Order
 from orders.serializers import OrderSerializer
-from core.utils import send_otp_email
+from .tasks import send_otp_email
 
 # redis
 redis_client = redis.StrictRedis(host=settings.REDIS_HOST, port=settings.REDIS_PORT, db=settings.REDIS_DB)
@@ -114,7 +114,7 @@ class UserRegisterAPIView(APIView):
         serializer = UserRegisterSerializer(data=request.POST)
         if serializer.is_valid():
             random_code = random.randint(1000, 9999)
-            send_otp_email(serializer.validated_data["email"], random_code)
+            send_otp_email.delay(serializer.validated_data["email"], random_code)
             # OtpCode.objects.create(phone_number=serializer.validated_data["phone_number"], code=random_code)
             redis_client.setex(serializer.validated_data["email"], 180, random_code)
             email = serializer.validated_data["email"]
