@@ -225,18 +225,15 @@
             });
     }
     
-    // Event listener for form submission
     document.querySelector('form').addEventListener('submit', function(event) {
-        event.preventDefault(); // Prevent the default form submission
+        event.preventDefault(); 
     
         const searchInput = document.getElementById('gsearch');
-        const query = searchInput.value.trim(); // Get the search query
+        const query = searchInput.value.trim(); 
     
-        // Fetch products based on the search query
         searchProducts(query);
     });
     
-    // Initial fetch of products when page loads
     searchProducts('');
 </script>
 
