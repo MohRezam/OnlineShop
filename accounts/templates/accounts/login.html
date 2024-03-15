@@ -95,7 +95,7 @@
    }
  
    function fetchData(data) {
-     fetch("accounts/login/api/", {
+     fetch("/accounts/login/api/", {
        method: 'POST',
        headers: {
          ...includeAuthToken(),

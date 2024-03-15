@@ -131,6 +131,15 @@
   <script src="{% static 'js/custom.js' %}"></script>
 
   <script>
+   function includeAuthToken() {
+      const access_token = localStorage.getItem("access_token");
+      if (access_token) {
+        return {
+          'Authorization': 'JWT ' + access_token
+        };
+      }
+      return {};
+    }
    function fetchCartData() {
        $.getJSON('/orders/api/cart/slug2', function(data) {
            $('#cartBody').empty();
@@ -173,7 +182,12 @@
    $(document).on("click", "#checkoutButton", function(event) {
        event.preventDefault(); 
 
-       fetch('{% url "orders:order_create" %}')
+       fetch('/orders/cart/create/', {
+         headers: {
+            ...includeAuthToken(),
+            'Content-Type': 'application/json'
+         }
+       })
        .then(response => response.json())
        .then(data => {
            if (data.redirect_url) {

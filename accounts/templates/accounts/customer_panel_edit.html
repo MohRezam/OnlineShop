@@ -106,8 +106,23 @@
     <script src="{% static 'js/theme.js' %}"></script>
 
   <script>
+    function includeAuthToken() {
+      const access_token = localStorage.getItem("access_token");
+      if (access_token) {
+        return {
+          'Authorization': 'JWT ' + access_token
+        };
+      }
+      return {};
+    }
 
-    fetch('/accounts/panel/api/v1/')
+    fetch('/accounts/panel/api/v1/', {
+      headers: {
+        ...includeAuthToken(),
+        'Content-Type': 'application/json'
+      }
+    }
+    )
         .then(response => response.json())
         .then(data => {
             const { customer_info, address_info } = data;
