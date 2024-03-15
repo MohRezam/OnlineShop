@@ -19,10 +19,10 @@
                     {% csrf_token %}
                      <div class="row">
                         <div class="col-md-12">
-                           <input class="contactus" placeholder="Email" type="email" name="email" required> 
+                           <input class="contactus" placeholder="Email" type="email" name="email" id="email_input" required> 
                         </div>
                         <div class="col-md-12">
-                           <input class="contactus" placeholder="Password" type="password" name="password" required>                          
+                           <input class="contactus" placeholder="Password" type="password" name="password" id="password_input" required>                          
                         </div>
                         <div class="col-md-12">
                            <button class="send_btn" type="submit">Sign in</button>
@@ -57,8 +57,8 @@
      });
  
      function getToken() {
-       const email = document.querySelector('input[name="email"]').value;
-       const password = document.querySelector('input[name="password"]').value;
+       const email = document.getElementById("email_input").value;
+       const password = document.getElementById("password_input").value;
  
        fetch("http://127.0.0.1:8000/auth/jwt/create/", {
          method: 'POST',
@@ -95,7 +95,7 @@
    }
  
    function fetchData(data) {
-     fetch("api/", {
+     fetch("accounts/login/api/", {
        method: 'POST',
        headers: {
          ...includeAuthToken(),
