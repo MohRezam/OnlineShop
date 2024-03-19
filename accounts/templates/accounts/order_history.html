@@ -89,7 +89,6 @@
                                 </table>
                               </div>
                             <script>
-                              document.addEventListener('DOMContentLoaded', function() {
                                 function includeAuthToken() {
                                     const access_token = localStorage.getItem("access_token");
                                     if (access_token) {
@@ -99,13 +98,13 @@
                                     }
                                     return {};
                                   }
+                              document.addEventListener('DOMContentLoaded', function() {
                                 fetch('/accounts/api/order_history', {
                                     headers: {
                                         ...includeAuthToken(),
                                         'Content-Type': 'application/json'
                                     }
-                                }
-                                )
+                                })
                                     .then(response => response.json())
                                     .then(data => {
                                         data.queryset.forEach(item => {
