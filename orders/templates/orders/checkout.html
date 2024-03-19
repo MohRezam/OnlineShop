@@ -124,7 +124,6 @@
   <script src="{% static 'js/custom.js' %}"></script>
 
   <script>
-    var data; 
     function includeAuthToken() {
         const access_token = localStorage.getItem("access_token");
         if (access_token) {
@@ -135,6 +134,7 @@
         return {};
       }
 
+    var data; 
     fetch('api/', {
         headers: {
             ...includeAuthToken(),
