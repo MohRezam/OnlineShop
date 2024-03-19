@@ -121,8 +121,7 @@
         ...includeAuthToken(),
         'Content-Type': 'application/json'
       }
-    }
-    )
+    })
         .then(response => response.json())
         .then(data => {
             const { customer_info, address_info } = data;
@@ -151,6 +150,7 @@
           fetch("/accounts/panel/api/v1/", {
               method: 'PUT',
               headers: {
+                  ...includeAuthToken(),
                   "Content-Type": "application/json"
               },
               body: JSON.stringify(formData)
