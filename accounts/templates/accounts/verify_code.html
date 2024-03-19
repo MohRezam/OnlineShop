@@ -61,12 +61,11 @@ function timer(remaining) {
   }
 
   if(!timerOn) {
-    // Do validate stuff here
     return;
   }
   
-  // Do timeout stuff here
   alert('Timeout for otp');
+  window.location.href = '/accounts/register/'
 }
 
 timer(180);
