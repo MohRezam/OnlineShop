@@ -93,6 +93,9 @@
                                           <!-- Address rows will be dynamically added here -->
                                       </tbody>
                                   </table>
+                                  <div class="col-sm-12">
+                                    <a class="btn btn-info " target="__blank" href="/accounts/address/add/">Add Address</a>
+                                  </div><br>
                                   <hr>
                               </div>
                                                         
@@ -127,14 +130,12 @@
         }
         return {};
       }
-
       fetch(window.location.pathname + 'api/v1/', {
         headers: {
           ...includeAuthToken(),
           'Content-Type': 'application/json'
         }
-      }
-      )
+      })
           .then(response => response.json())
           .then(data => {
               document.getElementById('first-name').textContent = data.customer_info.first_name;
@@ -153,8 +154,7 @@
           ...includeAuthToken(),
           'Content-Type': 'application/json'
         }
-      }
-      )
+      })
       .then(response => response.json())
       .then(data => {
           const addressTableBody = document.getElementById('address-table-body');
