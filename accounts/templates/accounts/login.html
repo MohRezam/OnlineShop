@@ -74,42 +74,14 @@
        .then(data => {
          localStorage.setItem("access_token", data.access);
          localStorage.setItem("refresh_token", data.refresh);
-        
-         fetchData({ email: email, password: password });
-         window.location.href = "/"; 
+         window.location.href = document.referrer; 
        })
        .catch(error => {
          console.error('Error:', error);
        });
      }
    });
- 
-   function includeAuthToken() {
-     const access_token = localStorage.getItem("access_token");
-     if (access_token) {
-       return {
-         'Authorization': 'JWT ' + access_token
-       };
-     }
-     return {};
-   }
- 
-   function fetchData(data) {
-     fetch("/accounts/login/api/", {
-       method: 'POST',
-       headers: {
-         ...includeAuthToken(),
-         'Content-Type': 'application/json'
-       },
-       body: JSON.stringify(data)
-     })
-     .then(response => response.json())
-     .then(data => {
-     })
-     .catch(error => {
-       console.error('Error:', error);
-     });
-   }
+
  </script>
  
  
