@@ -95,20 +95,11 @@
     </div>
     </div>
     <script>
-        function includeAuthToken() {
-            const access_token = localStorage.getItem("access_token");
-            if (access_token) {
-              return {
-                'Authorization': 'JWT ' + access_token
-              };
-            }
-            return {};
-          }
         fetch('/api' + window.location.pathname ,{
             method:"GET",
             headers:{
-            ...includeAuthToken(),
-            "Content-Type":"application/json"
+            "Content-Type":"application/json",
+            "Authorization":`Bearer ${localStorage.getItem("access_token")}`
             }
             })
         .then(response => response.json())
