@@ -15,7 +15,7 @@
             </div>
             <div class="row">
                <div class="col-md-10 offset-md-1">
-                  <form id="request" class="main_form" method="post" action="{% url 'accounts:user_register_api' %}" >
+                  <form id="request" class="main_form" method="post" action="/accounts/api/register/" >
                      {% csrf_token %}
                      <div class="row">
                         <div class="col-md-12">
