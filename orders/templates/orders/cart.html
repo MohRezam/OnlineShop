@@ -76,15 +76,12 @@
                               <li class="nav-item">
                                  <a class="nav-link" href="{% url 'products:contact' %}">Contact Us</a>
                               </li>
-                              {% if user.is_authenticated %}
-                              <li class="nav-item d_none">
-                                 <a class="nav-link" href="{% url "accounts:user_logout" %}">Logout</a>
+                              <li class="nav-item d_none" id='logout-btn'>
+                                 <a class="nav-link" href="#" onclick='logoutFunc()'>Logout</a>
                               </li>
-                              {% else %}
-                              <li class="nav-item d_none">
+                              <li class="nav-item d_none" id="login-btn">
                                  <a class="nav-link" href="{% url "accounts:user_login" %}">Login</a>
                               </li>
-                              {% endif %}
                               <li class="nav-item d_none">
                                
                                   {% comment %} search fiield {% endcomment %}
@@ -196,6 +193,23 @@
        })
        .catch(error => console.error('Error:', error));
    });
+   document.addEventListener("DOMContentLoaded", function() {
+      var loginLink = document.getElementById('login-btn');
+      var logoutLink = document.getElementById('logout-btn');
+
+      if (localStorage.getItem('access_token')) {
+          loginLink.style.display = 'none';
+          logoutLink.style.display = 'block';
+      } else {
+          loginLink.style.display = 'block';
+          logoutLink.style.display = 'none';
+      }
+  });
+
+  function logoutFunc() {
+      localStorage.removeItem("access_token");
+      window.location.reload(); 
+  }
 </script>
 </body>
 </html>
