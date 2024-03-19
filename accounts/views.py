@@ -7,7 +7,6 @@ from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 import random
 from django.contrib import messages
-from django.contrib.auth import authenticate, login, logout
 from django.urls import reverse
 from rest_framework.permissions import AllowAny
 from django.conf import settings
@@ -39,9 +38,6 @@ class VerifyCodeView(View):
     
 class UserLoginView(View):
     def get(self, request):
-        if request.user.is_authenticated:
-            messages.info(request, "You are already logged in.")
-            return redirect("products:home")
         return render(request, "accounts/login.html", {})
     
     # def post(self, request):
@@ -60,13 +56,7 @@ class UserLoginView(View):
     #         return render(request, "accounts/login.html", {})
     
     
-class UserLogOutView(View):
-    def get(self, request):
-        if request.user.is_authenticated:
-            user = request.user
-            logout(request)
-            messages.success(request, "You logged out successfully", "success")
-        return redirect("products:home")
+
     
 
 
@@ -79,6 +69,12 @@ class CustomerPanelView(View):
 class CustomerAddressView(View):
     def get(self, request, address_id):
         return render(request, "accounts/customer_panel_address_edit.html")
+    
+
+class CustomerAddAddressView(View):
+    def get(self, request):
+        return render(request, "accounts/customer_panel_address_add.html")
+        return reverse('accounts:add_address')
 
 class CustomerPanelEditView(View):
     def get(self, request):
@@ -194,16 +190,7 @@ class VerifyCodeAPIView(APIView):
         
 
     
-class LoginView(APIView):
-    def post(self, request):
-        data = json.loads(request.body)
-        email = data.get("email")
-        password = data.get("password")
-        user = authenticate(username=email, password=password)
-        login(request, user)
-        messages.success(request, "You are logged in successfully", "success")
-        return redirect("products:home")
-        
+
 
 # class UserLoginAPIView(APIView):
 #     def post(self, request):
@@ -313,17 +300,37 @@ class EditAddressAPIView(APIView):
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
+
+
+
+# class AddAddressAPIView(APIView):
+#     permission_classes = [IsAuthenticated]
+#     def post(self, request):
+#         data = request.data
+#         Address.objects.create(province=data['province'],
+#                             city=data['city'],
+#                             detailed_address=data['detailed_address'],
+#                             postal_code=data['postal_code'],
+#                             user=request.user)
+#         return Response(status=status.HTTP_200_OK)
+    
+    
+
+class AddAddressAPIView(APIView):
+    permission_classes = [IsAuthenticated]
     def post(self, request):
         serializer = AddressSerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            data = serializer.validated_data
+            Address.objects.create(province=data['province'],
+                                city=data['city'],
+                                detailed_address=data['detailed_address'],
+                                postal_code=data['postal_code'],
+                                user=request.user)
+            return Response(status=status.HTTP_200_OK)
         else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-
-    
+            print(serializer.errors)
+            return Response(status=status.HTTP_400_BAD_REQUEST)
     
 class OrderHistoryApi(APIView):
     """
