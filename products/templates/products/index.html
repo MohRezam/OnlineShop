@@ -309,7 +309,23 @@
   <script src="{% static 'js/custom.js' %}"></script>
   
   <script>
-   fetch('api/')
+   // Function to include the JWT token in the Authorization header
+   function includeAuthToken() {
+     const access_token = localStorage.getItem("access_token");
+     if (access_token) {
+       return {
+         'Authorization': 'JWT ' + access_token
+       };
+     }
+     return {};
+   }
+
+   fetch('api/', {
+     headers: {
+       ...includeAuthToken(),
+       'Content-Type': 'application/json'
+     }
+   })
    .then(response => response.json())
    .then(data => {
        const categories = data.categories; 

@@ -118,11 +118,25 @@
     <script src="{% static 'js/bootstrap.min.js' %}"></script>
     <script src="{% static 'js/theme.js' %}"></script>
     <script>
-      // Fetch user data
-      fetch(window.location.pathname + 'api/v1/')
+      function includeAuthToken() {
+        const access_token = localStorage.getItem("access_token");
+        if (access_token) {
+          return {
+            'Authorization': 'JWT ' + access_token
+          };
+        }
+        return {};
+      }
+
+      fetch(window.location.pathname + 'api/v1/', {
+        headers: {
+          ...includeAuthToken(),
+          'Content-Type': 'application/json'
+        }
+      }
+      )
           .then(response => response.json())
           .then(data => {
-              // Populate placeholders
               document.getElementById('first-name').textContent = data.customer_info.first_name;
               document.getElementById('last-name').textContent = data.customer_info.last_name;
               document.getElementById('phone-number').textContent = data.customer_info.phone_number;
@@ -134,14 +148,18 @@
           })
           .catch(error => console.error('Error fetching user data:', error));
 
-      // Fetch address data
-      fetch(window.location.pathname + 'api/v1/')
+      fetch(window.location.pathname + 'api/v1/', {
+        headers: {
+          ...includeAuthToken(),
+          'Content-Type': 'application/json'
+        }
+      }
+      )
       .then(response => response.json())
       .then(data => {
           const addressTableBody = document.getElementById('address-table-body');
   
           data.address_info.forEach(function(address) {
-              // Create a new row for each address
               const newRow = document.createElement('tr');
               newRow.innerHTML = `
                   <td>${address.province}</td>
@@ -154,12 +172,9 @@
               `;
               addressTableBody.appendChild(newRow);
   
-              // Define event listener for edit button
               const editBtn = newRow.querySelector('.edit-address-btn');
               editBtn.addEventListener('click', function() {
-                  // Get the address id from data attribute
                   const addressId = this.getAttribute('data-address-id');
-                  // Redirect to the edit address page
                   window.location.href = `/accounts/address/edit/${addressId}/`;
               });
           });

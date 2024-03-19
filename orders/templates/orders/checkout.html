@@ -124,12 +124,25 @@
   <script src="{% static 'js/custom.js' %}"></script>
 
   <script>
-    var data; // Declare a global variable to hold the fetched data
+    var data; 
+    function includeAuthToken() {
+        const access_token = localStorage.getItem("access_token");
+        if (access_token) {
+          return {
+            'Authorization': 'JWT ' + access_token
+          };
+        }
+        return {};
+      }
 
-    fetch('api/')
+    fetch('api/', {
+        headers: {
+            ...includeAuthToken(),
+            'Content-Type': 'application/json'
+        }
+    })
         .then(response => response.json())
         .then(data => {
-            // Store the fetched data in the global variable
             console.log(data.calculate_total_price)
             document.getElementById('username').innerHTML = 'Thanks for your Order ' + data.serializer.user.first_name;
             document.getElementById('total-price').innerHTML = 'total price: ' + data.serializer.calculate_total_price;
@@ -142,12 +155,10 @@
                 option.text = `${address.province}, ${address.city}, ${address.detailed_address}`;
                 document.getElementById('addressDropdown').appendChild(option);
             });
-            // Store the fetched data in the global variable
             this.data = data;
         })
         .catch(error => console.error('Error:', error));
 
-    // Add event listener for dropdown change
     document.getElementById('addressDropdown').addEventListener('change', function(event) {
         var selectedAddressId = this.value;
         if (selectedAddressId) {
@@ -157,13 +168,11 @@
             document.getElementById('detail').value = selectedAddress.detailed_address;
             document.getElementById('post_code').value = selectedAddress.postal_code;
 
-            // Disable the input fields
             document.getElementById('province').disabled = true;
             document.getElementById('city').disabled = true;
             document.getElementById('detail').disabled = true;
             document.getElementById('post_code').disabled = true;
         } else {
-            // Enable the input fields if no address is selected
             document.getElementById('province').disabled = false;
             document.getElementById('city').disabled = false;
             document.getElementById('detail').disabled = false;
@@ -182,6 +191,7 @@
         fetch('api/', {
             method: 'POST',
             headers: {
+                ...includeAuthToken(),
                 'Content-Type': 'application/json',
                 'X-CSRFToken': getCookie('csrftoken')
             },
@@ -216,6 +226,7 @@
       fetch('api/', {
           method: 'POST',
           headers: {
+              ...includeAuthToken(),
               'Content-Type': 'application/json',
               'X-CSRFToken': getCookie('csrftoken')
           },
