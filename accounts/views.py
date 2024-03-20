@@ -107,14 +107,12 @@ class UserRegisterAPIView(APIView):
     
     serializer_class = UserRegisterSerializer
     def post(self, request):
-        serializer = UserRegisterSerializer(data=request.POST)
+        serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
             random_code = random.randint(1000, 9999)
             send_otp_email.delay(serializer.validated_data["email"], random_code)
             # OtpCode.objects.create(phone_number=serializer.validated_data["phone_number"], code=random_code)
             redis_client.setex(serializer.validated_data["email"], 180, random_code)
-            email = serializer.validated_data["email"]
-            hidden_email = email[:4] + '*'*(len(email)-17) + email[-13:]
             request.session["user_profile_info"] = {
                 "first_name":serializer.validated_data["first_name"],
                 "last_name":serializer.validated_data["last_name"],
@@ -122,15 +120,11 @@ class UserRegisterAPIView(APIView):
                 "email":serializer.validated_data["email"],
                 "password":serializer.validated_data["password"]
             }
-            messages.success(request, f"we sent {hidden_email} a code", 'success')
-            return redirect('accounts:verify_code')
-        error_messages = serializer.errors
-        for k, v in error_messages.items():
-            message = v[0]
-        messages.error(request, f"{message}", "danger")  
-        return redirect('accounts:user_register')
+            return Response(status=status.HTTP_200_OK)
+         
+        return Response(data=serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
-
+ 
 class VerifyCodeAPIView(APIView):
     """
     API view for verifying OTP code and completing user registration.
@@ -152,41 +146,50 @@ class VerifyCodeAPIView(APIView):
                 or redirects back to the verification page with error messages if verification fails.
     """
     serializer_class = OtpCodeSerializer
+
     def post(self, request):
         try:
             email = request.session["user_profile_info"]["email"]
-        except:
-            messages.error(request, "Please register again", "danger")
-            return redirect("accounts:user_register")
-            # return Response({"message":"User already registered"})
-        # otp_code_object = OtpCode.objects.get(phone_number=phone_number)
-        serializer = OtpCodeSerializer(data=request.POST)
-        
+        except KeyError:
+            return Response(
+                {"error": "Please register again"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
-            # if serializer.validated_data["code"] == str(otp_code_object.code):
-            if redis_client.get(email).decode('utf-8') == serializer.validated_data["code"]:
-                user_info = request.session["user_profile_info"]
+            code = serializer.validated_data.get("code")
+            if code == redis_client.get(email).decode('utf-8'):
+                user_info = request.session.get("user_profile_info")
                 try:
                     User.objects.create_user(
-                    first_name = user_info["first_name"],
-                    last_name = user_info["last_name"],
-                    phone_number = user_info["phone_number"],
-                    email = user_info["email"],
-                    password = user_info["password"],
-                )   
-                    # otp_code_object.delete()
+                        first_name=user_info["first_name"],
+                        last_name=user_info["last_name"],
+                        phone_number=user_info["phone_number"],
+                        email=user_info["email"],
+                        password=user_info["password"],
+                    )
                     request.session.clear()
-                    messages.success(request, "You registered successfuly")
-                    return redirect("accounts:user_login")
-                    # return Response({"message":"user registered successfuly"})
-                except:
-                    messages.error(request, "You are already registered", "danger")
-                    return redirect("accounts:user_login")
-                    # return Response({"message": "User already registered"})
-            messages.error(request, "Code is not correct", "danger")
-            return redirect("accounts:verify_code")
-        return redirect(request, "accounts:user_login")
-        # return Response(serializer.errors)
+                    return Response(
+                        {"message": "You are registered successfully",
+                         "redirect_url": reverse("accounts:user_login")},
+                        status=status.HTTP_200_OK
+                    )
+                except Exception as e:
+                    return Response(
+                        {"error": "Failed to register user", "detail": str(e)},
+                        status=status.HTTP_400_BAD_REQUEST
+                    )
+            else:
+                return Response(
+                    {"error": "Incorrect code"},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+        else:
+            return Response(
+                {"error": "Invalid input data"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
         
 
     
@@ -329,7 +332,6 @@ class AddAddressAPIView(APIView):
                                 user=request.user)
             return Response(status=status.HTTP_200_OK)
         else:
-            print(serializer.errors)
             return Response(status=status.HTTP_400_BAD_REQUEST)
     
 class OrderHistoryApi(APIView):
