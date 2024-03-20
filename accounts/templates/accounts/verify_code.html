@@ -15,11 +15,10 @@
             </div>
             <div class="row">
                <div class="col-md-10 offset-md-1">
-                  <form id="request" class="main_form" method="post" action="/accounts/api/verify/">
-                    {% csrf_token %}
+                  <form id="myForm" class="main_form" method="post" action="#">
                      <div class="row">
                         <div class="col-md-12">
-                           <input class="contactus" placeholder="Code" type="type" name="code" required>
+                           <input class="contactus" placeholder="Code" type="type" name="code" id="code" required>
                            <div style="color:white;">Time left = <span id="timer"></span></div> 
                         </div>
                         <div class="col-md-12">
@@ -42,6 +41,36 @@
   <script src="{% static 'js/custom.js' %}"></script>
 
   <script>
+   document.getElementById("myForm").addEventListener("submit", function(event) {
+      event.preventDefault(); 
+  
+      verifyFunc();
+  });
+
+  function verifyFunc() {
+      var code = document.getElementById('code').value;
+
+      fetch("/accounts/verify/api/v1/", {
+         method: 'POST',
+         headers: {
+            'Content-Type': 'application/json'
+         },
+         body: JSON.stringify({
+            code: code
+         })
+
+
+      })
+      .then(data => {
+         alert(data.message);
+         window.location.href = '/';
+      })
+      .catch(error => {
+         alert(error);
+         window.location.href = '/accounts/register/';
+      })
+   }
+
    let timerOn = true;
 
 function timer(remaining) {
