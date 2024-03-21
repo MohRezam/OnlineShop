@@ -95,11 +95,21 @@
     </div>
     </div>
     <script>
+        function includeAuthToken() {
+            const access_token = localStorage.getItem("access_token");
+            if (access_token) {
+              return {
+                'Authorization': 'JWT ' + access_token
+              };
+            }
+            return {};
+          }
+
         fetch('/api' + window.location.pathname ,{
             method:"GET",
             headers:{
             "Content-Type":"application/json",
-            "Authorization":`Bearer ${localStorage.getItem("access_token")}`
+            ...includeAuthToken(),
             }
             })
         .then(response => response.json())
@@ -163,6 +173,7 @@
                 fetch('/api' + window.location.pathname, {
                     method: "POST",
                     headers: {
+                        ...includeAuthToken(),
                         "Content-Type": "application/json",
                     },
                     body: JSON.stringify(newComment)
