@@ -22,7 +22,7 @@ from orders.serializers import OrderSerializer
 from .tasks import send_otp_email
 
 # redis
-redis_client = redis.StrictRedis(host=settings.REDIS_HOST, port=settings.REDIS_PORT, db=settings.REDIS_DB)
+redis_client = redis.Redis(host=settings.REDIS_HOST, port=settings.REDIS_PORT, db=settings.REDIS_DB, password=settings.REDIS_PASS)
 
 
 class UserRegisterView(View):
