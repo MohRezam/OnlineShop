@@ -121,7 +121,7 @@ CACHES = {
 
 # saving sessions in redis
 
-SESSION_ENGINE = 'core.sessions.redis'
+SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
 SESSION_COOKIE_AGE = 1209600
 
 # Password validation
