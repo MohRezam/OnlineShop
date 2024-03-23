@@ -42,12 +42,14 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    
+    # Local apps
     'accounts.apps.AccountsConfig',
     'core.apps.CoreConfig',
     'orders.apps.OrdersConfig',
     'products.apps.ProductsConfig',
     
-    # 3rd party apps
+    # Third-party apps
     'rest_framework',
     'djoser',
      "debug_toolbar",
