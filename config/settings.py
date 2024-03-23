@@ -109,15 +109,17 @@ DATABASES = {
 REDIS_HOST = env("REDISHOST") 
 REDIS_PORT = env("REDISPORT")    
 REDIS_DB = env("REDISDB") 
+REDIS_PASS = env("REDISPASS")
 
 SECRET_KEY = env("SECRET_KEY")
 
 CACHES = {
     "default": {
         "BACKEND": "django.core.cache.backends.redis.RedisCache",
-        "LOCATION": env.str("REDIS_URL", "redis://localhost:6379/"),
+        "LOCATION": 'redis://:' + REDIS_PASS + '@127.0.0.1:6379',
         "KEY_PREFIX": "shop",
         "TIMEOUT": 60 * 15,  # in seconds: 60 * 15 (15 minutes)
+   
     }
 }
 
