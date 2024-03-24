@@ -26,7 +26,7 @@ class CommonTestSetup(TestCase):
 
         cls.category = Category.objects.create(
             name='TestCategory',
-            slug="test-product",
+            slug="test-product1",
             image="test/test/test",
             discount=cls.discount,
         )
@@ -43,7 +43,7 @@ class CategoryModelTest(CommonTestSetup):
         sub_category = Category.objects.create(
             name='TestSubCategory',
             is_sub=True,
-            slug="test-product",
+            slug="test-product2",
             image="test/test/test",
             parent_category=self.category,
         )
@@ -66,7 +66,7 @@ class ProductModelTest(CommonTestSetup):
             brand='TestBrand',
             price=100.0,
             description='TestDescription',
-            slug='test-product',
+            slug='test-product3',
             inventory_quantity=50,
             is_available=True,
             image="test/test/test",
@@ -76,7 +76,7 @@ class ProductModelTest(CommonTestSetup):
         )
 
     def test_product_str_representation(self):
-        expected_str = str(self.product.name)
+        expected_str = f"{self.category}-{self.product.name}"
         self.assertEqual(str(self.product), expected_str)
 
     def test_product_user_foreign_key(self):
@@ -127,7 +127,7 @@ class ProductFeatureValueModelTest(CommonTestSetup):
             brand='Test Brand',
             price=100,
             description='Test Description',
-            slug='test-product',
+            slug='test-product4',
             inventory_quantity=10,
             is_available=True,
             image="test/test/test",
@@ -204,7 +204,7 @@ class CommentModelTest(CommonTestSetup):
             brand='Test Brand',
             price=100,
             description='Test Description',
-            slug='test-product',
+            slug='test-product5',
             inventory_quantity=10,
             is_available=True,
             image="test/test/test",
