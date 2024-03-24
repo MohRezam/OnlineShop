@@ -74,7 +74,14 @@
        .then(data => {
          localStorage.setItem("access_token", data.access);
          localStorage.setItem("refresh_token", data.refresh);
-         window.location.href = document.referrer; 
+         if (document.referrer == 'http://127.0.0.1:8000/accounts/verify/') {
+            alert('You logged in successfully');
+            window.location.href = '/';
+         }
+         else {
+            alert('You logged in successfully');
+            window.location.href = document.referrer; 
+         }
        })
        .catch(error => {
          console.error('Error:', error);
