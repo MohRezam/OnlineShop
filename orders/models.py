@@ -47,14 +47,12 @@ class Order(BaseModel):
         ("not paid", "Not Paid"),
         ("paid", "Paid"),
     )
-    # total_price = models.DecimalField(max_digits=10, decimal_places=2)
     is_paid = models.CharField(max_length=25, choices=PAYMENT_CHOICES, default=False) # when we create order from cart we have to set is_paid to True
     province = models.CharField(max_length=255, blank=True, null=True, help_text="like Alborz") # if user dont fill this it is going to fill by user address model informations
     city = models.CharField(max_length=255, blank=True, null=True, help_text="like karaj")
     detailed_address = models.TextField(blank=True, null=True)
     postal_code = models.PositiveIntegerField(blank=True, null=True, help_text="like 3149757953")
     discount = models.IntegerField(blank=True, null=True, default=None)
-    # max_discount = models.IntegerField(blank=True, null=True, default=None)
 
     # Foreign Keys
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="orders")
