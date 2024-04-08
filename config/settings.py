@@ -26,9 +26,13 @@ environ.Env.read_env()
 SECRET_KEY = env("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = env('DEBUG')
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ["*"]
+
+CSRF_TRUSTED_ORIGINS = [
+    "http://localhost",
+]
 
 if DEBUG:
     INTERNAL_IPS = ["127.0.0.1"]
@@ -50,14 +54,16 @@ INSTALLED_APPS = [
     'products.apps.ProductsConfig',
     
     # Third-party apps
+    'corsheaders',
     'rest_framework',
     'djoser',
-     "debug_toolbar",
-     "drf_spectacular",
+    'debug_toolbar',
+    'drf_spectacular',
 
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -67,6 +73,21 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     "debug_toolbar.middleware.DebugToolbarMiddleware"
 ]
+
+
+CORS_ALLOW_HEADERS = [
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',  
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+    'json'
+]
+
 
 ROOT_URLCONF = 'config.urls'
 
@@ -106,20 +127,23 @@ DATABASES = {
 
 # redis
 
-REDIS_HOST = env("REDISHOST") 
-REDIS_PORT = env("REDISPORT")    
-REDIS_DB = env("REDISDB") 
-REDIS_PASS = env("REDISPASS")
+import os
 
-SECRET_KEY = env("SECRET_KEY")
+REDIS_HOST = os.environ.get("REDISHOST")
+REDIS_PORT = int(os.environ.get("REDISPORT", 6379))  
+REDIS_DB = int(os.environ.get("REDISDB", 0))  
+REDIS_PASS = os.environ.get("REDISPASS")
 
+SECRET_KEY = os.environ.get("SECRET_KEY")
+
+# Define cache settings
 CACHES = {
     "default": {
         "BACKEND": "django.core.cache.backends.redis.RedisCache",
-        "LOCATION": 'redis://:' + REDIS_PASS + '@127.0.0.1:6379',
+        "LOCATION": f"redis://{REDIS_HOST}:{REDIS_PORT}/{REDIS_DB}",  
         "KEY_PREFIX": "shop",
-        "TIMEOUT": 60 * 15,  # in seconds: 60 * 15 (15 minutes)
-   
+        "TIMEOUT": 60 * 15, 
+ 
     }
 }
 
@@ -162,11 +186,13 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
-STATIC_URL = 'static/'
+STATICFILES_FINDERS = (
+'django.contrib.staticfiles.finders.FileSystemFinder',
+'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+)
 
-STATICFILES_DIRS = [
-    BASE_DIR / "static",
-]
+STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'static'
 
 # media files
 MEDIA_URL = "/media/"
