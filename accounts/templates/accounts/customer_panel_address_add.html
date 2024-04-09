@@ -1,13 +1,12 @@
-{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
-    <link rel="stylesheet" href="{% static '/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="/static//css/bootstrap.min.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i&amp;display=swap">
-    <link rel="stylesheet" href="{% static 'fonts/fontawesome-all.min.css' %}">
-    <link rel="stylesheet" href="{% static 'css/profile.css' %}">
+    <link rel="stylesheet" href="/static/fonts/fontawesome-all.min.css">
+    <link rel="stylesheet" href="/static/css/profile.css">
 </head>
 
 <body id="page-top">
@@ -35,15 +34,15 @@
                     </div>
                 </nav>
                 <div class="container">
-                    <link rel="stylesheet" href="{% static 'css/profile.css' %}">
+                    <link rel="stylesheet" href="/static/css/profile.css">
                     <div class="main-body">
                     
                           <!-- Breadcrumb -->
                           <nav aria-label="breadcrumb" class="main-breadcrumb">
                             <ol class="breadcrumb">
-                              <li class="breadcrumb-item"><a href="{% url 'products:home' %}">Home</a></li>
+                              <li class="breadcrumb-item"><a href="/">Home</a></li>
                               <li class="breadcrumb-item"><a href="javascript:void(0)">User</a></li>
-                              <li class="breadcrumb-item active" aria-current="page" href="{% url 'accounts:user_panel' %}">User Profile</li>
+                              <li class="breadcrumb-item active" aria-current="page" href="/accounts/panel">User Profile</li>
                             </ol>
                           </nav>
                           <!-- /Breadcrumb -->
@@ -100,47 +99,10 @@
             </div>
         </div>
     <div>        
-    <script src="{% static 'js/bootstrap.min.js' %}"></script>
-    <script src="{% static 'js/theme.js' %}"></script>
+    <script src="/static/js/bootstrap.min.js"></script>
+    <script src="/static/js/theme.js"></script>
 
-    <script>
-      function includeAuthToken() {
-        const access_token = localStorage.getItem("access_token");
-        if (access_token) {
-          return {
-            'Authorization': 'JWT ' + access_token
-          };
-        }
-        return {};
-      }
-     
-      function submitAddressForm() {
-          const formData = {
-              province: document.getElementById('province').value,
-              city: document.getElementById('city').value,
-              detailed_address: document.getElementById('address-detail').value,
-              postal_code: document.getElementById('postal-code').value,
-          };
-  
-          fetch(window.location.pathname + "api/v1/", {
-              method: 'POST',
-              headers: {
-                  ...includeAuthToken(),
-                  "Content-Type": "application/json"
-              },
-              body: JSON.stringify(formData)
-          })
-          .then(data => {
-                alert('Address added successfully')
-                window.location.href = '/accounts/panel/';
-              
-          })
-          .catch(error => {
-              console.error('Error:', error); 
-              alert('Error submitting form!');
-          });
-      }
-  </script>  
+    <script src="/static/scripts/customer_panel_address_add.js"></script>  
 
 </body>
 </html>
