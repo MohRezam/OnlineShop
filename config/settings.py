@@ -195,7 +195,13 @@ STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'static'
 
 # media files
-MEDIA_URL = "/media/"
+import os
+
+DEFAULT_HOST = 'localhost'
+
+HOST = os.getenv('APP_HOST', DEFAULT_HOST)
+
+MEDIA_URL = f"http://{HOST}/media/"
 MEDIA_ROOT = BASE_DIR / "media"
 
 
