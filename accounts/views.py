@@ -19,11 +19,18 @@ from .serializers import AddressSerializer
 from rest_framework import status
 from orders.models import Order
 from orders.serializers import OrderSerializer
-from .tasks import send_otp_email
+# from .tasks import send_otp_email
 
 # redis
-redis_client = redis.Redis(host=settings.REDIS_HOST, port=settings.REDIS_PORT, db=settings.REDIS_DB, password=settings.REDIS_PASS)
+redis_client = redis.Redis(host=settings.REDIS_HOST, port=settings.REDIS_PORT, db=settings.REDIS_DB)
+from django.core.mail import send_mail
 
+def send_otp_email(email, otp):
+    subject = 'Your OTP Code'
+    message = f'Your OTP code is: {otp}'
+    from_email = 'mkalhor81126@gmail.com'
+    recipient_list = [email]
+    send_mail(subject, message, from_email, recipient_list)
 
 class UserRegisterView(View):
     def get(self, request):
@@ -74,7 +81,6 @@ class CustomerAddressView(View):
 class CustomerAddAddressView(View):
     def get(self, request):
         return render(request, "accounts/customer_panel_address_add.html")
-        return reverse('accounts:add_address')
 
 class CustomerPanelEditView(View):
     def get(self, request):
@@ -110,7 +116,7 @@ class UserRegisterAPIView(APIView):
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
             random_code = random.randint(1000, 9999)
-            send_otp_email.delay(serializer.validated_data["email"], random_code)
+            send_otp_email(serializer.validated_data["email"], random_code)
             # OtpCode.objects.create(phone_number=serializer.validated_data["phone_number"], code=random_code)
             redis_client.setex(serializer.validated_data["email"], 180, random_code)
             request.session["user_profile_info"] = {
