@@ -12,6 +12,8 @@ function registerFunc() {
     var email = document.getElementById("email").value;
     var password = document.getElementById("password").value;
 
+    event.preventDefault();
+
     fetch("/accounts/register/api/v1/", {
         method: 'POST',
         headers: {

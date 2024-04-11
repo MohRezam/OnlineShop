@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', function () {
             .then(data => {
                 localStorage.setItem("access_token", data.access);
                 localStorage.setItem("refresh_token", data.refresh);
-                if (document.referrer == 'http://127.0.0.1:80/accounts/verify/') {
+                if (document.referrer == 'http://localhost/accounts/verify/') {
                     alert('You logged in successfully');
                     window.location.href = '/';
                 } else {
