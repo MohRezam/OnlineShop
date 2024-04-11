@@ -37,8 +37,7 @@ services:
       - "6379:6379"
     restart: always
     volumes:
-      - /path/to/local/data:/root/redis
-      - /path/to/local/redis.conf:/usr/local/etc/redis/redis.conf
+      - redisdata:/data
 
   celery_worker:
     container_name: celery_worker
@@ -89,5 +88,5 @@ networks:
 
 volumes:
   postgres_data:
-
+  redisdata:
 
