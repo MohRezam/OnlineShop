@@ -1,8 +1,100 @@
-{% extends "base.html" %}
-{% block body_class %}main-layout inner_posituong{% endblock %}
-{% load static %}
-{% block title %}Sign in{% endblock title %}
-{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- basic -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <!-- mobile metas -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1">
+    <!-- site metas -->
+    <title>Sign in</title>
+    <meta name="keywords" content="">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <!-- bootstrap css -->
+    <link rel="stylesheet" href="/static/css/bootstrap.min.css">
+    <!-- style css -->
+    <link rel="stylesheet" href="/static/css/style.css">
+    <!-- Responsive-->
+    <link rel="stylesheet" href="/static/css/responsive.css">
+    <!-- fevicon -->
+    <link rel="icon" href="/static/images/fevicon.png" type="image/gif" />
+    <!-- Scrollbar Custom CSS -->
+    <link rel="stylesheet" href="/static/css/jquery.mCustomScrollbar.min.css">
+    <!-- Tweaks for older IEs-->
+    <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.5/jquery.fancybox.min.css" media="screen">
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script><![endif]-->
+</head>
+<!-- body -->
+<body class="main-layout inner_posituong">
+<!-- loader  -->
+<div class="loader_bg">
+    <div class="loader"><img src="/static/images/loading.gif" alt="#" /></div>
+</div>
+<!-- end loader -->
+<!-- header -->
+<header>
+    <!-- header inner -->
+    <div class="header">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-xl-3 col-lg-3 col-md-3 col-sm-3 col logo_section">
+                    <div class="full">
+                        <div class="center-desk">
+                            <div class="logo">
+                                <a href="/"><img src="/static/images/logo.png" alt="#" /></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-9 col-lg-9 col-md-9 col-sm-9">
+                    <nav class="navigation navbar navbar-expand-md navbar-dark ">
+                        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample04" aria-controls="navbarsExample04" aria-expanded="false" aria-label="Toggle navigation">
+                            <span class="navbar-toggler-icon"></span>
+                        </button>
+                        <div class="collapse navbar-collapse" id="navbarsExample04">
+                            <ul class="navbar-nav mr-auto">
+                                <li class="nav-item">
+                                    <a class="nav-link" href="/orders/cart">Cart {{cart | length}}</a>
+                                </li>
+                                <li class="nav-item active">
+                                    <a class="nav-link" href="/">Home</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="/about">About</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="/category/computer">Computer</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link"  href="/category/laptop">Laptop</a>
+                                </li>
+                                <li class="nav-item" id='profile'>
+                                    <a class="nav-link"  href="/accounts/panel">Profile</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="/contact">Contact Us</a>
+                                </li>
+                                <li class="nav-item" id="logout-btn" style="display: none;">
+                                    <a class="nav-link" href="#" onclick="logoutFunc()">Logout</a>
+                                </li>
+                                <li class="nav-item" id="login-btn">
+                                    <a class="nav-link" href="/accounts/login">Login</a>
+                                </li>
+                                <li class="nav-item d_none">
+                                </li>
+                            </ul>
+                        </div>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
       <!--  contact -->
       <div class="contact">
          <div class="container">
@@ -16,7 +108,6 @@
             <div class="row">
                <div class="col-md-10 offset-md-1">
                 <form id="request" class="main_form">
-                    {% csrf_token %}
                      <div class="row">
                         <div class="col-md-12">
                            <input class="contactus" placeholder="Email" type="email" name="email" id="email_input" required> 
@@ -28,7 +119,7 @@
                            <button class="send_btn" type="submit">Sign in</button>
                         </div>
                         <div class="col-md-12 text-center mt-3"> <!-- Centered text under the button with margin top -->
-                           <p style="color: white;">Don't have an account? <a href="{% url "accounts:user_register" %}" style="color: #48ca95;">Sign up</a></p> 
+                           <p style="color: white;">Don't have an account? <a href="/accounts/register" style="color: #48ca95;">Sign up</a></p> 
                      </div>
                   </form>
                 
@@ -37,82 +128,64 @@
          </div>
       </div>
       <!-- end contact -->
+      <footer>
+        <div class="footer">
+            <div class="container">
+                <div class="row">
+                    <div class="col-xl-3 col-lg-3 col-md-6 col-sm-6">
+                        <img class="logo1" src="/static/images/logo1.png" alt="#"/>
+                        <ul class="social_icon">
+                            <li><a href="#"><i class="fa fa-facebook" aria-hidden="true"></i></a></li>
+                            <li><a href="#"><i class="fa fa-twitter" aria-hidden="true"></i></a></li>
+                            <li><a href="#"><i class="fa fa-linkedin-square" aria-hidden="true"></i></a></li>
+                            <li><a href="#"><i class="fa fa-instagram" aria-hidden="true"></i></a></li>
+                        </ul>
+                    </div>
+                    <div class="col-xl-3 col-lg-3 col-md-6 col-sm-6">
+                        <h3>About Us</h3>
+                        <ul class="about_us">
+                            <li>dolor sit amet, consectetur<br> magna aliqua. Ut enim ad <br>minim veniam, <br> quisdotempor incididunt r</li>
+                        </ul>
+                    </div>
+                    <div class="col-xl-3 col-lg-3 col-md-6 col-sm-6">
+                        <h3>Contact Us</h3>
+                        <ul class="conta">
+                            <li>dolor sit amet,<br> consectetur <br>magna aliqua.<br> quisdotempor <br>incididunt ut e </li>
+                        </ul>
+                    </div>
+                    <div class="col-xl-3 col-lg-3 col-md-6 col-sm-6">
+                        <form class="bottom_form">
+                            <h3>Newsletter</h3>
+                            <input class="enter" placeholder="Enter your email" type="text" name="Enter your email">
+                            <button class="sub_btn">subscribe</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="copyright">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <p>© 2019 All Rights Reserved. Design by<a href="https://html.design/"> Free Html Templates</a></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+     </footer>
        <!-- Javascript files-->
-  <script src="{% static 'js/jquery.min.js' %}"></script>
-  <script src="{% static 'js/popper.min.js' %}"></script>
-  <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
-  <script src="{% static 'js/jquery-3.0.0.min.js' %}"></script>
+  <script src="/static/js/jquery.min.js"></script>
+  <script src="/static/js/popper.min.js"></script>
+  <script src="/static/js/bootstrap.bundle.min.js"></script>
+  <script src="/static/js/jquery-3.0.0.min.js"></script>
   <!-- sidebar -->
-  <script src="{% static 'js/jquery.mCustomScrollbar.concat.min.js' %}"></script>
-  <script src="{% static 'js/custom.js' %}"></script>
+  <script src="/static 'js/jquery.mCustomScrollbar.concat.min.js"></script>
+  <script src="/static/js/custom.js"></script>
 
-  <script>
-   document.addEventListener('DOMContentLoaded', function() {
-     const form = document.getElementById("request");
- 
-     form.addEventListener("submit", function(event) {
-       event.preventDefault();
-       getToken();
-       fetchData(); 
-     });
- 
-     function getToken() {
-       const email = document.getElementById("email_input").value;
-       const password = document.getElementById("password_input").value;
- 
-       fetch("http://127.0.0.1:8000/auth/jwt/create/", {
-         method: 'POST',
-         headers: {
-           "Content-Type": "application/json"
-         },
-         body: JSON.stringify({
-           email: email,
-           password: password
-         })
-       })
-       .then(response => response.json())
-       .then(data => {
-         localStorage.setItem("access_token", data.access);
-         localStorage.setItem("refresh_token", data.refresh);
-        
-         fetchData({ email: email, password: password });
-         window.location.href = "/"; 
-       })
-       .catch(error => {
-         console.error('Error:', error);
-       });
-     }
-   });
- 
-   function includeAuthToken() {
-     const access_token = localStorage.getItem("access_token");
-     if (access_token) {
-       return {
-         'Authorization': 'JWT ' + access_token
-       };
-     }
-     return {};
-   }
- 
-   function fetchData(data) {
-     fetch("/accounts/login/api/", {
-       method: 'POST',
-       headers: {
-         ...includeAuthToken(),
-         'Content-Type': 'application/json'
-       },
-       body: JSON.stringify(data)
-     })
-     .then(response => response.json())
-     .then(data => {
-     })
-     .catch(error => {
-       console.error('Error:', error);
-     });
-   }
- </script>
+  <script src="/static/scripts/login.js"></script>
+  <script src="/static/scripts/base.js"></script>
  
  
-   {% endblock content %}  
+ 
 
    

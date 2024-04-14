@@ -27,6 +27,7 @@ djoser==2.2.2
 drf-spectacular==0.27.1
 env==0.1.0
 filelock==3.13.1
+gunicorn==21.2.0
 idna==3.6
 inflection==0.5.1
 jsonschema==4.21.1
@@ -35,6 +36,7 @@ kavenegar==1.1.2
 kombu==5.3.5
 Markdown==3.5.2
 oauthlib==3.2.2
+packaging==24.0
 pillow==10.2.0
 pipenv==2023.12.1
 platformdirs==4.2.0

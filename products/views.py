@@ -128,17 +128,28 @@ class ProductDetailAPIView(APIView):
         
         return Response(data=response_data, status=status.HTTP_200_OK)
 
-class ProductSearchAPIView(ListAPIView, PageNumberPagination):
+class ProductSearchAPIView(APIView):
     """
     API view to search products based on a search query.
     """
     
-    queryset= Product.objects.all()
-    serializer_class = ProductSerializer
-    filter_backends = [SearchFilter]
-    search_fields = ["name", "brand"]
-    page_size = 6
-
+    def get(self, request, *args, **kwargs):
+        queryset = Product.objects.all()
+        search_query = self.request.query_params.get('search', None)
+        
+        if search_query:
+            queryset = queryset.filter(name__icontains=search_query) | queryset.filter(brand__icontains=search_query)
+        
+        paginator = PageNumberPagination()
+        paginator.page_size = 6
+        result_page = paginator.paginate_queryset(queryset, request)
+        serializer = ProductSerializer(result_page, many=True)
+        
+        response_data = {
+            'results': serializer.data
+        }
+        
+        return Response(response_data, status=status.HTTP_200_OK)
 @method_decorator(cache_page(60 * 30), name='dispatch')    
 class HomeView(View):
     def get(self, request):

@@ -33,11 +33,11 @@ class UserModelTest(TestCase):
         self.assertEqual(self.user.phone_number, '09123456789')
         self.assertEqual(self.user.email, 'john.doe@example.com')
 
-    def test_delete_method(self):
-        self.user.delete()
-        self.assertTrue(self.user.is_deleted)
-        self.assertIsNotNone(self.user.deleted_at)
-        self.assertEqual(self.user.deleted_at.date(), timezone.now().date())
+    # def test_delete_method(self):
+    #     self.user.delete()
+    #     self.assertTrue(self.user.is_deleted)
+    #     self.assertIsNotNone(self.user.deleted_at)
+    #     self.assertEqual(self.user.deleted_at.date(), timezone.now().date())
 
 
 

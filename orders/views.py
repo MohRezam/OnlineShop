@@ -23,36 +23,7 @@ class CartView(View):
     def get(self, request):
         return render(request, "orders/cart.html")
     
-# # with session
-# class CartAPI(APIView):
-#     def get(self, request, slug, format=None):
-#         cart = Cart(request)
 
-#         return Response(
-#             {"data": list(cart.__iter__()), 
-#             "cart_total_price": cart.get_total_price()},
-#             status=status.HTTP_200_OK
-#             )
-
-#     def post(self, request, slug,**kwargs):
-#         cart = Cart(request)
-
-#         if "remove" in request.data:
-#             product = request.data["product"]
-#             cart.remove(product)
-
-#         elif "clear" in request.data:
-#             cart.clear()
-
-#         else:
-#             product = request.data
-#             cart.add(
-#                     product=get_object_or_404(Product, slug=product["product"]),
-#                     quantity=product["quantity"],
-#                 )
-#         return Response(
-#             {"message": "cart updated"},
-#             status=status.HTTP_202_ACCEPTED)
 
 # with cookies
 class CartAPI(APIView):
@@ -249,7 +220,7 @@ class OrderDetailAPIView(APIView):
             order.postal_code = address.postal_code
             order.save()
         response_data = {
-        "redirect_url": reverse("orders:order_pay", kwargs={"order_id": order.id}) 
+        "redirect_url": reverse("products:home", kwargs={"order_id": order.id})  # this is not the correct url. Have to do it cause had problem with zarinpaal.
         }
         return Response(data=response_data, status=status.HTTP_200_OK)
     
@@ -327,7 +298,8 @@ ZP_API_STARTPAY = f"https://{sandbox}.zarinpal.com/pg/StartPay/"
 description = "توضیحات مربوط به تراکنش را در این قسمت وارد کنید"  # Required
 CallbackURL = 'http://127.0.0.1:8080/orders/verify/'
 
-class OrderPayView(LoginRequiredMixin, View):
+class OrderPayView(APIView):
+    permission_classes = [IsAuthenticated]
     def get(self, request, order_id):
         order = Order.objects.get(id=order_id)
         request.session['order_pay'] = {
@@ -360,7 +332,8 @@ class OrderPayView(LoginRequiredMixin, View):
             return JsonResponse({'status': False, 'code': 'connection error'})
 
 
-class OrderVerifyView(LoginRequiredMixin, View):
+class OrderVerifyView(APIView):
+    permission_classes = [IsAuthenticated]
     def get(self, request):
         order_id = request.session["order_pay"]["order_id"]
         order = Order.objects.get(id=int(order_id))

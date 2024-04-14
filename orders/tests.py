@@ -4,8 +4,6 @@ from .models import Order, Coupon, OrderItem, CartItem, Cart, Transaction
 from products.models import Product, Category
 from django.utils import timezone
 
-
-
 class OrderModelTest(TestCase):
 
     def setUp(self):
@@ -19,22 +17,20 @@ class OrderModelTest(TestCase):
             is_staff=False,
         )
 
-
-        self.coupon = Coupon.objects.create(code='TESTCODE', percentage=1, expiration_date=timezone.now() + timezone.timedelta(days=7), available_quantity=100, usage_limit_per_user=3)
+        self.coupon = Coupon.objects.create(code='TESTCODE', discount=1, valid_from=timezone.now(), valid_to=timezone.now() + timezone.timedelta(days=7), is_active=False)
 
         self.order = Order.objects.create(
-            total_price=100.00,
             is_paid=True,
             province='Test Province',
             city='Test City',
             detailed_address='Test Detailed Address',
             postal_code=12345,
             user=self.user,
-            coupon=self.coupon,
+            discount=self.coupon,
         )
 
     def test_order_str_representation(self):
-        expected_str = f"Total: {self.order.total_price}, Payment: {self.order.is_paid}"
+        expected_str = f"Total: {self.order.calculate_total_price()}, Payment: {self.order.is_paid}"
         self.assertEqual(str(self.order), expected_str)
 
     def test_verbose_name_plural(self):
@@ -46,29 +42,34 @@ class OrderModelTest(TestCase):
     def test_foreign_key_relationship_coupon(self):
         self.assertEqual(self.order.coupon, self.coupon)
 
-
+    def test_calculate_total_price(self):
+        # Create order items and test total price calculation
+        product = Product.objects.create(name='Test Product', price=100)
+        OrderItem.objects.create(order=self.order, product=product, quantity=2)
+        self.assertEqual(self.order.calculate_total_price(), 200)
 
 class OrderItemModelTest(TestCase):
 
     def setUp(self):
-        self.product = Product.objects.create(name='Test Product',
-                brand="Test Brand", 
-                price=100, 
-                description="Test Description", 
-                slug="Test slug",
-                inventory_quantity=100,
-                user=get_user_model().objects.create_user(phone_number='09123456789', email='john.doe@example.com', first_name='John', last_name='Doe', password="123"),
-                category=Category.objects.create(name="Test name"),
-                )
+        self.user = get_user_model().objects.create(
+            first_name='John',
+            last_name='Doe',
+            phone_number='09123456789',  
+            email='john.doe@example.com',
+            image="test/test/test",
+            role='product manager',
+            is_staff=False,
+        )
+
         self.order = Order.objects.create(
-            total_price=100.00,
             is_paid=True,
             province='Test Province',
             city='Test City',
             detailed_address='Test Detailed Address',
             postal_code=12345,
-            user=get_user_model().objects.create_user(phone_number='09123456788', email='john.doe@example+.com', first_name='John', last_name='Doe', password="123"),
+            user=self.user,
         )
+        self.product = Product.objects.create(name='Test Product', price=100)
 
         self.order_item = OrderItem.objects.create(
             quantity=2,
@@ -89,9 +90,6 @@ class OrderItemModelTest(TestCase):
     def test_foreign_key_relationship_product(self):
         self.assertEqual(self.order_item.product, self.product)
 
-
-
-
 class CartModelTest(TestCase):
     def setUp(self):
         self.user = get_user_model().objects.create(
@@ -104,7 +102,6 @@ class CartModelTest(TestCase):
             is_staff=False,
         )
 
-
         self.cart = Cart.objects.create(
             user=self.user,
             province='Test Province',
@@ -114,32 +111,16 @@ class CartModelTest(TestCase):
         )
 
     def test_cart_str_representation(self):
-        self.assertEqual(str(self.cart), f"total cart: {self.cart.calculate_total_price()}")
+        expected_str = f"total cart: {self.cart.calculate_total_price()}"
+        self.assertEqual(str(self.cart), expected_str)
 
     def test_calculate_total_price(self):
-        cart_item = CartItem.objects.create(
-            quantity=10,
-            cart=self.cart,
-            product = Product.objects.create(name='Test Product',
-                brand="Test Brand", 
-                price=100, 
-                description="Test Description", 
-                slug="Test slug",
-                inventory_quantity=100,
-                user=get_user_model().objects.create_user(phone_number='09123456788', email='john.doe@example3.com', first_name='John', last_name='Doe', password="123"),
-                category=Category.objects.create(name="Test name"),
-                )
-        )
-
-        expected_total_price = cart_item.total_price()
-
-        self.assertEqual(self.cart.calculate_total_price(), expected_total_price)
+        product = Product.objects.create(name='Test Product', price=100)
+        CartItem.objects.create(cart=self.cart, product=product, quantity=2)
+        self.assertEqual(self.cart.calculate_total_price(), 200)
 
     def test_verbose_name_plural(self):
-        expected_verbose_name_plural = 'carts'
-        self.assertEqual(Cart._meta.verbose_name_plural, expected_verbose_name_plural)
-        
-
+        self.assertEqual(Cart._meta.verbose_name_plural, 'carts')
 
 class CartItemModelTest(TestCase):
     def setUp(self):
@@ -153,20 +134,6 @@ class CartItemModelTest(TestCase):
             is_staff=False,
         )
 
-
-        self.category = Category.objects.create(name="Test Category")
-
-        self.product = Product.objects.create(
-            name='Test Product',
-            brand="Test Brand",
-            price=100,
-            description="Test Description",
-            slug="test-slug",
-            inventory_quantity=100,
-            user=self.user,
-            category=self.category,
-        )
-
         self.cart = Cart.objects.create(
             user=self.user,
             province='Test Province',
@@ -175,12 +142,12 @@ class CartItemModelTest(TestCase):
             postal_code=12345
         )
 
+        self.product = Product.objects.create(name='Test Product', price=100)
+
         self.cart_item = CartItem.objects.create(
             quantity=2,
             cart=self.cart,
             product=self.product,
-            created_at=timezone.now(),
-            updated_at=timezone.now(),
         )
 
     def test_cart_item_total_price(self):
@@ -190,8 +157,6 @@ class CartItemModelTest(TestCase):
     def test_cart_item_str_representation(self):
         expected_str = f"total price of {self.cart_item.quantity} {self.product.name}: {self.cart_item.total_price()}"
         self.assertEqual(str(self.cart_item), expected_str)
-        
-        
 
 class CouponModelTest(TestCase):
     def setUp(self):
@@ -205,19 +170,16 @@ class CouponModelTest(TestCase):
             is_staff=False,
         )
 
-
         self.coupon = Coupon.objects.create(
             code='TESTCODE',
             percentage=10,
             expiration_date=timezone.now() + timezone.timedelta(days=7),
-            available_quantity=100,
-            usage_limit_per_user=1,
             is_active=True,
         )
         self.coupon.user.add(self.user)
 
     def test_coupon_str_representation(self):
-        expected_str = f"TESTCODE with 10 percentage is active until {self.coupon.expiration_date} for 100 people"
+        expected_str = f"{self.coupon.code} with {self.coupon.discount} percentage is active until {self.coupon.expiration_date}."
         self.assertEqual(str(self.coupon), expected_str)
 
     def test_coupon_user_relation(self):
@@ -225,9 +187,6 @@ class CouponModelTest(TestCase):
 
     def test_coupon_verbose_name_plural(self):
         self.assertEqual(str(Coupon._meta.verbose_name_plural), 'coupons')
-        
-        
- 
 
 class TransactionModelTest(TestCase):
     def setUp(self):
@@ -241,15 +200,16 @@ class TransactionModelTest(TestCase):
             is_staff=False,
         )
 
-
+        self.coupon = Coupon.objects.create(code='TESTCODE', discount=1, valid_from=timezone.now(), valid_to=timezone.now() + timezone.timedelta(days=7), is_active=False)
+        
         self.order = Order.objects.create(
-            total_price=100.00,
             is_paid=True,
             province='Test Province',
             city='Test City',
             detailed_address='Test Detailed Address',
             postal_code=12345,
-            user=self.user
+            user=self.user,
+            discount=self.coupon,
         )
 
         self.transaction = Transaction.objects.create(

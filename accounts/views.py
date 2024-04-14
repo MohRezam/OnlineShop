@@ -7,7 +7,6 @@ from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 import random
 from django.contrib import messages
-from django.contrib.auth import authenticate, login, logout
 from django.urls import reverse
 from rest_framework.permissions import AllowAny
 from django.conf import settings
@@ -20,11 +19,18 @@ from .serializers import AddressSerializer
 from rest_framework import status
 from orders.models import Order
 from orders.serializers import OrderSerializer
-from .tasks import send_otp_email
+# from .tasks import send_otp_email
 
 # redis
-redis_client = redis.StrictRedis(host=settings.REDIS_HOST, port=settings.REDIS_PORT, db=settings.REDIS_DB)
+redis_client = redis.Redis(host=settings.REDIS_HOST, port=settings.REDIS_PORT, db=settings.REDIS_DB)
+from django.core.mail import send_mail
 
+def send_otp_email(email, otp):
+    subject = 'Your OTP Code'
+    message = f'Your OTP code is: {otp}'
+    from_email = 'mkalhor81126@gmail.com'
+    recipient_list = [email]
+    send_mail(subject, message, from_email, recipient_list)
 
 class UserRegisterView(View):
     def get(self, request):
@@ -39,9 +45,6 @@ class VerifyCodeView(View):
     
 class UserLoginView(View):
     def get(self, request):
-        if request.user.is_authenticated:
-            messages.info(request, "You are already logged in.")
-            return redirect("products:home")
         return render(request, "accounts/login.html", {})
     
     # def post(self, request):
@@ -60,13 +63,7 @@ class UserLoginView(View):
     #         return render(request, "accounts/login.html", {})
     
     
-class UserLogOutView(View):
-    def get(self, request):
-        if request.user.is_authenticated:
-            user = request.user
-            logout(request)
-            messages.success(request, "You logged out successfully", "success")
-        return redirect("products:home")
+
     
 
 
@@ -79,6 +76,11 @@ class CustomerPanelView(View):
 class CustomerAddressView(View):
     def get(self, request, address_id):
         return render(request, "accounts/customer_panel_address_edit.html")
+    
+
+class CustomerAddAddressView(View):
+    def get(self, request):
+        return render(request, "accounts/customer_panel_address_add.html")
 
 class CustomerPanelEditView(View):
     def get(self, request):
@@ -111,14 +113,12 @@ class UserRegisterAPIView(APIView):
     
     serializer_class = UserRegisterSerializer
     def post(self, request):
-        serializer = UserRegisterSerializer(data=request.POST)
+        serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
             random_code = random.randint(1000, 9999)
-            send_otp_email.delay(serializer.validated_data["email"], random_code)
+            send_otp_email(serializer.validated_data["email"], random_code)
             # OtpCode.objects.create(phone_number=serializer.validated_data["phone_number"], code=random_code)
             redis_client.setex(serializer.validated_data["email"], 180, random_code)
-            email = serializer.validated_data["email"]
-            hidden_email = email[:4] + '*'*(len(email)-17) + email[-13:]
             request.session["user_profile_info"] = {
                 "first_name":serializer.validated_data["first_name"],
                 "last_name":serializer.validated_data["last_name"],
@@ -126,15 +126,11 @@ class UserRegisterAPIView(APIView):
                 "email":serializer.validated_data["email"],
                 "password":serializer.validated_data["password"]
             }
-            messages.success(request, f"we sent {hidden_email} a code", 'success')
-            return redirect('accounts:verify_code')
-        error_messages = serializer.errors
-        for k, v in error_messages.items():
-            message = v[0]
-        messages.error(request, f"{message}", "danger")  
-        return redirect('accounts:user_register')
+            return Response(status=status.HTTP_200_OK)
+         
+        return Response(data=serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
-
+ 
 class VerifyCodeAPIView(APIView):
     """
     API view for verifying OTP code and completing user registration.
@@ -156,54 +152,54 @@ class VerifyCodeAPIView(APIView):
                 or redirects back to the verification page with error messages if verification fails.
     """
     serializer_class = OtpCodeSerializer
+
     def post(self, request):
         try:
             email = request.session["user_profile_info"]["email"]
-        except:
-            messages.error(request, "Please register again", "danger")
-            return redirect("accounts:user_register")
-            # return Response({"message":"User already registered"})
-        # otp_code_object = OtpCode.objects.get(phone_number=phone_number)
-        serializer = OtpCodeSerializer(data=request.POST)
-        
+        except KeyError:
+            return Response(
+                {"error": "Please register again"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
-            # if serializer.validated_data["code"] == str(otp_code_object.code):
-            if redis_client.get(email).decode('utf-8') == serializer.validated_data["code"]:
-                user_info = request.session["user_profile_info"]
+            code = serializer.validated_data.get("code")
+            if code == redis_client.get(email).decode('utf-8'):
+                user_info = request.session.get("user_profile_info")
                 try:
                     User.objects.create_user(
-                    first_name = user_info["first_name"],
-                    last_name = user_info["last_name"],
-                    phone_number = user_info["phone_number"],
-                    email = user_info["email"],
-                    password = user_info["password"],
-                )   
-                    # otp_code_object.delete()
+                        first_name=user_info["first_name"],
+                        last_name=user_info["last_name"],
+                        phone_number=user_info["phone_number"],
+                        email=user_info["email"],
+                        password=user_info["password"],
+                    )
                     request.session.clear()
-                    messages.success(request, "You registered successfuly")
-                    return redirect("accounts:user_login")
-                    # return Response({"message":"user registered successfuly"})
-                except:
-                    messages.error(request, "You are already registered", "danger")
-                    return redirect("accounts:user_login")
-                    # return Response({"message": "User already registered"})
-            messages.error(request, "Code is not correct", "danger")
-            return redirect("accounts:verify_code")
-        return redirect(request, "accounts:user_login")
-        # return Response(serializer.errors)
+                    return Response(
+                        {"message": "You are registered successfully",
+                         "redirect_url": reverse("accounts:user_login")},
+                        status=status.HTTP_200_OK
+                    )
+                except Exception as e:
+                    return Response(
+                        {"error": "Failed to register user", "detail": str(e)},
+                        status=status.HTTP_400_BAD_REQUEST
+                    )
+            else:
+                return Response(
+                    {"error": "Incorrect code"},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+        else:
+            return Response(
+                {"error": "Invalid input data"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
         
 
     
-class LoginView(APIView):
-    def post(self, request):
-        data = json.loads(request.body)
-        email = data.get("email")
-        password = data.get("password")
-        user = authenticate(username=email, password=password)
-        login(request, user)
-        messages.success(request, "You are logged in successfully", "success")
-        return redirect("products:home")
-        
+
 
 # class UserLoginAPIView(APIView):
 #     def post(self, request):
@@ -313,17 +309,36 @@ class EditAddressAPIView(APIView):
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
+
+
+
+# class AddAddressAPIView(APIView):
+#     permission_classes = [IsAuthenticated]
+#     def post(self, request):
+#         data = request.data
+#         Address.objects.create(province=data['province'],
+#                             city=data['city'],
+#                             detailed_address=data['detailed_address'],
+#                             postal_code=data['postal_code'],
+#                             user=request.user)
+#         return Response(status=status.HTTP_200_OK)
+    
+    
+
+class AddAddressAPIView(APIView):
+    permission_classes = [IsAuthenticated]
     def post(self, request):
         serializer = AddressSerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            data = serializer.validated_data
+            Address.objects.create(province=data['province'],
+                                city=data['city'],
+                                detailed_address=data['detailed_address'],
+                                postal_code=data['postal_code'],
+                                user=request.user)
+            return Response(status=status.HTTP_200_OK)
         else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-
-    
+            return Response(status=status.HTTP_400_BAD_REQUEST)
     
 class OrderHistoryApi(APIView):
     """
