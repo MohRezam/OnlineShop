@@ -6,31 +6,87 @@
 
 This online store serves as a platform for buying and selling various Digital Products. The store offers various features that allow users to easily find and order their desired products.
 
-## Installation and Setup
+Getting Started
 
-### Install Dependencies
+Follow these steps to set up the project locally:
+1. Clone the Repository
 
-Before using the store, it's necessary to install the project dependencies. You can do this by using the following command:
+bash
 
+git clone https://github.com/your-username/project-name.git
+cd project-name
 
-$ pip install -r requirements.txt
+2. Create a Virtual Environment
 
+Create a virtual environment to isolate project dependencies:
 
-### Database Setup
+bash
 
-Before running the site, make sure to migrate the models to set up the database. You can do this using the following commands:
+python3 -m venv venv
 
+Activate the virtual environment:
 
-$ python manage.py makemigrations
-$ python manage.py migrate
+bash
 
+# On macOS and Linux
+source venv/bin/activate
 
-### Run the Server
+# On Windows
+venv\Scripts\activate
 
-After completing the above steps, you can run the server:
+3. Install Dependencies
 
+Install project dependencies from requirements.txt:
 
-$ python manage.py runserver
+bash
+
+pip install -r requirements.txt
+
+4. Set Up Environment Variables
+
+Create a .env file in the project root directory and add the following environment variables:
+
+env
+
+SECRET_KEY='your-secret-key'
+DEBUG=1
+DJANGO_ALLOWED_HOSTS=localhost 127.0.0.1 [::1]
+
+REDISHOST=redis
+REDISPORT=6379
+REDISDB=0
+# REDISPASS=your-redis-password
+
+POSTGRES_NAME=postgres_django
+POSTGRES_USER=postgres_django
+POSTGRES_PASSWORD=your-postgres-password
+POSTGRES_HOST=postgres
+POSTGRES_PORT=5432
+
+APP_HOST=localhost
+
+Replace your-secret-key, your-redis-password, and your-postgres-password with your actual values.
+5. Docker Setup
+
+Run the following commands to build and run the Docker containers:
+
+bash
+
+docker-compose up --build
+
+6. Access the Application
+
+Once Docker containers are up and running, you can access the application at:
+
+arduino
+
+http://localhost:80/
+
+Notes
+
+    Make sure Docker is running before executing Docker commands.
+    Update .env file with your actual values for SECRET_KEY, REDISPASS, and POSTGRES_PASSWORD.
+    If you encounter any issues, refer to Docker logs or run docker-compose logs to troubleshoot.
 
 
 ## Features
