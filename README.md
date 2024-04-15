@@ -55,7 +55,7 @@ DJANGO_ALLOWED_HOSTS=localhost 127.0.0.1 [::1]
 REDISHOST=redis
 REDISPORT=6379
 REDISDB=0
-# REDISPASS=your-redis-password
+REDISPASS=your-redis-password
 
 POSTGRES_NAME=postgres_django
 POSTGRES_USER=postgres_django
