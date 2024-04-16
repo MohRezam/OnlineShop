@@ -14,7 +14,7 @@ Follow these steps to set up the project locally:
 bash
 
 git clone git@github.com:MohRezam/OnlineShop.git
-cd project-name
+cd OnlineShop
 
 2. Create a Virtual Environment
 
